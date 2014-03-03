@@ -39,6 +39,7 @@ struct level* game_get_curr_level(struct game* game) {
 	return game->curr_level;
 }
 
+/* Display the game's interface */
 void game_banner_display(struct game* game) {
 	assert(game);
 

@@ -45,6 +45,10 @@ struct map* map_new(int width, int height)
 int map_is_inside(struct map* map, int x, int y)
 {
 	assert(map);
+
+	if(x < 0 || y < 0 || x >= map->width || y >= map->height)
+		return 0;
+
 	return 1;
 }
 
