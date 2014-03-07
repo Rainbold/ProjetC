@@ -52,23 +52,23 @@ void game_banner_display(struct game* game) {
 	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 6 * SIZE_BLOC) / 4;
 	int x = white_bloc;
 	y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
-	window_display_image(sprite_get_banner_life(), x, y);
+	window_display_image(sprite_get_banner_life(), x, y); // sprite life
 
 	x = white_bloc + SIZE_BLOC;
-	window_display_image(sprite_get_number(2), x, y);
+	window_display_image(sprite_get_number(2), x, y); // life number, todo : life variable
 
 	x = 2 * white_bloc + 2 * SIZE_BLOC;
-	window_display_image(sprite_get_banner_bomb(), x, y);
+	window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
 
 	x = 2 * white_bloc + 3 * SIZE_BLOC;
 	window_display_image(
-			sprite_get_number(player_get_nb_bomb(game_get_player(game))), x, y);
+			sprite_get_number(player_get_nb_bomb(game_get_player(game))), x, y); // bomb number
 
 	x = 3 * white_bloc + 4 * SIZE_BLOC;
-	window_display_image(sprite_get_banner_range(), x, y);
+	window_display_image(sprite_get_banner_range(), x, y); // range sprite
 
 	x = 3 * white_bloc + 5 * SIZE_BLOC;
-	window_display_image(sprite_get_number(1), x, y);
+	window_display_image(sprite_get_number(1), x, y); // range number, todo : range variable
 }
 
 void game_display(struct game* game) {
@@ -83,7 +83,7 @@ void game_display(struct game* game) {
 	window_refresh();
 }
 
-short input_keyboard(struct game* game) {
+short input_keyboard(struct game* game) { // todo : P for pause, espace for bomb
 	SDL_Event event;
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
