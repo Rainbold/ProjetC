@@ -83,7 +83,7 @@ void game_display(struct game* game) {
 	window_refresh();
 }
 
-short input_keyboard(struct game* game) { // todo : P for pause, espace for bomb
+short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, espace for bomb
 	SDL_Event event;
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
@@ -97,22 +97,33 @@ short input_keyboard(struct game* game) { // todo : P for pause, espace for bomb
 			case SDLK_ESCAPE:
 				return 1;
 			case SDLK_UP:
-				player_set_current_way(player, NORTH);
-				player_move(player, map);
+				if(!isPaused) {
+					player_set_current_way(player, NORTH);
+					player_move(player, map);
+				}
 				break;
 			case SDLK_DOWN:
-				player_set_current_way(player, SOUTH);
-				player_move(player, map);
+				if(!isPaused) {
+					player_set_current_way(player, SOUTH);
+					player_move(player, map);
+				}
 				break;
 			case SDLK_RIGHT:
-				player_set_current_way(player, EAST);
-				player_move(player, map);
+				if(!isPaused) {
+					player_set_current_way(player, EAST);
+					player_move(player, map);
+				}
 				break;
 			case SDLK_LEFT:
-				player_set_current_way(player, WEST);
-				player_move(player, map);
+				if(!isPaused) {
+					player_set_current_way(player, WEST);
+					player_move(player, map);
+				}
 				break;
 			case SDLK_SPACE:
+				break;
+			case SDLK_p:
+				return 2;
 				break;
 			default:
 				break;
@@ -124,9 +135,11 @@ short input_keyboard(struct game* game) { // todo : P for pause, espace for bomb
 	return 0;
 }
 
-int game_update(struct game* game) {
-	if (input_keyboard(game) == 1)
+int game_update(struct game* game, int isPaused) {
+	int state = input_keyboard(game, isPaused);
+	if (state == 1)
 		return 1; // exit game
-
+	if (state == 2)
+		return 2; // paused
 	return 0;
 }

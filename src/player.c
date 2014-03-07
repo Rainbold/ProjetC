@@ -81,24 +81,24 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 
 	switch (map_get_cell_type(map, x, y)) {
 	case CELL_SCENERY:
+		return 0; // stop the function and the player do not move
+		break;
+
+	case CELL_CASE: // todo : move the case
 		return 0;
 		break;
 
-	case CELL_CASE:
-		return 0;
-		break;
-
-	case CELL_BONUS:
+	case CELL_BONUS: // todo : bonus
 
 		break;
 
-	case CELL_GOAL:
+	case CELL_GOAL: // todo : goal
 		break;
 
-	case CELL_MONSTER:
+	case CELL_MONSTER: // todo : monster
 		break;
 
-	case CELL_PLAYER:
+	case CELL_PLAYER: // todo : you win
 		break;
 
 	default:
