@@ -11,15 +11,17 @@ struct player {
 	int x, y;
 	enum way current_way;
 	int nb_bomb;
+	int nb_life;
 };
 
-struct player* player_init(int bomb_number) {
+struct player* player_init(int bomb_number, int life_number) {
 	struct player* player = malloc(sizeof(*player));
 	if (!player)
 		error("Memory error");
 
 	player->current_way = SOUTH;
 	player->nb_bomb = bomb_number;
+	player->nb_life = life_number;
 
 	return player;
 }
@@ -44,19 +46,36 @@ void player_set_current_way(struct player* player, enum way way) {
 	player->current_way = way;
 }
 
-int player_get_nb_bomb(struct player* player) {
+int player_get_nb_bomb(struct player* player) { // get nb_bomb
 	assert(player);
 	return player->nb_bomb;
 }
 
-void player_inc_nb_bomb(struct player* player) {
+void player_inc_nb_bomb(struct player* player) { // nb_bomb++
 	assert(player);
 	player->nb_bomb += 1;
 }
 
-void player_dec_nb_bomb(struct player* player) {
+void player_dec_nb_bomb(struct player* player) { // nb_bomb--
 	assert(player);
 	player->nb_bomb -= 1;
+}
+
+int player_get_nb_life(struct player* player) { // get nb_life
+	assert(player);
+	return player->nb_life;
+}
+
+void player_inc_nb_life(struct player* player) { // nb_life++
+	assert(player);
+	if(player_get_nb_life(player) < 9)
+		player->nb_life += 1;
+}
+
+void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
+	assert(player);
+	if(player_get_nb_life(player) > 0)
+		player->nb_life -= 1;
 }
 
 void player_from_map(struct player* player, struct map* map) {

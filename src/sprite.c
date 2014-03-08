@@ -163,7 +163,7 @@ void sprite_free() {
 }
 
 SDL_Surface* sprite_get_number(short number) {
-	assert(number >= 0 && number < 9);
+	assert(number >= 0 && number <= 9);
 	return numbers[number];
 }
 
