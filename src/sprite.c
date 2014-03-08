@@ -4,7 +4,7 @@
 #include <sprite.h>
 #include <misc.h>
 
-// Sprites general
+// Sprites general 
 #define MAP_CASE        "sprite/wood_box.png"
 #define MAP_KEY			"sprite/key.png"
 #define MAP_DOOR		"sprite/door.png"
@@ -31,6 +31,7 @@
 #define BANNER_9		"sprite/banner_9.jpg"
 
 // Sprites of Bombs
+#define BOMB_TTL0       "sprite/explosion_1.png"
 #define BOMB_TTL1       "sprite/bomb1.png"
 #define BOMB_TTL2       "sprite/bomb2.png"
 #define BOMB_TTL3       "sprite/bomb3.png"
@@ -70,6 +71,10 @@ SDL_Surface* bonus[NB_BONUS];
 
 // player
 SDL_Surface* player_img[4];
+
+// bombs
+#define NB_BOMBS 5
+SDL_Surface* bombs[NB_BOMBS];
 
 void banner_load() {
 	// numbers imgs
@@ -148,11 +153,28 @@ void player_unload() {
 		SDL_FreeSurface(player_img[i]);
 }
 
+void bombs_load()
+{
+	// bombs imgs
+	bombs[0] = load_image(BOMB_TTL4);
+	bombs[1] = load_image(BOMB_TTL3);
+	bombs[2] = load_image(BOMB_TTL2);
+	bombs[3] = load_image(BOMB_TTL1);
+	bombs[4] = load_image(BOMB_TTL0);
+}
+
+void bombs_unload()
+{
+	for (int i = 0; i < 4; i++)
+		SDL_FreeSurface(bombs[i]);
+}
+
 void sprite_load() {
 	map_load();
 	bonus_load();
 	banner_load();
 	player_load();
+	bombs_load();
 }
 
 void sprite_free() {
@@ -160,6 +182,12 @@ void sprite_free() {
 	bonus_unload();
 	banner_unload();
 	player_unload();
+	bombs_unload();
+}
+
+SDL_Surface* sprite_get_bomb(short bombAnim) {
+	assert(bombAnim >= 0 && bombAnim < NB_BOMBS);
+	return bombs[bombAnim];
 }
 
 SDL_Surface* sprite_get_number(short number) {

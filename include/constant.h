@@ -3,7 +3,7 @@
 
 #define WINDOW_NAME "[PG110] Bomberman 2014"
 
-// Size (# of pixels) of a cell of the map
+// Size (# of pixels) of a cell of the map 
 #define SIZE_BLOC       40
 
 // Size (# of pixels) of banner
@@ -23,5 +23,13 @@ typedef enum way {
 	WEST, // 2
 	EAST //3
 } way_t;
+
+typedef enum currentAnimation {
+	ANIM_1 = 0,
+	ANIM_2, // 1
+	ANIM_3, // 2
+	ANIM_4, //3
+	ANIM_5 //4
+} currentAnimation_t;
 
 #endif /* CONSTANT */

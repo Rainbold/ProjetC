@@ -1,7 +1,7 @@
 #include <SDL/SDL_image.h> // IMG_Load
 #include <assert.h>
 
-#include <constant.h>
+#include <constant.h> 
 #include <misc.h>
 
 SDL_Surface* window;

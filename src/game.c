@@ -5,10 +5,13 @@
 #include <misc.h>
 #include <window.h>
 #include <sprite.h>
+#include <bomb.h>
 
 struct game {
 	struct level* curr_level; // current level
 	struct player* player;
+	struct bomb* bombs[MAP_WIDTH*MAP_HEIGHT];
+	int bombCounter;
 };
 
 struct game* game_new(void) {
@@ -17,8 +20,13 @@ struct game* game_new(void) {
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level
 
-	game->player = player_init(1);
+	game->player = player_init(8);
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
+
+	game->bombCounter = 0; // Bombs' number initialized to 0
+	for( int i=0; i<MAP_WIDTH*MAP_HEIGHT; i++ ) {
+		game->bombs[i] = NULL;
+	}
 
 	return game;
 }
@@ -78,12 +86,16 @@ void game_display(struct game* game) {
 
 	game_banner_display(game);
 	level_display(game_get_curr_level(game));
+
+	for(int i=0; i<game->bombCounter; i++)
+		bomb_display(level_get_curr_map(game->curr_level), game->player, game->bombs[i]);
+
 	player_display(game->player);
 
 	window_refresh();
 }
 
-short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, espace for bomb
+short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, space for bomb
 	SDL_Event event;
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
@@ -94,7 +106,7 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, e
 			return 1;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
-			case SDLK_ESCAPE:
+			case SDLK_ESCAPE: 
 				return 1;
 			case SDLK_UP:
 				if(!isPaused) {
@@ -121,6 +133,11 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, e
 				}
 				break;
 			case SDLK_SPACE:
+				if(player_get_nb_bomb(game->player) > 0) { // If the player still has at least one bomb...
+					game->bombs[game->bombCounter] = bomb_plant(level_get_curr_map(game->curr_level), game->player); // ...the bomb is planted
+					if(game->bombCounter < MAP_WIDTH*MAP_HEIGHT - 1)
+						game->bombCounter++;
+				}
 				break;
 			case SDLK_p:
 				return 2;

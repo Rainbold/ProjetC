@@ -23,7 +23,7 @@ struct player* player_init(int bomb_number) {
 
 	return player;
 }
-
+ 
 void player_free(struct player* player) {
 	assert(player);
 	free(player);
@@ -206,4 +206,3 @@ void player_display(struct player* player) {
 	window_display_image(sprite_get_player(player->current_way),
 			player->x * SIZE_BLOC, player->y * SIZE_BLOC);
 }
-

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h> // NULL (macos)
 #include <level.h>
-#include <game.h>
+#include <game.h> 
 #include <map.h>
 
 struct level {

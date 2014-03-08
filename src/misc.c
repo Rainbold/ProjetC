@@ -2,7 +2,7 @@
 #include <misc.h>
 
 void error(const char *s, ...) {
-	va_list ap;
+	va_list ap; 
 	va_start(ap, s);
 
 	vfprintf(stderr, s, ap);

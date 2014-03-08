@@ -5,7 +5,7 @@
 #include <constant.h>
 
 struct player;
-
+ 
 // Creates a new player with a given number of available bombs
 struct player* player_init(int bomb_number);
 void player_free(struct player* player);

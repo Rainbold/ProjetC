@@ -4,10 +4,11 @@
 #include <SDL/SDL.h>
 #include <map.h>
 #include <constant.h>
-
+ 
 // load game's sprites
 void		 sprite_load();
 
+SDL_Surface* sprite_get_bomb(short bombAnim);
 SDL_Surface* sprite_get_player(way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
 SDL_Surface* sprite_get_tree();
