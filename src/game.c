@@ -20,11 +20,7 @@ struct game* game_new(void) {
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level
 
-<<<<<<< HEAD
-	game->player = player_init(8);
-=======
 	game->player = player_init(1, 2); // player init with nb_bomb and nb_life
->>>>>>> 5542c3d3e5dae21c81c6f1785b14fc18264d913a
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->bombCounter = 0; // Bombs' number initialized to 0
