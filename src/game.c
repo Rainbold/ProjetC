@@ -20,7 +20,11 @@ struct game* game_new(void) {
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level
 
+<<<<<<< HEAD
 	game->player = player_init(8);
+=======
+	game->player = player_init(1, 2); // player init with nb_bomb and nb_life
+>>>>>>> 5542c3d3e5dae21c81c6f1785b14fc18264d913a
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->bombCounter = 0; // Bombs' number initialized to 0
@@ -63,7 +67,8 @@ void game_banner_display(struct game* game) {
 	window_display_image(sprite_get_banner_life(), x, y); // sprite life
 
 	x = white_bloc + SIZE_BLOC;
-	window_display_image(sprite_get_number(2), x, y); // life number, todo : life variable
+	window_display_image(
+			sprite_get_number(player_get_nb_life(game_get_player(game))), x, y); // life number
 
 	x = 2 * white_bloc + 2 * SIZE_BLOC;
 	window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
@@ -108,6 +113,12 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, s
 			switch (event.key.keysym.sym) {
 			case SDLK_ESCAPE: 
 				return 1;
+			case SDLK_a:
+				player_inc_nb_life(player);
+				break;
+			case SDLK_z:
+				player_dec_nb_life(player);
+				break;
 			case SDLK_UP:
 				if(!isPaused) {
 					player_set_current_way(player, NORTH);
