@@ -82,7 +82,7 @@ void player_inc_nb_life(struct player* player) { // nb_life++
 
 void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
 	assert(player);
-	if(player_get_nb_life(player) > 0 && (SDL_GetTicks() - player->timer >= 4000.f || player->timer == -1) ) {
+	if(player_get_nb_life(player) > 0 && (player->invicibility != 1 || player->timer == -1) ) {
 		player->nb_life -= 1;
 		player->timer = SDL_GetTicks();
 		player->invicibility = 1;
@@ -102,7 +102,7 @@ void player_inc_nb_range(struct player* player) { // nb_range++
 
 void player_dec_nb_range(struct player* player) { // nb_range--
 	assert(player);
-	if(player_get_nb_range(player) > 0)
+	if(player_get_nb_range(player) > 1)
 		player->nb_range -= 1;
 }
 
@@ -185,10 +185,6 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 		}
 		break;
 
-	case CELL_BONUS: // todo : bonus
-
-		break;
-
 	case CELL_GOAL: // todo : goal
 		break;
 
@@ -201,6 +197,19 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 	default:
 		break;
 	}
+
+	char type = map_get_cell_compose_type(map, x, y);	
+
+	if(type == (CELL_BONUS|(BONUS_LIFE << 4)))
+		player_inc_nb_life(player);
+	else if (type == (CELL_BONUS|(BONUS_BOMB_NB_INC << 4)))
+		player_inc_nb_bomb(player);
+	else if (type == (CELL_BONUS|(BONUS_BOMB_NB_DEC << 4)))
+		player_dec_nb_bomb(player);
+	else if (type == (CELL_BONUS|(BONUS_BOMB_RANGE_INC << 4)))
+		player_inc_nb_range(player);
+	else if (type == (CELL_BONUS|(BONUS_BOMB_RANGE_DEC << 4)))
+		player_dec_nb_range(player);
 
 	// Player has moved
 	return 1;

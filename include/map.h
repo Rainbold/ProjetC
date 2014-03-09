@@ -54,8 +54,14 @@ int map_get_height(struct map* map);
 // Return the type of a cell
 cell_type_t map_get_cell_type(struct map* map, int x, int y);
 
+// Return the type of a cell without masking the least significant bit
+char map_get_cell_compose_type(struct map* map, int x, int y);
+
 // Set the type of a cell
 void  map_set_cell_type(struct map* map, int x, int y, cell_type_t type);
+
+// Destroy a case and set the type of cell to a bonus cell
+void map_case_destroyed(struct map* map, int x, int y);
 
 // Test if (x,y) is within the map
 int map_is_inside(struct map* map, int x, int y);

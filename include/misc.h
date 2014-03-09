@@ -9,4 +9,7 @@ void error(const char *s, ...);
 // Load an image, raise an error in case of failure
 SDL_Surface* load_image(const char *filename);
 
+// Return a random number between a and b (a must be lesser than b)
+int rand_ab(int a, int b);
+
 #endif /* MISC_H_ */

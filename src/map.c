@@ -78,10 +78,39 @@ enum cell_type map_get_cell_type(struct map* map, int x, int y)
 	return map->grid[CELL(x,y)] & 15;
 }
 
+char map_get_cell_compose_type(struct map* map, int x, int y)
+{
+	assert(map && map_is_inside(map, x, y));
+	return map->grid[CELL(x,y)];
+}
+
 void map_set_cell_type(struct map* map, int x, int y, enum cell_type type)
 {
 	assert(map && map_is_inside(map, x, y));
 	map->grid[CELL(x,y)] = type;
+}
+
+void map_case_destroyed(struct map* map, int x, int y)
+{
+	assert(map && map_is_inside(map, x, y));
+	
+	int r = rand_ab(0, 99);
+
+	if(0 <= r && r < 30)
+		map_set_cell_type(map, x, y, CELL_EMPTY);
+	else if( 30 <= r && r < 35 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_LIFE << 4)));
+	else if( 35 <= r && r < 40 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_MONSTER << 4)));
+	else if( 40 <= r && r < 55 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_BOMB_RANGE_INC << 4)));
+	else if( 55 <= r && r < 70 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_BOMB_RANGE_DEC << 4)));
+	else if( 70 <= r && r < 85 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_BOMB_NB_INC << 4)));
+	else if( 85 <= r && r < 100 )
+		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_BOMB_NB_DEC << 4)));
+
 }
 
 void display_bonus(struct map* map, int x, int y, char type)

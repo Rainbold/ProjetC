@@ -1,5 +1,7 @@
 #include <SDL/SDL_image.h> // IMG_Load
 #include <misc.h>
+#include <time.h>
+#include <assert.h>
 
 void error(const char *s, ...) {
 	va_list ap; 
@@ -18,3 +20,9 @@ SDL_Surface* load_image(const char* filename) {
 	return img;
 }
 
+int rand_ab(int a, int b)
+{
+	assert(a<b);
+	srand(time(NULL));
+	return rand()%(b-a)+a;
+}

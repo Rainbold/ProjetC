@@ -124,14 +124,14 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 
 					if(!bomb->stopAnimDir[NORTH]) {
 						for(int j=0; j<bombCounter; j++) {
-							if(bomb_get_x(bombs[j]) == bomb->x && bomb_get_y(bombs[j]) == bomb->y-i && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) {
+							if(bomb_get_x(bombs[j]) == bomb->x && bomb_get_y(bombs[j]) == bomb->y-i && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) { 
 								bomb_set_timer(bombs[j], SDL_GetTicks() - 4000.f);
 							}
 						}
 						if(bomb->x == player_get_x(player) && bomb->y-i == player_get_y(player))
 							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
-							map_set_cell_type(map, bomb->x,bomb->y-i, CELL_EMPTY); // CELL_CASE is replaced by CELL_EMPTY
+							map_case_destroyed(map, bomb->x,bomb->y-i); // CELL_CASE is replaced by CELL_BONUS (which is associated to a random bonus)
 							bomb->stopAnimDir[NORTH] = 1; // Variable used to control that the explosion can't go any further
 						} else {
 							bomb->directions[NORTH]++; // If the cell is not a case, then the explosion can keep going
@@ -158,7 +158,7 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 						if(bomb->x == player_get_x(player) && bomb->y+i == player_get_y(player))
 							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
-							map_set_cell_type(map, bomb->x,bomb->y+i, CELL_EMPTY);
+							map_case_destroyed(map, bomb->x,bomb->y+i);
 							bomb->stopAnimDir[SOUTH] = 1;
 						} else {
 							bomb->directions[SOUTH]++;
@@ -184,7 +184,7 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 						if(bomb->x+i == player_get_x(player) && bomb->y == player_get_y(player))
 							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
-							map_set_cell_type(map, bomb->x+i,bomb->y, CELL_EMPTY);
+							map_case_destroyed(map, bomb->x+i,bomb->y);
 							bomb->stopAnimDir[EAST] = 1;
 						} else {
 							bomb->directions[EAST]++;
@@ -210,7 +210,7 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 						if(bomb->x-i == player_get_x(player) && bomb->y == player_get_y(player))
 							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
-							map_set_cell_type(map, bomb->x-i,bomb->y, CELL_EMPTY);
+							map_case_destroyed(map, bomb->x-i,bomb->y);
 							bomb->stopAnimDir[WEST] = 1;
 						} else {
 							bomb->directions[WEST]++;
