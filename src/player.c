@@ -12,6 +12,7 @@ struct player {
 	enum way current_way;
 	int nb_bomb;
 	int nb_life;
+	float timer;
 };
 
 struct player* player_init(int bomb_number, int life_number) {
@@ -22,6 +23,7 @@ struct player* player_init(int bomb_number, int life_number) {
 	player->current_way = SOUTH;
 	player->nb_bomb = bomb_number;
 	player->nb_life = life_number;
+	player->timer = SDL_GetTicks();
 
 	return player;
 }
@@ -74,8 +76,10 @@ void player_inc_nb_life(struct player* player) { // nb_life++
 
 void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
 	assert(player);
-	if(player_get_nb_life(player) > 0)
+	if(player_get_nb_life(player) > 0 && SDL_GetTicks() - player->timer >= 4000.f) {
 		player->nb_life -= 1;
+		player->timer = SDL_GetTicks();
+	}
 }
 
 void player_from_map(struct player* player, struct map* map) {

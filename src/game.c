@@ -20,7 +20,7 @@ struct game* game_new(void) {
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level
 
-	game->player = player_init(1, 2); // player init with nb_bomb and nb_life
+	game->player = player_init(8, 2); // player init with nb_bomb and nb_life
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->bombCounter = 0; // Bombs' number initialized to 0
@@ -89,7 +89,7 @@ void game_display(struct game* game) {
 	level_display(game_get_curr_level(game));
 
 	for(int i=0; i<game->bombCounter; i++)
-		bomb_display(level_get_curr_map(game->curr_level), game->player, game->bombs[i]);
+		bomb_display(level_get_curr_map(game->curr_level), game->player, game->bombs[i], game->bombs, game->bombCounter);
 
 	player_display(game->player);
 
