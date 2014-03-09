@@ -29,10 +29,8 @@ struct bomb* bomb_plant(struct map* map, struct player* player)
 
 	bomb->timer = SDL_GetTicks(); // The time is stored when the bomb is created
 
-	bomb->curAnimBomb = ANIM_1;
-
-	bomb->range = 1;
-	
+	bomb->curAnimBomb = ANIM_4;
+	bomb->length = player_get_nb_range(player);
 	bomb->directions[NORTH] = 1;
 	bomb->directions[SOUTH] = 1;
 	bomb->directions[WEST] = 1;
@@ -102,6 +100,7 @@ void bomb_set_timer(struct bomb* bomb, float timer)
 
 void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[], int bombCounter)
 {
+
 	if(SDL_GetTicks() - bomb->timer < 5000.f) {
 		bomb->curAnimBomb = ANIM_5;
 		window_display_image(sprite_get_bomb(bomb->curAnimBomb),

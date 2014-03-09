@@ -20,7 +20,7 @@ struct game* game_new(void) {
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level
 
-	game->player = player_init(8, 2); // player init with nb_bomb and nb_life
+	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->bombCounter = 0; // Bombs' number initialized to 0
@@ -77,7 +77,8 @@ void game_banner_display(struct game* game) {
 	window_display_image(sprite_get_banner_range(), x, y); // range sprite
 
 	x = 3 * white_bloc + 5 * SIZE_BLOC;
-	window_display_image(sprite_get_number(1), x, y); // range number, todo : range variable
+	window_display_image(
+			sprite_get_number(player_get_nb_range(game_get_player(game))), x, y); // range number, todo : range variable
 }
 
 void game_display(struct game* game) {
@@ -115,6 +116,18 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, s
 			case SDLK_z:
 				player_dec_nb_life(player);
 				break;
+			case SDLK_q:
+				player_inc_nb_bomb(player);
+				break;
+			case SDLK_s:
+				player_dec_nb_bomb(player);
+				break;
+			case SDLK_w:
+				player_inc_nb_range(player);
+				break;
+			case SDLK_x:
+				player_dec_nb_range(player);
+				break;
 			case SDLK_UP:
 				if(!isPaused) {
 					player_set_current_way(player, NORTH);
@@ -140,8 +153,8 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, s
 				}
 				break;
 			case SDLK_SPACE:
-				if(player_get_nb_bomb(game->player) > 0) { // If the player still has at least one bomb...
-					game->bombs[game->bombCounter] = bomb_plant(level_get_curr_map(game->curr_level), game->player); // ...the bomb is planted
+				if(player_get_nb_bomb(player) > 0) { // If the player still has at least one bomb...
+					game->bombs[game->bombCounter] = bomb_plant(level_get_curr_map(game->curr_level), player); // ...the bomb is planted
 					if(game->bombCounter < MAP_WIDTH*MAP_HEIGHT - 1)
 						game->bombCounter++;
 				}
