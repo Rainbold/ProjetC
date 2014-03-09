@@ -30,7 +30,7 @@ struct bomb* bomb_plant(struct map* map, struct player* player)
 	bomb->timer = SDL_GetTicks(); // The time is stored when the bomb is created
 
 	bomb->curAnimBomb = ANIM_4;
-	bomb->length = player_get_nb_range(player);
+	bomb->range = player_get_nb_range(player);
 	bomb->directions[NORTH] = 1;
 	bomb->directions[SOUTH] = 1;
 	bomb->directions[WEST] = 1;
@@ -124,11 +124,12 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 
 					if(!bomb->stopAnimDir[NORTH]) {
 						for(int j=0; j<bombCounter; j++) {
-							printf("%f\n", bomb_get_timer(bombs[j]));
 							if(bomb_get_x(bombs[j]) == bomb->x && bomb_get_y(bombs[j]) == bomb->y-i && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) {
 								bomb_set_timer(bombs[j], SDL_GetTicks() - 4000.f);
 							}
 						}
+						if(bomb->x == player_get_x(player) && bomb->y-i == player_get_y(player))
+							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
 							map_set_cell_type(map, bomb->x,bomb->y-i, CELL_EMPTY); // CELL_CASE is replaced by CELL_EMPTY
 							bomb->stopAnimDir[NORTH] = 1; // Variable used to control that the explosion can't go any further
@@ -150,11 +151,12 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 
 					if(!bomb->stopAnimDir[SOUTH]) {
 						for(int j=0; j<bombCounter; j++) {
-							printf("%f\n", bomb_get_timer(bombs[j]));
 							if(bomb_get_x(bombs[j]) == bomb->x && bomb_get_y(bombs[j]) == bomb->y+i && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) {
 								bomb_set_timer(bombs[j], SDL_GetTicks() - 4000.f);
 							}
 						}
+						if(bomb->x == player_get_x(player) && bomb->y+i == player_get_y(player))
+							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
 							map_set_cell_type(map, bomb->x,bomb->y+i, CELL_EMPTY);
 							bomb->stopAnimDir[SOUTH] = 1;
@@ -175,11 +177,12 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 					window_display_image(sprite_get_bomb(bomb->curAnimBomb), (bomb->x+i) * SIZE_BLOC, bomb->y * SIZE_BLOC);
 					if(!bomb->stopAnimDir[EAST]) {
 						for(int j=0; j<bombCounter; j++) {
-							printf("%f\n", bomb_get_timer(bombs[j]));
 							if(bomb_get_x(bombs[j]) == bomb->x+i && bomb_get_y(bombs[j]) == bomb->y && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) {
 								bomb_set_timer(bombs[j], SDL_GetTicks() - 4000.f);
 							}
 						}
+						if(bomb->x+i == player_get_x(player) && bomb->y == player_get_y(player))
+							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
 							map_set_cell_type(map, bomb->x+i,bomb->y, CELL_EMPTY);
 							bomb->stopAnimDir[EAST] = 1;
@@ -200,11 +203,12 @@ void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, s
 					window_display_image(sprite_get_bomb(bomb->curAnimBomb), (bomb->x-i) * SIZE_BLOC, bomb->y * SIZE_BLOC);
 					if(!bomb->stopAnimDir[WEST]) {
 						for(int j=0; j<bombCounter; j++) {
-							printf("%f\n", bomb_get_timer(bombs[j]));
 							if(bomb_get_x(bombs[j]) == bomb->x-i && bomb_get_y(bombs[j]) == bomb->y && SDL_GetTicks() - bomb_get_timer(bombs[j]) < 4000.f) {
 								bomb_set_timer(bombs[j], SDL_GetTicks() - 4000.f);
 							}
 						}
+						if(bomb->x-i == player_get_x(player) && bomb->y == player_get_y(player))
+							player_dec_nb_life(player);
 						if(cellType == CELL_CASE) {
 							map_set_cell_type(map, bomb->x-i,bomb->y, CELL_EMPTY);
 							bomb->stopAnimDir[WEST] = 1;

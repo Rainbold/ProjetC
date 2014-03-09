@@ -13,6 +13,7 @@ struct player {
 	int nb_bomb;
 	int nb_life;
 	int nb_range;
+	int invicibility;
 	float timer;
 };
 
@@ -25,7 +26,8 @@ struct player* player_init(int bomb_number, int life_number, int range_number) {
 	player->nb_bomb = bomb_number;
 	player->nb_life = life_number;
 	player->nb_range = range_number;
-	player->timer = SDL_GetTicks();
+	player->timer = -1;
+	player->invicibility = 0;
 
 	return player;
 }
@@ -80,9 +82,10 @@ void player_inc_nb_life(struct player* player) { // nb_life++
 
 void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
 	assert(player);
-	if(player_get_nb_life(player) > 0 && SDL_GetTicks() - player->timer >= 4000.f) {
+	if(player_get_nb_life(player) > 0 && (SDL_GetTicks() - player->timer >= 4000.f || player->timer == -1) ) {
 		player->nb_life -= 1;
 		player->timer = SDL_GetTicks();
+		player->invicibility = 1;
 	}
 }
 
@@ -247,6 +250,27 @@ int player_move(struct player* player, struct map* map) {
 
 void player_display(struct player* player) {
 	assert(player);
+
+	if( player->invicibility == 1 ) {
+		if( SDL_GetTicks() - player->timer < 500.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
+		else if( SDL_GetTicks() - player->timer < 1000.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
+		else if( SDL_GetTicks() - player->timer < 1500.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
+		else if( SDL_GetTicks() - player->timer < 2000.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
+		else if( SDL_GetTicks() - player->timer < 2500.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
+		else if( SDL_GetTicks() - player->timer < 3000.f )
+			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
+	}
+
+	if( SDL_GetTicks() - player->timer > 3000.f ) {
+		player->invicibility = 0;
+		SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 255);
+	}
+
 	window_display_image(sprite_get_player(player->current_way),
 			player->x * SIZE_BLOC, player->y * SIZE_BLOC);
 }

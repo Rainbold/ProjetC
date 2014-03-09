@@ -36,7 +36,7 @@ void window_display_image(SDL_Surface* sprite, int x, int y) {
 	SDL_Rect place;
 	place.x = x;
 	place.y = y;
-
+	
 	SDL_BlitSurface(sprite, NULL, window, &place);
 }
 
