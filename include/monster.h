@@ -27,7 +27,7 @@ int monster_move(struct list* mList, struct map* map, struct player* player);
 
 void monster_display(struct map* map, struct player* player);
 
-void monster_kill(struct monster* monster);
+struct list* monster_kill(struct list* mList, int x, int y);
 
 
 

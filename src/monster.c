@@ -3,7 +3,6 @@
 #include <assert.h>
 
 struct monster {
-	int id;
 	m_type type;
 	way_t currentWay;
 	int size;
@@ -58,6 +57,12 @@ int monster_get_aggr(struct monster* monster)
 	return monster->aggr;
 }
 
+struct list* monster_kill(struct list* mList, int x, int y)
+{
+	assert(mList);
+	return list_remove(mList, x, y);
+}
+
 static int monster_move_aux(struct map* map, int x, int y) {
 
 	if (!map_is_inside(map, x, y))
@@ -84,7 +89,6 @@ static int monster_move_aux(struct map* map, int x, int y) {
 		break;
 
 	case CELL_PLAYER:
-		return 0;
 		break;
 
 	default:
@@ -103,13 +107,21 @@ int monster_move(struct list* mList, struct map* map, struct player* player) {
 
 	int distMP = -1;
 
+	// We set the cell type to monster again in case something erased it
+	map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
+
+
+	// A monster moves every second
 	if(SDL_GetTicks() - monster_get_movetimer(mList->data) < 1000.f)
 		return 0;
 
+	// We get the next direction for the monster and its distance between it and the player
 	dir = monster_pathfinding(map, player, mList, &distMP);
-	if(distMP > monster_get_aggr(mList->data))
+
+	// If the distance is grater than the agressivity of the monster or if the player is unreachable, 
+	// then the monster moves randomly
+	if(distMP > monster_get_aggr(mList->data) || dir == -1)
 		dir = rand_ab(0, 3);
-	printf("%d \n", dir);
 
 	switch (dir) {
 	case NORTH:
@@ -156,6 +168,8 @@ void monster_display(struct map* map, struct player* player)
 
 	while(mList != NULL) {
 		monster_move(mList, map, player);
+		if(mList->x == player_get_x(player) && mList->y == player_get_y(player))
+			player_dec_nb_life(player);
 		window_display_image(sprite_get_monster( monster_get_currentway(mList->data) ), mList->x * SIZE_BLOC, mList->y * SIZE_BLOC);
 		mList = mList->next;
 	}
@@ -177,7 +191,7 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 	int x = xSrc;
 	int y = ySrc;
 
-	int min = 999;
+	int min = 99999999;
 	int xMin = 0;
 	int yMin = 0;
 
@@ -255,9 +269,9 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 			}
 		}
 
-		min = 999;
-		xMin = 0;
-		yMin = 0;
+		min = 999999;
+		xMin = -1;
+		yMin = -1;
 		verif = 0;
 
 		for(int i=0; i<height; i++)
@@ -272,34 +286,19 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 				}
 			}
 		}
-		verif = 1;
-		weightArr[yMin][xMin][1] = 2;
 
-		if(verif) {
-			x = xMin;
-			y = yMin;
-		} else {
-			x = -1;
-			y = -1;
-		}
-
+		x = xMin;
+		y = yMin;
 
 		if(x == -1 && y == -1)
 			return -1;
+
+		weightArr[yMin][xMin][1] = 2;
 	}
 
 	int loop2 = 1;
 	x = xDest;
 	y = yDest;
-
-	for(int i=0; i<height; i++)
-	{
-		for(int j=0; j<width; j++)
-		{
-			printf("%d:%d ", prevArr[i][j][0], prevArr[i][j][1]);
-		}
-		printf("\n");
-	}
 
 	int yInt = 0;
 	int i = 0;
@@ -327,5 +326,5 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 	else if(ySrc < y)
 		return SOUTH;
 	else
-		return 0;
+		return -2;
 }

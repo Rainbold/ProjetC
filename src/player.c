@@ -192,6 +192,7 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 			break;
 
 		case CELL_MONSTER: // todo : monster
+			player_dec_nb_life(player);
 			break;
 
 		case CELL_PLAYER: // todo : you win
@@ -254,7 +255,7 @@ int player_move(struct player* player, struct map* map) {
 	}
 
 	if (move) {
-		if(map_get_cell_type(map, x, y) != CELL_BOMB)
+		if(map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_MONSTER)
 			map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, player->x, player->y, CELL_PLAYER);
 	}

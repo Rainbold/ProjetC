@@ -90,10 +90,12 @@ void map_display(struct map* map);
 // Insert a monster on the map
 void map_insert_monster(struct map* map, int x, int y, s_type type, void* data);
 
-// Return the monsters' list
-struct list* map_get_monsters(struct map* map);
-
 // Load the monsters' list
 struct list* map_load_monsters(struct map* map);
+
+// Return the monsters' list
+struct list* map_get_monsters(struct map* map);
+// Change the monsters' list
+void map_set_monsters(struct map* map, struct list* mList);
 
 #endif /* MAP_H_ */

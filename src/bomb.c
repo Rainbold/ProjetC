@@ -9,6 +9,7 @@
 #include <misc.h>
 #include <constant.h>
 #include <bomb.h>
+#include <monster.h>
 
 struct bomb {
 	int x, y;
@@ -171,7 +172,7 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 		player_dec_nb_life(player);
 
 	int cellType = 0;
-	for(int dx = -1; dx <= 1; dx += 2 ) { // For every direction in x
+	for(int dx = -1; dx <= 1; dx += 1 ) { // For every direction in x
 		for(int r = 1; r <= bomb->range_dir[dx+2]; r++){
 			cellType = map_get_cell_type(map, (bomb->x + dx * r), bomb->y);
 			switch(cellType){
@@ -180,6 +181,8 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 					player_dec_nb_life(player);
 				break;
 			case CELL_MONSTER : // Monster
+				//map_set_monsters( map, monster_kill(map_get_monsters(map), (bomb->x + dx * r), bomb->y) );
+				//map_set_cell_type(map, (bomb->x + dx * r), bomb->y, CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
 				map_case_destroyed(map, (bomb->x + dx * r),bomb->y);
@@ -206,6 +209,8 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 					player_dec_nb_life(player);
 				break;
 			case CELL_MONSTER : // Monster
+				//map_set_monsters( map, monster_kill(map_get_monsters(map), bomb->x, (bomb->y + dy * r)) );
+				//map_set_cell_type(map, bomb->x, (bomb->y + dy * r), CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
 				map_case_destroyed(map, bomb->x, (bomb->y + dy * r));
