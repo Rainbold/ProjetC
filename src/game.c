@@ -10,8 +10,6 @@
 struct game {
 	struct level* curr_level; // current level
 	struct player* player;
-	struct bomb* bombs[MAP_WIDTH*MAP_HEIGHT];
-	int bombCounter;
 };
 
 struct game* game_new(void) {
@@ -22,11 +20,6 @@ struct game* game_new(void) {
 
 	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
-
-	game->bombCounter = 0; // Bombs' number initialized to 0
-	for( int i=0; i<MAP_WIDTH*MAP_HEIGHT; i++ ) {
-		game->bombs[i] = NULL;
-	}
 
 	return game;
 }
@@ -89,8 +82,10 @@ void game_display(struct game* game) {
 	game_banner_display(game);
 	level_display(game_get_curr_level(game));
 
-	for(int i=0; i<game->bombCounter; i++)
-		bomb_display(level_get_curr_map(game->curr_level), game->player, game->bombs[i], game->bombs, game->bombCounter);
+	bomb_display(
+			level_get_curr_map(game->curr_level), // map
+			game->player,
+			map_get_bombs(level_get_curr_map(game->curr_level))); // Bombs[]
 
 	player_display(game->player);
 
@@ -153,11 +148,8 @@ short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, s
 				}
 				break;
 			case SDLK_SPACE:
-				if(player_get_nb_bomb(player) > 0) { // If the player still has at least one bomb...
-					game->bombs[game->bombCounter] = bomb_plant(level_get_curr_map(game->curr_level), player); // ...the bomb is planted
-					if(game->bombCounter < MAP_WIDTH*MAP_HEIGHT - 1)
-						game->bombCounter++;
-				}
+			  bomb_plant(map, player); // the bomb is planted if it is possible
+					break;
 				break;
 			case SDLK_p:
 				return 2;

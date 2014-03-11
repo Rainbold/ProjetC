@@ -184,18 +184,21 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 			break;
 		}
 		break;
+		case CELL_BOMB:
+			return 0;
 
-	case CELL_GOAL: // todo : goal
-		break;
+			break;
+		case CELL_GOAL: // todo : goal
+			break;
 
-	case CELL_MONSTER: // todo : monster
-		break;
+		case CELL_MONSTER: // todo : monster
+			break;
 
-	case CELL_PLAYER: // todo : you win
-		break;
+		case CELL_PLAYER: // todo : you win
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	char type = map_get_cell_compose_type(map, x, y);	
@@ -251,7 +254,8 @@ int player_move(struct player* player, struct map* map) {
 	}
 
 	if (move) {
-		map_set_cell_type(map, x, y, CELL_EMPTY);
+		if(map_get_cell_type(map, x, y) != CELL_BOMB)
+			map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, player->x, player->y, CELL_PLAYER);
 	}
 	return move;

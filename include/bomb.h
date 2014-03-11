@@ -6,9 +6,13 @@
 
 struct bomb; 
 
-struct bomb* bomb_plant(struct map* map, struct player* player); // bomb planting function
-void bomb_explosion(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[], int bombCounter); // environment destruction
-void bomb_display(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[], int bombCounter);
+void bomb_plant(struct map* map, struct player* player); // bomb planting function
+void bomb_display(struct map* map, struct player* player, struct bomb* bombs[]);
+void bomb_update(struct map* map, struct player* player, struct bomb* bombs[]);
+void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[]);
+void bomb_explo_init(struct map* map, struct player* player, struct bomb* bomb);
+void bomb_free(struct bomb* bomb);
+
 
 int bomb_get_x(struct bomb* bomb);
 int bomb_get_y(struct bomb* bomb);
