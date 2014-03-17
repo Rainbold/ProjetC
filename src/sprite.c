@@ -3,6 +3,7 @@
 
 #include <sprite.h>
 #include <misc.h>
+#include <constant.h>
 
 // Sprites general 
 #define MAP_CASE        "sprite/wood_box.png"
@@ -37,6 +38,12 @@
 #define BOMB_TTL3       "sprite/bomb3.png"
 #define BOMB_TTL4       "sprite/bomb4.png"
 
+// Sprites of menu
+#define GREY 			"sprite/m_grey.png"
+#define MAIN			"sprite/m_main.png"
+#define NEW				"sprite/m_newgame.png"
+#define QUIT			"sprite/m_quit.png"
+
 // Sprites of Bonus
 #define IMG_BONUS_BOMB_RANGE_INC  "sprite/bonus_bomb_range_inc.png"
 #define IMG_BONUS_BOMB_RANGE_DEC  "sprite/bonus_bomb_range_dec.png"
@@ -70,6 +77,9 @@ SDL_Surface* door;
 SDL_Surface* closed_door;
 SDL_Surface* stone;
 SDL_Surface* tree;
+
+// Menu
+SDL_Surface* menu[NB_SELECT_MENU];
 
 // bonus
 #define NB_BONUS 4
@@ -186,10 +196,21 @@ void bombs_load()
 
 void bombs_unload()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NB_BOMBS; i++)
 		SDL_FreeSurface(bombs[i]);
 }
 
+void menu_load() {
+	menu[M_BG_GREY] = load_image(GREY);
+	menu[M_BG_MAINMENU] = load_image(MAIN);
+	menu[M_NEWGAME] = load_image(NEW);
+	menu[M_QUIT]= load_image(QUIT);
+}
+
+void menu_unload() {
+	for (int i = 0; i < NB_SELECT_MENU; i++)
+	SDL_FreeSurface(menu[i]);
+}
 void sprite_load() {
 	map_load();
 	bonus_load();
@@ -197,6 +218,7 @@ void sprite_load() {
 	player_load();
 	monster_load();
 	bombs_load();
+	menu_load();
 }
 
 void sprite_free() {
@@ -206,6 +228,7 @@ void sprite_free() {
 	player_unload();
 	monster_unload();
 	bombs_unload();
+	menu_unload();
 }
 
 SDL_Surface* sprite_get_bomb(short bombAnim) {
@@ -251,6 +274,11 @@ SDL_Surface* sprite_get_banner_range() {
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 	assert(bonus[bonus_type]);
 	return bonus[bonus_type];
+}
+
+SDL_Surface* sprite_get_menu(enum select_menu select_menu) {
+	assert(select_menu);
+	return menu[select_menu];
 }
 
 SDL_Surface* sprite_get_tree() {

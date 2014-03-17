@@ -22,6 +22,6 @@ struct level* game_get_curr_level(struct game* game);
 void game_display(struct game* game);
 
 // update
-int game_update(struct game* game, int isPaused);
+enum state game_update(struct game* game, int key);
 
 #endif /* GAME_H_ */

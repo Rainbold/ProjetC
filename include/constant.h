@@ -32,4 +32,30 @@ typedef enum currentAnimation {
 	ANIM_5 //4
 } currentAnimation_t;
 
+typedef enum state {
+	MENU = 0,
+	GAME,
+	NEWGAME,
+	ENDGAME,
+	QUIT
+} state_t;
+
+typedef enum game_state {
+	PLAYING = 0,
+	PAUSED, // 1
+} game_state_t;
+
+#define NB_SELECT_MENU 5
+typedef enum select_menu {
+	M_NEWGAME = 0,
+	M_MAINMENU,
+	M_QUIT,
+	M_BG_GREY,
+	M_BG_MAINMENU
+} menu_t;
+
+typedef enum type {
+	MAIN = 0
+} type_t;
+
 #endif /* CONSTANT */

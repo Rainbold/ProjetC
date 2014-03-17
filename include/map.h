@@ -1,6 +1,8 @@
 #ifndef MAP_H_
 #define MAP_H_
 
+#define MAX_BOMB 9
+
 typedef enum cell_type {
 	CELL_EMPTY=0,
 	CELL_GOAL,  // 1
@@ -46,6 +48,14 @@ typedef enum type_struct {
 } s_type;
 
 struct map;
+
+struct bomb* map_get_bomb(struct map* map, int i);
+struct bomb** map_get_bombs(struct map* map);
+void map_set_bomb(struct map* map,struct bomb* bomb, int i);
+void map_inc_bomb_counter(struct map* map);
+void map_dec_bomb_counter(struct map* map);
+int map_get_bomb_counter(struct map* map);
+
 
 // Create a new empty map
 struct map* map_new(int width, int height);

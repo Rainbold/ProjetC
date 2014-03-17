@@ -16,7 +16,39 @@ struct map {
 	int height;
 	char* grid;
 	struct list* monstersList;
+	struct bomb* bombs[MAX_BOMB]; // Max 9 bombs
+	int bomb_counter;
 };
+
+struct bomb* map_get_bomb(struct map* map, int i){
+	assert(0 <= i && i <= MAX_BOMB);
+	return map->bombs[i];
+}
+
+struct bomb** map_get_bombs(struct map* map){
+	assert(map);
+	return map->bombs;
+}
+
+void map_set_bomb(struct map* map,struct bomb* bomb, int i){
+	assert(0 <= i && i <= MAX_BOMB);
+	map->bombs[i] = bomb;
+}
+
+int map_get_bomb_counter(struct map* map) {
+	assert(map);
+	return map->bomb_counter;
+}
+
+void map_inc_bomb_counter(struct map* map) {
+	assert(map);
+	map->bomb_counter++;
+}
+
+void map_dec_bomb_counter(struct map* map) {
+	assert(map);
+	map->bomb_counter--;
+}
 
 #define CELL(i,j) (i +  map->width * j)
 
@@ -230,6 +262,11 @@ struct map* map_get_default(void)
 	for (int i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
 		map->grid[i] = themap[i];
 
+	map->bomb_counter = 0;
+
+	for(int i =0; i <= MAX_BOMB; i++){
+		map->bombs[i] = NULL;
+	}
 	return map;
 }
 
