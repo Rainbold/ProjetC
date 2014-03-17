@@ -1,10 +1,11 @@
 #include <assert.h>
-#include <constant.h>
-#include <menu.h>
+#include <SDL/SDL.h>
+#include <game.h>
 #include <misc.h>
 #include <window.h>
-#include <SDL/SDL.h>
 #include <sprite.h>
+#include <constant.h>
+#include <menu.h>
 
 struct menu {
 	int nb_field;
@@ -16,8 +17,7 @@ struct menu {
 	SDL_Surface* point;
 };
 
-struct menu* new_menu(enum type type) {
-	//assert(type);
+struct menu* new_menu(enum type type){
 	struct menu* menu = malloc( sizeof(*menu) );
 	switch(type) {
 	case MAIN:
@@ -30,7 +30,7 @@ struct menu* new_menu(enum type type) {
 		menu->select_x[1] = 170;
 		menu->select_y[1] = 200;
 		menu->background = M_BG_MAINMENU;
-		//menu->point = sprite_get_player(SOUTH);
+		menu->point = sprite_get_player(SOUTH);
 		break;
 	}
 	return menu;
@@ -71,12 +71,11 @@ void menu_display(struct menu* menu) {
 	assert(menu);
 
 	window_clear();
-
-	//window_display_image(sprite_get_menu(menu->background), 0, 0);
+	window_display_image(sprite_get_menu(M_BG_MAINMENU), 0, 0);
 	for (int i = 0; i < menu->nb_field; i++) {
-		//window_display_image(sprite_get_menu(menu->select[i]), menu->select_x[i], menu->select_y[i]);
+		window_display_image(sprite_get_menu(menu->select[i]), menu->select_x[i], menu->select_y[i]);
 	}
-	//window_display_image(menu->point, menu->select_x[menu->pos] - 40, menu->select_y[menu->pos]);
+	window_display_image(menu->point, menu->select_x[menu->pos] - 40, menu->select_y[menu->pos]);
 
 	window_refresh();
 

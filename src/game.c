@@ -14,7 +14,6 @@ struct game {
 };
 
 struct game* game_new(void) {
-	sprite_load(); // load sprites into process memory
 
 	struct game* game = malloc(sizeof(*game));
 	game->curr_level = level_get_level(0); // get maps of the first level

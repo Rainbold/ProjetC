@@ -180,10 +180,11 @@ void bombs_unload()
 }
 
 void menu_load() {
+	menu[M_NEWGAME] = load_image(NEW);
+	menu[M_MAINMENU] = load_image(NEW);
+	menu[M_QUIT]= load_image(QUIT);
 	menu[M_BG_GREY] = load_image(GREY);
 	menu[M_BG_MAINMENU] = load_image(MAIN);
-	menu[M_NEWGAME] = load_image(NEW);
-	menu[M_QUIT]= load_image(QUIT);
 }
 
 void menu_unload() {
@@ -248,8 +249,8 @@ SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 	return bonus[bonus_type];
 }
 
-SDL_Surface* sprite_get_menu(enum select_menu select_menu) {
-	assert(select_menu);
+SDL_Surface* sprite_get_menu(select_menu_t select_menu) {
+	assert(menu[select_menu]);
 	return menu[select_menu];
 }
 

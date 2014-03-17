@@ -11,7 +11,7 @@ enum state input_keyboard(void* thing, enum state state) { // state : 0 = MENU, 
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT: // keyboard : esc
-			return ENDGAME;
+			return QUIT;
 		case SDL_KEYDOWN:
 			switch (state) {
 			case GAME:

@@ -52,7 +52,7 @@ typedef enum select_menu {
 	M_QUIT,
 	M_BG_GREY,
 	M_BG_MAINMENU
-} menu_t;
+} select_menu_t;
 
 typedef enum type {
 	MAIN = 0
