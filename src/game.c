@@ -12,6 +12,7 @@ struct game {
 	struct level* curr_level; // current level
 	struct player* player;
 	enum game_state game_state;
+	int pos;
 };
 
 struct game* game_new(void) {
@@ -23,6 +24,7 @@ struct game* game_new(void) {
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->game_state = PLAYING;
+	game->pos = 0;
 
 	return game;
 }
@@ -96,6 +98,11 @@ void game_display(struct game* game) {
 
 	if(game->game_state == PAUSED) {
 		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
+		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
+		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
+		window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
+		window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
+		window_display_image(sprite_get_player(SOUTH), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
 	}
 	window_refresh();
 }
@@ -106,14 +113,25 @@ enum state game_update(struct game* game, int key) {
 
 	switch (key) {
 	case SDLK_ESCAPE:
-	case SDLK_p:
-		// pause et menu
+	case SDLK_p: // Pause
 		game->game_state = !(game->game_state);
+		game->pos = 0;
 		return GAME;
 		break;
 	case SDLK_RETURN:
-		//if(game->game_state == PAUSED)
-			//return MAINMENU;
+		if(game->game_state == PAUSED) {
+			switch(game->pos) {
+			case 0:
+				game->game_state = !(game->game_state);
+				game->pos = 0;
+				return GAME;
+				break;
+			case 1:
+				return ENDGAME;
+			case 2:
+				return QUIT;
+			}
+		}
 		break;
 	case SDLK_a:
 		player_inc_nb_life(player);
@@ -138,11 +156,17 @@ enum state game_update(struct game* game, int key) {
 			player_set_current_way(player, NORTH);
 			player_move(player, map);
 		}
+		else if (game->game_state == PAUSED && game->pos > 0) {
+			game->pos--;
+		}
 		break;
 	case SDLK_DOWN:
 		if(game->game_state == PLAYING){
 		player_set_current_way(player, SOUTH);
 		player_move(player, map);
+		}
+		else if (game->game_state == PAUSED && game->pos < 2) {
+			game->pos++;
 		}
 		break;
 	case SDLK_RIGHT:

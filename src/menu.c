@@ -23,8 +23,8 @@ struct menu* new_menu(enum type type){
 	case MAIN:
 		menu->nb_field = 2;
 		menu->pos = 0;
-		menu->select[0] = M_NEWGAME;
-		menu->select[1] = M_QUIT;
+		menu->select[0] = M_B_NEWGAME;
+		menu->select[1] = M_B_QUIT;
 		menu->select_x[0] = 170;
 		menu->select_y[0] = 140;
 		menu->select_x[1] = 170;
@@ -40,31 +40,34 @@ enum state menu_update(struct menu* menu, int key) {
 
 	switch (key) {
 	case SDLK_RETURN:
-			switch(menu->select[menu->pos]) {
-			case M_NEWGAME:
-				return NEWGAME;
-				break;
-			case M_QUIT:
-				return QUIT;
+		switch(menu->select[menu->pos]) {
+		case M_B_NEWGAME:
+			return NEWGAME;
 			break;
-			default:
-				break;
-			}
-			break;
-		case SDLK_UP:
-			if(menu->pos > 0){
-				menu->pos--;
-			}
-			break;
-		case SDLK_DOWN:
-			if(menu->pos < menu->nb_field){
-				menu->pos++;
-			}
+		case M_B_QUIT:
+			return QUIT;
 			break;
 		default:
 			break;
 		}
-		return MENU;
+		break;
+	case SDLK_UP:
+		if(menu->pos > 0){
+			menu->pos--;
+		}
+		break;
+	case SDLK_DOWN:
+		if(menu->pos < menu->nb_field - 1){
+			menu->pos++;
+		}
+		break;
+	case SDLK_ESCAPE:
+		return QUIT;
+		break;
+	default:
+		break;
+	}
+	return MENU;
 }
 
 void menu_display(struct menu* menu) {

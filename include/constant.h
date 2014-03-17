@@ -45,13 +45,15 @@ typedef enum game_state {
 	PAUSED, // 1
 } game_state_t;
 
-#define NB_SELECT_MENU 5
+#define NB_SELECT_MENU 7
 typedef enum select_menu {
-	M_NEWGAME = 0,
-	M_MAINMENU,
-	M_QUIT,
+	M_B_NEWGAME = 0,
+	M_B_MAINMENU,
+	M_B_QUIT,
+	M_B_KEEP,
 	M_BG_GREY,
-	M_BG_MAINMENU
+	M_BG_MAINMENU,
+	M_H_PAUSE
 } select_menu_t;
 
 typedef enum type {

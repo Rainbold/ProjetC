@@ -59,7 +59,6 @@ int monster_get_aggr(struct monster* monster)
 }
 
 static int monster_move_aux(struct map* map, int x, int y) {
-	int cellType = 0;
 
 	if (!map_is_inside(map, x, y))
 		return 0;

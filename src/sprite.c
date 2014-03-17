@@ -39,10 +39,13 @@
 #define BOMB_TTL4       "sprite/bomb4.png"
 
 // Sprites of menu
-#define GREY 			"sprite/m_grey.png"
-#define MAIN			"sprite/m_main.png"
-#define NEW				"sprite/m_newgame.png"
-#define QUIT			"sprite/m_quit.png"
+#define MENU_BG_GREY 	"sprite/m_bg_grey.png"
+#define MENU_BG_MAIN	"sprite/m_bg_main.png"
+#define MENU_B_NEWGAME	"sprite/m_b_newgame.png"
+#define MENU_B_QUIT		"sprite/m_b_quit.png"
+#define MENU_B_KEEP		"sprite/m_b_continuer.png"
+#define MENU_B_MAIN		"sprite/m_b_main.png"
+#define MENU_H_PAUSE	"sprite/m_h_pause.png"
 
 // Sprites of Bonus
 #define IMG_BONUS_BOMB_RANGE_INC  "sprite/bonus_bomb_range_inc.png"
@@ -201,11 +204,13 @@ void bombs_unload()
 }
 
 void menu_load() {
-	menu[M_NEWGAME] = load_image(NEW);
-	menu[M_MAINMENU] = load_image(NEW);
-	menu[M_QUIT]= load_image(QUIT);
-	menu[M_BG_GREY] = load_image(GREY);
-	menu[M_BG_MAINMENU] = load_image(MAIN);
+	menu[M_B_NEWGAME] = load_image(MENU_B_NEWGAME);
+	menu[M_B_MAINMENU] = load_image(MENU_B_MAIN);
+	menu[M_B_QUIT] = load_image(MENU_B_QUIT);
+	menu[M_B_KEEP] = load_image(MENU_B_KEEP);
+	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
+	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN);
+	menu[M_H_PAUSE] = load_image(MENU_H_PAUSE);
 }
 
 void menu_unload() {
