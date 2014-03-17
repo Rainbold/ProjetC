@@ -23,6 +23,13 @@ SDL_Surface* load_image(const char* filename) {
 int rand_ab(int a, int b)
 {
 	assert(a<b);
-	srand(time(NULL));
-	return rand()%(b-a)+a;
+	
+	int divisor = RAND_MAX/(b-a+1);
+	int res;
+
+	do {
+		res = rand() / divisor;
+	} while(res > b);
+
+	return res+a;
 }

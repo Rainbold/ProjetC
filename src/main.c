@@ -4,6 +4,7 @@
 #include <game.h>
 #include <window.h>
 
+
 int main(int argc, char *argv[]) {
 	struct game* game = game_new();
 

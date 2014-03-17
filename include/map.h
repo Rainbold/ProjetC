@@ -40,6 +40,11 @@ enum compose_type {
     CELL_CASE_MONSTER = CELL_CASE | (BONUS_MONSTER << 4) // 0100 0101
 };
 
+typedef enum type_struct {
+	LIST_MONSTER,
+	LIST_BOMB
+} s_type;
+
 struct map;
 
 // Create a new empty map
@@ -71,5 +76,14 @@ struct map* map_get_default();
 
 // Display the map on the screen
 void map_display(struct map* map);
+
+// Insert a monster on the map
+void map_insert_monster(struct map* map, int x, int y, s_type type, void* data);
+
+// Return the monsters' list
+struct list* map_get_monsters(struct map* map);
+
+// Load the monsters' list
+struct list* map_load_monsters(struct map* map);
 
 #endif /* MAP_H_ */
