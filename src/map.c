@@ -8,11 +8,14 @@
 #include <misc.h>
 #include <sprite.h>
 #include <window.h>
+#include <list.h>
+#include <monster.h>
 
 struct map {
 	int width;
 	int height;
 	char* grid;
+	struct list* monstersList;
 	struct bomb* bombs[MAX_BOMB]; // Max 9 bombs
 	int bomb_counter;
 };
@@ -60,6 +63,8 @@ struct map* map_new(int width, int height)
 	map->width = width;
 	map->height = height;
 
+	map->monstersList = list_new();
+
 	map->grid = malloc(height * width);
 	if (map->grid == NULL) {
 		error("map_new : malloc grid failed");
@@ -72,6 +77,17 @@ struct map* map_new(int width, int height)
 			map->grid[CELL(i,j)] = CELL_EMPTY;
 
 	return map;
+}
+
+struct list* map_load_monsters(struct map* map)
+{
+	int i, j;
+	for (i = 0; i < map->width; i++)
+		for (j = 0; j < map->height; j++)
+			if(map->grid[CELL(i,j)] == CELL_MONSTER)
+				monster_init(map, i, j, MONSTER_NORMAL, 1, 1, 5);
+
+	return map->monstersList;
 }
 
 int map_is_inside(struct map* map, int x, int y)
@@ -120,6 +136,12 @@ void map_set_cell_type(struct map* map, int x, int y, enum cell_type type)
 {
 	assert(map && map_is_inside(map, x, y));
 	map->grid[CELL(x,y)] = type;
+}
+
+struct list* map_get_monsters(struct map* map)
+{
+	assert(map);
+	return map->monstersList;
 }
 
 void map_case_destroyed(struct map* map, int x, int y)
@@ -223,7 +245,7 @@ struct map* map_get_default(void)
 	struct map* map = map_new(MAP_WIDTH, MAP_HEIGHT);
 
 	char themap[MAP_WIDTH * MAP_HEIGHT] = {
-			CELL_PLAYER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY,
+			CELL_PLAYER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_MONSTER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY,
 			CELL_STONE, CELL_STONE, CELL_STONE, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_STONE, CELL_STONE, CELL_STONE, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
 			CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_CASE, CELL_STONE, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
 			CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_CASE, CELL_STONE, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
@@ -246,4 +268,9 @@ struct map* map_get_default(void)
 		map->bombs[i] = NULL;
 	}
 	return map;
+}
+
+void map_insert_monster(struct map* map, int x, int y, s_type type, void* data)
+{
+	map->monstersList = list_insert_back(map->monstersList, x, y, type, data);
 }

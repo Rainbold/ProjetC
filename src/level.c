@@ -19,6 +19,7 @@ struct level* level_get_level(int num) {
 		level->cur_map = 0;
 		level->maps = malloc(sizeof(*level->maps));
 		level->maps[0] = map_get_default();
+		map_load_monsters(level->maps[0]);
 		return level;
 		break;
 	}

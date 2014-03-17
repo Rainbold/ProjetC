@@ -6,6 +6,7 @@
 #include <window.h>
 #include <sprite.h>
 #include <bomb.h>
+#include <monster.h>
 
 struct game {
 	struct level* curr_level; // current level
@@ -88,6 +89,8 @@ void game_display(struct game* game) {
 			level_get_curr_map(game->curr_level), // map
 			game->player,
 			map_get_bombs(level_get_curr_map(game->curr_level))); // Bombs[]
+
+	monster_display(level_get_curr_map(game->curr_level), game->player);
 
 	player_display(game->player);
 

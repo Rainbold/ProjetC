@@ -7,6 +7,7 @@
 #include <menu.h>
 #include <sprite.h>
 
+
 int main(int argc, char *argv[]) {
 
 	window_create(SIZE_BLOC * MAP_WIDTH,
