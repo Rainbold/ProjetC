@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <time.h>
-
+#include <SDL/SDL.h>
 #include <game.h>
 #include <misc.h>
 #include <window.h>
@@ -10,6 +10,7 @@
 struct game {
 	struct level* curr_level; // current level
 	struct player* player;
+	enum game_state game_state;
 };
 
 struct game* game_new(void) {
@@ -20,6 +21,8 @@ struct game* game_new(void) {
 
 	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
+
+	game->game_state = PLAYING;
 
 	return game;
 }
@@ -89,86 +92,75 @@ void game_display(struct game* game) {
 
 	player_display(game->player);
 
+	if(game->game_state == PAUSED) {
+		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
+	}
 	window_refresh();
 }
 
-short input_keyboard(struct game* game, int isPaused) { // todo : P for pause, space for bomb
-	SDL_Event event;
+enum state game_update(struct game* game, int key) {
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
 
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT: // keyboard : esc
-			return 1;
-		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
-			case SDLK_ESCAPE: 
-				return 1;
-			case SDLK_a:
-				player_inc_nb_life(player);
-				break;
-			case SDLK_z:
-				player_dec_nb_life(player);
-				break;
-			case SDLK_q:
-				player_inc_nb_bomb(player);
-				break;
-			case SDLK_s:
-				player_dec_nb_bomb(player);
-				break;
-			case SDLK_w:
-				player_inc_nb_range(player);
-				break;
-			case SDLK_x:
-				player_dec_nb_range(player);
-				break;
-			case SDLK_UP:
-				if(!isPaused) {
-					player_set_current_way(player, NORTH);
-					player_move(player, map);
-				}
-				break;
-			case SDLK_DOWN:
-				if(!isPaused) {
-					player_set_current_way(player, SOUTH);
-					player_move(player, map);
-				}
-				break;
-			case SDLK_RIGHT:
-				if(!isPaused) {
-					player_set_current_way(player, EAST);
-					player_move(player, map);
-				}
-				break;
-			case SDLK_LEFT:
-				if(!isPaused) {
-					player_set_current_way(player, WEST);
-					player_move(player, map);
-				}
-				break;
-			case SDLK_SPACE:
-			  bomb_plant(map, player); // the bomb is planted if it is possible
-					break;
-				break;
-			case SDLK_p:
-				return 2;
-				break;
-			default:
-				break;
-			}
-
-			break;
+	switch (key) {
+	case SDLK_ESCAPE:
+	case SDLK_p:
+		// pause et menu
+		game->game_state = !(game->game_state);
+		return GAME;
+		break;
+	case SDLK_RETURN:
+		//if(game->game_state == PAUSED)
+			//return MAINMENU;
+		break;
+	case SDLK_a:
+		player_inc_nb_life(player);
+		break;
+	case SDLK_z:
+		player_dec_nb_life(player);
+		break;
+	case SDLK_q:
+		player_inc_nb_bomb(player);
+		break;
+	case SDLK_s:
+		player_dec_nb_bomb(player);
+		break;
+	case SDLK_w:
+		player_inc_nb_range(player);
+		break;
+	case SDLK_x:
+		player_dec_nb_range(player);
+		break;
+	case SDLK_UP:
+		if(game->game_state == PLAYING){
+			player_set_current_way(player, NORTH);
+			player_move(player, map);
 		}
+		break;
+	case SDLK_DOWN:
+		if(game->game_state == PLAYING){
+		player_set_current_way(player, SOUTH);
+		player_move(player, map);
+		}
+		break;
+	case SDLK_RIGHT:
+		if(game->game_state == PLAYING){
+		player_set_current_way(player, EAST);
+		player_move(player, map);
+		}
+		break;
+	case SDLK_LEFT:
+		if(game->game_state == PLAYING){
+		player_set_current_way(player, WEST);
+		player_move(player, map);
+		}
+		break;
+	case SDLK_SPACE:
+		if(game->game_state == PLAYING)
+			bomb_plant(map, player); // the bomb is planted if it is possible
+		break;
+	default:
+		break;
 	}
-	return 0;
-}
-
-int game_update(struct game* game, int isPaused) {
-	int state = input_keyboard(game, isPaused);
-	if (state == 1)
-		return 1; // exit game
-	if (state == 2)
-		return 2; // paused
-	return 0;
+	return GAME;
 }

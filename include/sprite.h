@@ -11,6 +11,8 @@ void		 sprite_load();
 SDL_Surface* sprite_get_bomb(short bombAnim);
 SDL_Surface* sprite_get_player(way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
+SDL_Surface* sprite_get_menu(enum select_menu select_menu);
+SDL_Surface* sprite_get_grey();
 SDL_Surface* sprite_get_tree();
 SDL_Surface* sprite_get_box();
 SDL_Surface* sprite_get_key();
