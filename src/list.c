@@ -36,14 +36,31 @@ struct list* list_insert_back(struct list* l, int x, int y, s_type type, void* d
 
 struct list* list_cut_head(struct list* l)
 {
+	if(l == NULL)
+		return NULL;
+	
 	struct list* l_h = l;
+
 	if(l != NULL && l->next != NULL)
 		l = l->next;
 	else
 		l = NULL;
+	
+	if(l_h != NULL)
+		free(l_h);
 
-	free(l_h);
+	return l;
+}
 
+struct list* list_find(struct list* l, int x, int y)
+{
+	while(l != NULL)
+	{
+		if(l->x == x && l->y == y)
+			break;
+		else
+			l = l->next;
+	}
 	return l;
 }
 
@@ -70,13 +87,4 @@ struct list* list_delete(struct list* l)
 	while(l != NULL)
 		l = list_cut_head(l);
 	return l;
-}
-
-void list_print(struct list* l)
-{
-	printf("\n\nLIST PRINT\n");
-	while(l != NULL) {
-		printf("%d\n", l->x);
-		l = l->next;
-	}
 }

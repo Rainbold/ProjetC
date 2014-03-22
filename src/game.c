@@ -13,18 +13,24 @@ struct game {
 	struct player* player;
 	enum game_state game_state;
 	int pos;
+	float delayStart;
+	float delayLoop;
+	float delayPerm;
 };
 
 struct game* game_new(void) {
 
 	struct game* game = malloc(sizeof(*game));
-	game->curr_level = level_get_level(0); // get maps of the first level
+	game->curr_level = level_get_level(0, game); // get maps of the first level
 
 	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->game_state = PLAYING;
 	game->pos = 0;
+	game->delayStart = 0;
+	game->delayLoop = 0;
+	game->delayPerm = 0;
 
 	return game;
 }
@@ -43,6 +49,12 @@ struct player* game_get_player(struct game* game) {
 
 struct level* game_get_curr_level(struct game* game) {
 	return game->curr_level;
+}
+
+float game_get_real_ticks(struct game* game)
+{
+	assert(game);
+	return SDL_GetTicks() - game->delayLoop - game->delayPerm;
 }
 
 /* Display the game's interface */
@@ -82,6 +94,7 @@ void game_banner_display(struct game* game) {
 void game_display(struct game* game) {
 	assert(game);
 
+
 	window_clear();
 
 	game_banner_display(game);
@@ -90,13 +103,15 @@ void game_display(struct game* game) {
 	bomb_display(
 			level_get_curr_map(game->curr_level), // map
 			game->player,
-			map_get_bombs(level_get_curr_map(game->curr_level))); // Bombs[]
+			map_get_bombs(level_get_curr_map(game->curr_level)),  // Bombs[]
+			game);
 
-	monster_display(level_get_curr_map(game->curr_level), game->player);
+	monster_display(level_get_curr_map(game->curr_level), game->player, game);
 
-	player_display(game->player);
+	player_display(game->player, game);
 
 	if(game->game_state == PAUSED) {
+		game->delayLoop = SDL_GetTicks() - game->delayStart;
 		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
 		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
 		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
@@ -116,6 +131,12 @@ enum state game_update(struct game* game, int key) {
 	case SDLK_p: // Pause
 		game->game_state = !(game->game_state);
 		game->pos = 0;
+		if(game->game_state == PAUSED)
+			game->delayStart = SDL_GetTicks();
+		else {
+			game->delayLoop = 0;
+			game->delayPerm += SDL_GetTicks() - game->delayStart;
+		}
 		return GAME;
 		break;
 	case SDLK_RETURN:
@@ -137,7 +158,7 @@ enum state game_update(struct game* game, int key) {
 		player_inc_nb_life(player);
 		break;
 	case SDLK_z:
-		player_dec_nb_life(player);
+		player_dec_nb_life(player, game);
 		break;
 	case SDLK_q:
 		player_inc_nb_bomb(player);
@@ -154,7 +175,7 @@ enum state game_update(struct game* game, int key) {
 	case SDLK_UP:
 		if(game->game_state == PLAYING){
 			player_set_current_way(player, NORTH);
-			player_move(player, map);
+			player_move(player, map, game);
 		}
 		else if (game->game_state == PAUSED && game->pos > 0) {
 			game->pos--;
@@ -162,8 +183,8 @@ enum state game_update(struct game* game, int key) {
 		break;
 	case SDLK_DOWN:
 		if(game->game_state == PLAYING){
-		player_set_current_way(player, SOUTH);
-		player_move(player, map);
+			player_set_current_way(player, SOUTH);
+			player_move(player, map, game);
 		}
 		else if (game->game_state == PAUSED && game->pos < 2) {
 			game->pos++;
@@ -171,19 +192,19 @@ enum state game_update(struct game* game, int key) {
 		break;
 	case SDLK_RIGHT:
 		if(game->game_state == PLAYING){
-		player_set_current_way(player, EAST);
-		player_move(player, map);
+			player_set_current_way(player, EAST);
+			player_move(player, map, game);
 		}
 		break;
 	case SDLK_LEFT:
 		if(game->game_state == PLAYING){
-		player_set_current_way(player, WEST);
-		player_move(player, map);
+			player_set_current_way(player, WEST);
+			player_move(player, map, game);
 		}
 		break;
 	case SDLK_SPACE:
 		if(game->game_state == PLAYING)
-			bomb_plant(map, player); // the bomb is planted if it is possible
+			bomb_plant(map, player, game); // the bomb is planted if it is possible
 		break;
 	default:
 		break;

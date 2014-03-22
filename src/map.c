@@ -79,14 +79,14 @@ struct map* map_new(int width, int height)
 	return map;
 }
 
-struct list* map_load_monsters(struct map* map)
+struct list* map_load_monsters(struct map* map, struct game* game)
 {
 	int i, j;
 	map->monstersList = list_delete(map->monstersList);
 	for (j = 0; j < map->height; j++)
 		for (i = 0; i < map->width; i++)
 			if(map->grid[CELL(i,j)] == CELL_MONSTER) 
-				monster_init(map, i, j, MONSTER_NORMAL, 1, 1, 5);
+				monster_init(map, i, j, MONSTER_NORMAL, 1, 1, 5, game);
 
 	return map->monstersList;
 }
@@ -151,7 +151,7 @@ void map_set_monsters(struct map* map, struct list* mList)
 	map->monstersList = mList;
 }
 
-void map_case_destroyed(struct map* map, int x, int y)
+void map_case_destroyed(struct map* map, int x, int y, struct game* game)
 {
 	assert(map && map_is_inside(map, x, y));
 	
@@ -163,7 +163,7 @@ void map_case_destroyed(struct map* map, int x, int y)
 		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_LIFE << 4)));
 	else if( 35 <= r && r < 40 ) {
 		map_set_cell_type(map, x, y, CELL_MONSTER);
-		map_load_monsters(map);
+		map_load_monsters(map, game);
 	}
 	else if( 40 <= r && r < 55 )
 		map_set_cell_type(map, x, y, (CELL_BONUS|(BONUS_BOMB_RANGE_INC << 4)));

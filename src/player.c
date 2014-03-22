@@ -1,5 +1,6 @@
 #include <SDL/SDL_image.h>
 #include <assert.h>
+#include <math.h>
 
 #include <player.h>
 #include <sprite.h>
@@ -80,11 +81,11 @@ void player_inc_nb_life(struct player* player) { // nb_life++
 		player->nb_life += 1;
 }
 
-void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
+void player_dec_nb_life(struct player* player, struct game* game) { // nb_life-- TODO gameover if nb_life <= 0
 	assert(player);
 	if(player_get_nb_life(player) > 0 && (player->invicibility != 1 || player->timer == -1) ) {
 		player->nb_life -= 1;
-		player->timer = SDL_GetTicks();
+		player->timer = game_get_real_ticks(game);
 		player->invicibility = 1;
 	}
 }
@@ -121,7 +122,7 @@ void player_from_map(struct player* player, struct map* map) {
 	}
 }
 
-static int player_move_aux(struct player* player, struct map* map, int x, int y) {
+static int player_move_aux(struct player* player, struct map* map, int x, int y, struct game* game) {
 	int cellType = 0;
 
 	if (!map_is_inside(map, x, y))
@@ -192,7 +193,7 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 			break;
 
 		case CELL_MONSTER: // todo : monster
-			player_dec_nb_life(player);
+			player_dec_nb_life(player, game);
 			break;
 
 		case CELL_PLAYER: // todo : you win
@@ -219,35 +220,35 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y)
 	return 1;
 }
 
-int player_move(struct player* player, struct map* map) {
+int player_move(struct player* player, struct map* map, struct game* game) {
 	int x = player->x;
 	int y = player->y;
 	int move = 0;
 
 	switch (player->current_way) {
 	case NORTH:
-		if (player_move_aux(player, map, x, y - 1)) {
+		if (player_move_aux(player, map, x, y - 1, game)) {
 			player->y--;
 			move = 1;
 		}
 		break;
 
 	case SOUTH:
-		if (player_move_aux(player, map, x, y + 1)) {
+		if (player_move_aux(player, map, x, y + 1, game)) {
 			player->y++;
 			move = 1;
 		}
 		break;
 
 	case WEST:
-		if (player_move_aux(player, map, x - 1, y)) {
+		if (player_move_aux(player, map, x - 1, y, game)) {
 			player->x--;
 			move = 1;
 		}
 		break;
 
 	case EAST:
-		if (player_move_aux(player, map, x + 1, y)) {
+		if (player_move_aux(player, map, x + 1, y, game)) {
 			player->x++;
 			move = 1;
 		}
@@ -262,25 +263,17 @@ int player_move(struct player* player, struct map* map) {
 	return move;
 }
 
-void player_display(struct player* player) {
+void player_display(struct player* player, struct game* game) {
 	assert(player);
 
 	if( player->invicibility == 1 ) {
-		if( SDL_GetTicks() - player->timer < 500.f )
+		if( (int)floor( (game_get_real_ticks(game) - player->timer)/500 )%2 == 0 )
 			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
-		else if( SDL_GetTicks() - player->timer < 1000.f )
-			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
-		else if( SDL_GetTicks() - player->timer < 1500.f )
-			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
-		else if( SDL_GetTicks() - player->timer < 2000.f )
-			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
-		else if( SDL_GetTicks() - player->timer < 2500.f )
-			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
-		else if( SDL_GetTicks() - player->timer < 3000.f )
+		else
 			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
 	}
 
-	if( SDL_GetTicks() - player->timer > 3000.f ) {
+	if( game_get_real_ticks(game) - player->timer > 3000.f ) {
 		player->invicibility = 0;
 		SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 255);
 	}

@@ -20,10 +20,10 @@ struct bomb {
 	int state;
 };
 
-void bomb_init(struct bomb* bomb, struct player* player) {
+void bomb_init(struct bomb* bomb, struct player* player, struct game* game) {
 	bomb->x = player_get_x(player);
 	bomb->y = player_get_y(player);
-	bomb->timer = SDL_GetTicks(); // The time is stored when the bomb is created
+	bomb->timer = game_get_real_ticks(game); // The time is stored when the bomb is created
 	bomb->curAnimBomb = ANIM_1;
 	bomb->range = player_get_nb_range(player);
 	for(int i = 0; i <= 3; i ++){
@@ -52,7 +52,7 @@ void bomb_set_timer(struct bomb* bomb, float timer) {
 }
 
 // Initialization of the bomb
-void bomb_plant(struct map* map, struct player* player){
+void bomb_plant(struct map* map, struct player* player, struct game* game){
 	assert(map);
 	assert(player);
 	if(player_get_nb_bomb(player)) { // if player has at least one bomb
@@ -67,7 +67,7 @@ void bomb_plant(struct map* map, struct player* player){
 		for(int i = 0; i < MAX_BOMB; i++){
 			if(map_get_bomb(map, i) == NULL){
 				bomb = malloc( sizeof(*bomb) );
-				bomb_init(bomb, player);
+				bomb_init(bomb, player, game);
 				player_dec_nb_bomb(player);
 				map_set_cell_type(map, bomb->x, bomb->y, CELL_BOMB);
 				map_set_bomb(map, bomb, i);
@@ -78,14 +78,14 @@ void bomb_plant(struct map* map, struct player* player){
 	}
 }
 
-void bomb_display(struct map* map, struct player* player, struct bomb* bombs[]) {
+void bomb_display(struct map* map, struct player* player, struct bomb* bombs[], struct game* game) {
 
 	assert(map);
 	assert(player);
 	assert(bombs);
 
 	if(map_get_bomb_counter(map) != 0){ // if there is at least one bomb
-		bomb_update(map, player, bombs);
+		bomb_update(map, player, bombs, game);
 
 		// bomb_display
 		for(int i = 0; i < MAX_BOMB; i++){ // For each bomb in bombs[]
@@ -122,7 +122,7 @@ void bomb_display(struct map* map, struct player* player, struct bomb* bombs[]) 
 }
 
 
-void bomb_update(struct map* map, struct player* player, struct bomb* bombs[]) {
+void bomb_update(struct map* map, struct player* player, struct bomb* bombs[], struct game* game) {
 
 	assert(map);
 	assert(player);
@@ -137,13 +137,13 @@ void bomb_update(struct map* map, struct player* player, struct bomb* bombs[]) {
 			if(!(bomb->state)) { // If the bomb has not exploded yet we display the animation of the bomb...
 
 				// Bomb's animation
-				if(SDL_GetTicks() - bomb_get_timer(bomb) < 1000.f) {
+				if(game_get_real_ticks(game) - bomb_get_timer(bomb) < 1000.f) {
 					bomb->curAnimBomb = ANIM_1;
-				} else if(SDL_GetTicks() - bomb->timer < 2000.f) {
+				} else if(game_get_real_ticks(game) - bomb->timer < 2000.f) {
 					bomb->curAnimBomb = ANIM_2;
-				} else if(SDL_GetTicks() - bomb->timer < 3000.f) {
+				} else if(game_get_real_ticks(game) - bomb->timer < 3000.f) {
 					bomb->curAnimBomb = ANIM_3;
-				} else if(SDL_GetTicks() - bomb->timer < 4000.f) {
+				} else if(game_get_real_ticks(game) - bomb->timer < 4000.f) {
 					bomb->curAnimBomb = ANIM_4;
 				} else {
 					bomb->curAnimBomb = ANIM_5;
@@ -153,23 +153,23 @@ void bomb_update(struct map* map, struct player* player, struct bomb* bombs[]) {
 				}
 			}
 			else{ // The bomb is exploding
-				if(SDL_GetTicks() - bomb->timer > 5000.f) {
+				if(game_get_real_ticks(game) - bomb->timer > 5000.f) {
 					bomb_free(bomb);
 					bombs[i] = NULL;
 					map_dec_bomb_counter(map);
 				}
 				else {
-					bomb_explo_event(map, player, bomb, bombs);
+					bomb_explo_event(map, player, bomb, bombs, game);
 				}
 			}
 		}
 	}
 }
 
-void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[]) { // While the bomb is exploding
+void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[], struct game* game) { // While the bomb is exploding
 	// If the player is standing on the bomb, he loses a life
 	if(bomb->x == player_get_x(player) && bomb->y == player_get_y(player))
-		player_dec_nb_life(player);
+		player_dec_nb_life(player, game);
 
 	int cellType = 0;
 	for(int dx = -1; dx <= 1; dx += 1 ) { // For every direction in x
@@ -178,21 +178,21 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 			switch(cellType){
 			case CELL_PLAYER : // Player
 				if((bomb->x + dx * r) == player_get_x(player) && bomb->y == player_get_y(player))
-					player_dec_nb_life(player);
+					player_dec_nb_life(player, game);
 				break;
 			case CELL_MONSTER : // Monster
-				//map_set_monsters( map, monster_kill(map_get_monsters(map), (bomb->x + dx * r), bomb->y) );
-				//map_set_cell_type(map, (bomb->x + dx * r), bomb->y, CELL_EMPTY);
+				map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), (bomb->x + dx * r), bomb->y, game) );
+				map_set_cell_type(map, (bomb->x + dx * r), bomb->y, CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
-				map_case_destroyed(map, (bomb->x + dx * r),bomb->y);
+				map_case_destroyed(map, (bomb->x + dx * r), bomb->y, game);
 				break;
 			default: // Every thing else
 				// Bomb
 				for(int i = 0; i < MAX_BOMB; i++){
 					if(bombs[i] != NULL){
-						if((bombs[i]->x == (bomb->x + dx * r)) && (bombs[i]->y == bomb->y) && (SDL_GetTicks() - bomb_get_timer(bombs[i])) < 4000.f && (bombs[i] != bomb))
-							bomb_set_timer(bombs[i], SDL_GetTicks() - 4000.f);
+						if((bombs[i]->x == (bomb->x + dx * r)) && (bombs[i]->y == bomb->y) && (game_get_real_ticks(game) - bomb_get_timer(bombs[i])) < 4000.f && (bombs[i] != bomb))
+							bomb_set_timer(bombs[i], game_get_real_ticks(game) - 4000.f);
 					}
 				}
 				break;
@@ -206,21 +206,21 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 			switch(cellType){
 			case CELL_PLAYER : // Player
 				if(bomb->x == player_get_x(player) && (bomb->y + dy * r) == player_get_y(player))
-					player_dec_nb_life(player);
+					player_dec_nb_life(player, game);
 				break;
 			case CELL_MONSTER : // Monster
-				//map_set_monsters( map, monster_kill(map_get_monsters(map), bomb->x, (bomb->y + dy * r)) );
-				//map_set_cell_type(map, bomb->x, (bomb->y + dy * r), CELL_EMPTY);
+				map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), bomb->x, (bomb->y + dy * r), game) );
+				map_set_cell_type(map, bomb->x, (bomb->y + dy * r), CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
-				map_case_destroyed(map, bomb->x, (bomb->y + dy * r));
+				map_case_destroyed(map, bomb->x, (bomb->y + dy * r), game);
 				break;
 			default: // Every thing else
 				// Bomb
 				for(int i = 0; i < MAX_BOMB; i++){
 					if(bombs[i] != NULL){
-						if((bombs[i]->x == bomb->x) && (bombs[i]->y == (bomb->y + dy * r)) && (SDL_GetTicks() - bomb_get_timer(bombs[i])) < 4000.f && (bombs[i] != bomb))
-							bomb_set_timer(bombs[i], SDL_GetTicks() - 4000.f);
+						if((bombs[i]->x == bomb->x) && (bombs[i]->y == (bomb->y + dy * r)) && (game_get_real_ticks(game) - bomb_get_timer(bombs[i])) < 4000.f && (bombs[i] != bomb))
+							bomb_set_timer(bombs[i], game_get_real_ticks(game) - 4000.f);
 					}
 				}
 				break;

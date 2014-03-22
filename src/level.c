@@ -11,7 +11,7 @@ struct level {
 	short cur_map; // the current map
 };
 
-struct level* level_get_level(int num) {
+struct level* level_get_level(int num, struct game* game) {
 	struct level* level = malloc(sizeof(*level));
 	switch (num) {
 	case 0:
@@ -19,7 +19,7 @@ struct level* level_get_level(int num) {
 		level->cur_map = 0;
 		level->maps = malloc(sizeof(*level->maps));
 		level->maps[0] = map_get_default();
-		map_load_monsters(level->maps[0]);
+		map_load_monsters(level->maps[0], game);
 		return level;
 		break;
 	}

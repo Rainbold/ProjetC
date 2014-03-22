@@ -1,6 +1,7 @@
 #include <monster.h>
 #include <list.h>
 #include <assert.h>
+#include <math.h>
 
 struct monster {
 	m_type type;
@@ -9,10 +10,12 @@ struct monster {
 	int life;
 	int aggr;
 	float moveTimer;
+	float lifeTimer; 
+	int invincibility;
 };
 
 
-void monster_init(struct map* map, int x, int y, m_type type, int size, int life, int aggr)
+void monster_init(struct map* map, int x, int y, m_type type, int size, int life, int aggr, struct game* game)
 {
 	struct monster* monster = malloc( sizeof(*monster) );
 	monster->type = type;
@@ -20,7 +23,9 @@ void monster_init(struct map* map, int x, int y, m_type type, int size, int life
 	monster->life = life;
 	monster->aggr= aggr;
 	monster->currentWay = SOUTH;
-	monster->moveTimer = SDL_GetTicks();
+	monster->moveTimer = game_get_real_ticks(game);
+	monster->lifeTimer = -1;
+	monster->invincibility = 0;
 
 	s_type typeL = LIST_MONSTER;
 
@@ -41,7 +46,8 @@ void monster_set_currentway(struct monster* monster, way_t dir)
 
 int monster_get_movetimer(struct monster* monster)
 {
-	assert(monster);
+	if(monster == NULL)
+		return 0;
 	return monster->moveTimer;
 }
 
@@ -55,6 +61,62 @@ int monster_get_aggr(struct monster* monster)
 {
 	assert(monster);
 	return monster->aggr;
+}
+
+int monster_get_nb_life(struct monster* monster) { // get nb_life
+	if(monster == NULL)
+		return 0;
+	return monster->life;
+}
+
+void monster_set_nb_life(struct monster* monster, int life) { // get nb_life
+	assert(monster);
+	monster->life = life;
+}
+
+int monster_get_invincibility(struct monster* monster) { // get nb_life
+	if(monster == NULL)
+		return 0;
+	return monster->invincibility;
+}
+
+void monster_set_invincibility(struct monster* monster, int invincibility) { // get nb_life
+	assert(monster);
+	monster->invincibility = invincibility;
+}
+
+float monster_get_life_timer(struct monster* monster) { // get nb_life
+	if(monster == NULL)
+		return 0;
+	return monster->lifeTimer;
+}
+
+void monster_set_life_timer(struct monster* monster, int lifeTimer) { // get nb_life
+	assert(monster);
+	monster->lifeTimer = lifeTimer;
+}
+
+struct list* monster_dec_nb_life(struct list* mList, int x, int y, struct game* game) { // nb_life
+	assert(mList);
+	assert(game);
+
+
+	if(!mList) 
+		return NULL;
+
+	struct list* monster = list_find(mList, x, y);
+	if(!monster) 
+		return NULL;
+	printf("%d\n", monster_get_nb_life(monster->data));
+	if(monster_get_nb_life(monster->data) > 0 && (monster_get_invincibility(monster->data) != 1 || monster_get_life_timer(monster->data) == -1) ) {
+		monster_set_nb_life(monster->data, monster_get_nb_life(monster->data)-1);
+		monster_set_life_timer(monster->data, game_get_real_ticks(game));
+		monster_set_invincibility(monster->data, 1);;
+	}
+	else if(monster_get_nb_life(monster->data) <= 0)
+		mList = monster_kill(mList, x, y);
+
+	return mList;
 }
 
 struct list* monster_kill(struct list* mList, int x, int y)
@@ -99,7 +161,7 @@ static int monster_move_aux(struct map* map, int x, int y) {
 	return 1;
 }
 
-int monster_move(struct list* mList, struct map* map, struct player* player) {
+int monster_move(struct list* mList, struct map* map, struct player* player, struct game* game) {
 	int x = mList->x;
 	int y = mList->y;
 	int move = 0;
@@ -112,8 +174,14 @@ int monster_move(struct list* mList, struct map* map, struct player* player) {
 
 
 	// A monster moves every second
-	if(SDL_GetTicks() - monster_get_movetimer(mList->data) < 1000.f)
+	if(!mList) 
 		return 0;
+
+	printf("appel 1\n");
+
+	if(game_get_real_ticks(game) - monster_get_movetimer(mList->data) < 1000.f)
+		return 0;
+	printf("appel 2\n");
 
 	// We get the next direction for the monster and its distance between it and the player
 	dir = monster_pathfinding(map, player, mList, &distMP);
@@ -155,22 +223,37 @@ int monster_move(struct list* mList, struct map* map, struct player* player) {
 
 	if (move) {
 		monster_set_currentway(mList->data, dir);
-		monster_set_movetimer(mList->data, SDL_GetTicks());
+		monster_set_movetimer(mList->data, game_get_real_ticks(game));
 		map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
 	}
 	return move;
 }
 
-void monster_display(struct map* map, struct player* player)
+void monster_display(struct map* map, struct player* player, struct game* game)
 {
 	struct list* mList = map_get_monsters(map);
 
 	while(mList != NULL) {
-		monster_move(mList, map, player);
+		if( monster_get_invincibility(mList->data) == 1 ) {
+			if( (int)floor( (game_get_real_ticks(game) - monster_get_life_timer(mList->data) )/500 )%2 == 0 )
+				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 128);
+			else
+				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 192);
+		}
+
+		if( game_get_real_ticks(game) - monster_get_life_timer(mList->data) > 3000.f ) {
+			monster_set_invincibility(mList->data, 0);
+			SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 255);
+		}
+
+		
+		monster_move(mList, map, player, game);
 		if(mList->x == player_get_x(player) && mList->y == player_get_y(player))
-			player_dec_nb_life(player);
+			player_dec_nb_life(player, game);
 		window_display_image(sprite_get_monster( monster_get_currentway(mList->data) ), mList->x * SIZE_BLOC, mList->y * SIZE_BLOC);
+		if(monster_get_nb_life(mList->data) <= 0)
+			monster_kill(mList, mList->x, mList->y);
 		mList = mList->next;
 	}
 }

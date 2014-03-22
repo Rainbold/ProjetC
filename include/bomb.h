@@ -1,15 +1,16 @@
 #ifndef BOMB_H_
 #define BOMB_H_
 
+#include <game.h>
 #include <map.h>
 #include <player.h>
 
 struct bomb; 
 
-void bomb_plant(struct map* map, struct player* player); // bomb planting function
-void bomb_display(struct map* map, struct player* player, struct bomb* bombs[]);
-void bomb_update(struct map* map, struct player* player, struct bomb* bombs[]);
-void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[]);
+void bomb_plant(struct map* map, struct player* player, struct game* game); // bomb planting function
+void bomb_display(struct map* map, struct player* player, struct bomb* bombs[], struct game* game);
+void bomb_update(struct map* map, struct player* player, struct bomb* bombs[], struct game* game);
+void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb, struct bomb* bombs[], struct game* game);
 void bomb_explo_init(struct map* map, struct player* player, struct bomb* bomb);
 void bomb_free(struct bomb* bomb);
 
