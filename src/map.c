@@ -86,7 +86,7 @@ struct list* map_load_monsters(struct map* map, struct game* game)
 	for (j = 0; j < map->height; j++)
 		for (i = 0; i < map->width; i++)
 			if(map->grid[CELL(i,j)] == CELL_MONSTER) 
-				monster_init(map, i, j, MONSTER_NORMAL, 1, 1, 5, game);
+				monster_init(map, i, j, MONSTER_NORMAL, 1, 2, 5, game);
 
 	return map->monstersList;
 }

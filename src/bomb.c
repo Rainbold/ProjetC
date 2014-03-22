@@ -182,7 +182,6 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 				break;
 			case CELL_MONSTER : // Monster
 				map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), (bomb->x + dx * r), bomb->y, game) );
-				map_set_cell_type(map, (bomb->x + dx * r), bomb->y, CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
 				map_case_destroyed(map, (bomb->x + dx * r), bomb->y, game);
@@ -210,7 +209,6 @@ void bomb_explo_event(struct map* map, struct player* player, struct bomb* bomb,
 				break;
 			case CELL_MONSTER : // Monster
 				map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), bomb->x, (bomb->y + dy * r), game) );
-				map_set_cell_type(map, bomb->x, (bomb->y + dy * r), CELL_EMPTY);
 				break;
 			case CELL_CASE : // Case
 				map_case_destroyed(map, bomb->x, (bomb->y + dy * r), game);

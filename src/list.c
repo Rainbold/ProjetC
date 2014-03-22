@@ -1,4 +1,5 @@
 #include <list.h>
+#include <assert.h>
 
 struct list* list_new()
 {
@@ -36,9 +37,8 @@ struct list* list_insert_back(struct list* l, int x, int y, s_type type, void* d
 
 struct list* list_cut_head(struct list* l)
 {
-	if(l == NULL)
-		return NULL;
-	
+	assert(l);
+
 	struct list* l_h = l;
 
 	if(l != NULL && l->next != NULL)
@@ -46,8 +46,7 @@ struct list* list_cut_head(struct list* l)
 	else
 		l = NULL;
 	
-	if(l_h != NULL)
-		free(l_h);
+	free(l_h);
 
 	return l;
 }

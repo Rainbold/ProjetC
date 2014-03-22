@@ -36,7 +36,7 @@ void monster_set_life_timer(struct monster* monster, int lifeTimer);
 
 struct list* monster_dec_nb_life(struct list* mList, int x, int y, struct game* game);
 
-struct list* monster_kill(struct list* mList, int x, int y);
+struct list* monster_kill(struct list* mList, int x, int y, struct map* map);
 
 
 

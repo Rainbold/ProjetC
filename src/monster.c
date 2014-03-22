@@ -97,31 +97,31 @@ void monster_set_life_timer(struct monster* monster, int lifeTimer) { // get nb_
 }
 
 struct list* monster_dec_nb_life(struct list* mList, int x, int y, struct game* game) { // nb_life
-	assert(mList);
 	assert(game);
 
-
-	if(!mList) 
+	if(mList == NULL) 
 		return NULL;
 
 	struct list* monster = list_find(mList, x, y);
+
 	if(!monster) 
 		return NULL;
-	printf("%d\n", monster_get_nb_life(monster->data));
+	
 	if(monster_get_nb_life(monster->data) > 0 && (monster_get_invincibility(monster->data) != 1 || monster_get_life_timer(monster->data) == -1) ) {
 		monster_set_nb_life(monster->data, monster_get_nb_life(monster->data)-1);
 		monster_set_life_timer(monster->data, game_get_real_ticks(game));
-		monster_set_invincibility(monster->data, 1);;
+		monster_set_invincibility(monster->data, 1);
 	}
-	else if(monster_get_nb_life(monster->data) <= 0)
-		mList = monster_kill(mList, x, y);
+	if(monster_get_nb_life(monster->data) <= 0)
+		mList = monster_kill(mList, x, y, level_get_curr_map(game_get_curr_level(game)));
 
 	return mList;
 }
 
-struct list* monster_kill(struct list* mList, int x, int y)
+struct list* monster_kill(struct list* mList, int x, int y, struct map* map)
 {
 	assert(mList);
+	map_set_cell_type(map, x, y, CELL_EMPTY);
 	return list_remove(mList, x, y);
 }
 
@@ -177,11 +177,8 @@ int monster_move(struct list* mList, struct map* map, struct player* player, str
 	if(!mList) 
 		return 0;
 
-	printf("appel 1\n");
-
 	if(game_get_real_ticks(game) - monster_get_movetimer(mList->data) < 1000.f)
 		return 0;
-	printf("appel 2\n");
 
 	// We get the next direction for the monster and its distance between it and the player
 	dir = monster_pathfinding(map, player, mList, &distMP);
@@ -252,8 +249,6 @@ void monster_display(struct map* map, struct player* player, struct game* game)
 		if(mList->x == player_get_x(player) && mList->y == player_get_y(player))
 			player_dec_nb_life(player, game);
 		window_display_image(sprite_get_monster( monster_get_currentway(mList->data) ), mList->x * SIZE_BLOC, mList->y * SIZE_BLOC);
-		if(monster_get_nb_life(mList->data) <= 0)
-			monster_kill(mList, mList->x, mList->y);
 		mList = mList->next;
 	}
 }
