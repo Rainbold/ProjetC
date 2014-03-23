@@ -24,13 +24,13 @@ typedef enum way {
 	EAST //3
 } way_t;
 
-typedef enum currentAnimation {
+typedef enum bomb_currentAnimation {
 	ANIM_1 = 0,
 	ANIM_2, // 1
 	ANIM_3, // 2
 	ANIM_4, //3
 	ANIM_5 //4
-} currentAnimation_t;
+} b_curAnim;
 
 typedef enum state {
 	MENU = 0,

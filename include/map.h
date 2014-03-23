@@ -49,14 +49,6 @@ typedef enum type_struct {
 
 struct map;
 
-struct bomb* map_get_bomb(struct map* map, int i);
-struct bomb** map_get_bombs(struct map* map);
-void map_set_bomb(struct map* map,struct bomb* bomb, int i);
-void map_inc_bomb_counter(struct map* map);
-void map_dec_bomb_counter(struct map* map);
-int map_get_bomb_counter(struct map* map);
-
-
 // Create a new empty map
 struct map* map_new(int width, int height);
 void map_free(struct map* map);
@@ -87,13 +79,24 @@ struct map* map_get_default();
 // Display the map on the screen
 void map_display(struct map* map);
 
+
+// Monsters functions
+
 // Insert a monster on the map
 void map_insert_monster(struct map* map, int x, int y, s_type type, void* data);
-
 // Return the monsters' list
 struct list* map_get_monsters(struct map* map);
-
 // Load the monsters' list
 struct list* map_load_monsters(struct map* map);
 
+// Bombs functions
+
+// Insert a bomb on the map
+void map_insert_bomb(struct map* map, int x, int y, s_type type, void* data);
+// Return the bombs' list
+struct list* map_get_bombs(struct map* map);
+
 #endif /* MAP_H_ */
+
+
+
