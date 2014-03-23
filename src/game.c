@@ -89,8 +89,7 @@ void game_display(struct game* game) {
 
 	bomb_display(
 			level_get_curr_map(game->curr_level), // map
-			game->player,
-			map_get_bombs(level_get_curr_map(game->curr_level))); // Bombs[]
+			game->player);
 
 	monster_display(level_get_curr_map(game->curr_level), game->player);
 

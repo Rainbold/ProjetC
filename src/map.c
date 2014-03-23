@@ -16,39 +16,8 @@ struct map {
 	int height;
 	char* grid;
 	struct list* monstersList;
-	struct bomb* bombs[MAX_BOMB]; // Max 9 bombs
-	int bomb_counter;
+	struct list* bombsList;
 };
-
-struct bomb* map_get_bomb(struct map* map, int i){
-	assert(0 <= i && i <= MAX_BOMB);
-	return map->bombs[i];
-}
-
-struct bomb** map_get_bombs(struct map* map){
-	assert(map);
-	return map->bombs;
-}
-
-void map_set_bomb(struct map* map,struct bomb* bomb, int i){
-	assert(0 <= i && i <= MAX_BOMB);
-	map->bombs[i] = bomb;
-}
-
-int map_get_bomb_counter(struct map* map) {
-	assert(map);
-	return map->bomb_counter;
-}
-
-void map_inc_bomb_counter(struct map* map) {
-	assert(map);
-	map->bomb_counter++;
-}
-
-void map_dec_bomb_counter(struct map* map) {
-	assert(map);
-	map->bomb_counter--;
-}
 
 #define CELL(i,j) (i +  map->width * j)
 
@@ -64,6 +33,7 @@ struct map* map_new(int width, int height)
 	map->height = height;
 
 	map->monstersList = list_new();
+	map->bombsList = list_new();
 
 	map->grid = malloc(height * width);
 	if (map->grid == NULL) {
@@ -142,6 +112,12 @@ struct list* map_get_monsters(struct map* map)
 {
 	assert(map);
 	return map->monstersList;
+}
+
+struct list* map_get_bombs(struct map* map)
+{
+	assert(map);
+	return map->bombsList;
 }
 
 void map_case_destroyed(struct map* map, int x, int y)
@@ -245,7 +221,7 @@ struct map* map_get_default(void)
 	struct map* map = map_new(MAP_WIDTH, MAP_HEIGHT);
 
 	char themap[MAP_WIDTH * MAP_HEIGHT] = {
-			CELL_PLAYER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_MONSTER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY,
+			CELL_PLAYER, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY,
 			CELL_STONE, CELL_STONE, CELL_STONE, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_STONE, CELL_STONE, CELL_STONE, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
 			CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_CASE, CELL_STONE, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
 			CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_CASE, CELL_STONE, CELL_EMPTY, CELL_EMPTY, CELL_STONE, CELL_EMPTY, CELL_EMPTY,
@@ -262,15 +238,15 @@ struct map* map_get_default(void)
 	for (int i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
 		map->grid[i] = themap[i];
 
-	map->bomb_counter = 0;
-
-	for(int i =0; i <= MAX_BOMB; i++){
-		map->bombs[i] = NULL;
-	}
 	return map;
 }
 
 void map_insert_monster(struct map* map, int x, int y, s_type type, void* data)
 {
 	map->monstersList = list_insert_back(map->monstersList, x, y, type, data);
+}
+
+void map_insert_bomb(struct map* map, int x, int y, s_type type, void* data)
+{
+	map->bombsList = list_insert_back(map->bombsList, x, y, type, data);
 }
