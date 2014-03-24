@@ -48,6 +48,7 @@ typedef enum type_struct {
 } s_type;
 
 struct map;
+struct game;
 
 // Create a new empty map
 struct map* map_new(int width, int height);
@@ -68,7 +69,7 @@ char map_get_cell_compose_type(struct map* map, int x, int y);
 void  map_set_cell_type(struct map* map, int x, int y, cell_type_t type);
 
 // Destroy a case and set the type of cell to a bonus cell
-void map_case_destroyed(struct map* map, int x, int y);
+void map_case_destroyed(struct game* game, struct map* map, int x, int y);
 
 // Test if (x,y) is within the map
 int map_is_inside(struct map* map, int x, int y);
@@ -84,10 +85,12 @@ void map_display(struct map* map);
 
 // Insert a monster on the map
 void map_insert_monster(struct map* map, int x, int y, s_type type, void* data);
+// Load the monsters' list
+struct list* map_load_monsters(struct map* map, struct game* game);
 // Return the monsters' list
 struct list* map_get_monsters(struct map* map);
-// Load the monsters' list
-struct list* map_load_monsters(struct map* map);
+// Change the monsters' list
+void map_set_monsters(struct map* map, struct list* mList);
 
 // Bombs functions
 
@@ -95,6 +98,8 @@ struct list* map_load_monsters(struct map* map);
 void map_insert_bomb(struct map* map, int x, int y, s_type type, void* data);
 // Return the bombs' list
 struct list* map_get_bombs(struct map* map);
+// Change the bombs' list
+void map_set_bombs(struct map* map, struct list* bList);
 
 #endif /* MAP_H_ */
 

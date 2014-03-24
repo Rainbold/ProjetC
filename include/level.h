@@ -1,12 +1,13 @@
 #ifndef LEVEL_H_
 #define LEVEL_H_
 
+#include <game.h>
 #include <map.h>
 
 struct level;
 
 // return level number num
-struct level*  level_get_level(int num);
+struct level* level_get_level(int num, struct game* game);
 
 // return current map of the level
 struct map* level_get_curr_map(struct level* level);

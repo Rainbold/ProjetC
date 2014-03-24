@@ -18,6 +18,7 @@ struct list* list_new();
 struct list* list_get_tail(struct list* l);
 struct list* list_insert_back(struct list* l, int x, int y, s_type type, void* data);
 struct list* list_cut_head(struct list* l);
+struct list* list_find(struct list* l, int x, int y);
 struct list* list_remove(struct list* l, int x, int y);
 struct list* list_delete(struct list* l);
 

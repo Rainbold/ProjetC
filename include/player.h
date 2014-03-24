@@ -1,6 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include <game.h>
 #include <map.h>
 #include <constant.h>
 
@@ -25,7 +26,7 @@ void player_dec_nb_bomb(struct player* player);
 // Set, Increase, Decrease the number of life that player has
 int player_get_nb_life(struct player* player);
 void player_inc_nb_life(struct player* player);
-void player_dec_nb_life(struct player* player);
+void player_dec_nb_life(struct player* player, struct game* game);
 
 // Set, Increase the number of range that player has
 int player_get_nb_range(struct player* player);
@@ -36,9 +37,9 @@ void player_dec_nb_range(struct player* player);
 void player_from_map(struct player* player, struct map* map);
 
 // Move the player according to the current direction
-int player_move(struct player* player, struct map* map);
+int player_move(struct player* player, struct map* map, struct game* game);
 
 // Display the player on the screen
-void player_display(struct player* player);
+void player_display(struct player* player, struct game* game);
 
 #endif /* PLAYER_H_ */
