@@ -27,4 +27,15 @@ SDL_Surface* sprite_get_banner_bomb();
 SDL_Surface* sprite_get_banner_line();
 SDL_Surface* sprite_get_banner_range();
 
+SDL_Surface* sprite_get_sprite_bomb();
+
+SDL_Rect sprite_get_br_wait(int i);
+SDL_Rect sprite_get_br_center(int i);
+SDL_Rect sprite_get_br_down(int i);
+SDL_Rect sprite_get_br_h(int i);
+SDL_Rect sprite_get_br_left(int i);
+SDL_Rect sprite_get_br_right(int i);
+SDL_Rect sprite_get_br_up(int i);
+SDL_Rect sprite_get_br_v(int i);
+
 #endif /* SPRITE_H_ */

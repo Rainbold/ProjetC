@@ -12,10 +12,8 @@ struct game {
 	struct level* curr_level; // current level
 	struct player* player;
 	enum game_state game_state;
+	int	frame;
 	int pos;
-	float delayStart;
-	float delayLoop;
-	float delayPerm;
 };
 
 struct game* game_new(void) {
@@ -27,10 +25,8 @@ struct game* game_new(void) {
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->game_state = PLAYING;
+	game->frame = 0;
 	game->pos = 0;
-	game->delayStart = 0;
-	game->delayLoop = 0;
-	game->delayPerm = 0;
 
 	return game;
 }
@@ -51,10 +47,10 @@ struct level* game_get_curr_level(struct game* game) {
 	return game->curr_level;
 }
 
-float game_get_real_ticks(struct game* game)
+int game_get_frame(struct game* game)
 {
 	assert(game);
-	return SDL_GetTicks() - game->delayLoop - game->delayPerm;
+	return game->frame;
 }
 
 /* Display the game's interface */
@@ -109,8 +105,9 @@ void game_display(struct game* game) {
 
 	player_display(game->player, game);
 
+	if(game->game_state == PLAYING)
+		game->frame++;
 	if(game->game_state == PAUSED) {
-		game->delayLoop = SDL_GetTicks() - game->delayStart;
 		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
 		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
 		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
@@ -130,12 +127,6 @@ enum state game_update(struct game* game, int key) {
 	case SDLK_p: // Pause
 		game->game_state = !(game->game_state);
 		game->pos = 0;
-		if(game->game_state == PAUSED)
-			game->delayStart = SDL_GetTicks();
-		else {
-			game->delayLoop = 0;
-			game->delayPerm += SDL_GetTicks() - game->delayStart;
-		}
 		return GAME;
 		break;
 	case SDLK_RETURN:

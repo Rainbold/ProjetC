@@ -9,8 +9,8 @@ struct monster {
 	int size;
 	int life;
 	int aggr;
-	float moveTimer;
-	float lifeTimer; 
+	int moveTimer;
+	int lifeTimer;
 	int invincibility;
 };
 
@@ -23,7 +23,7 @@ void monster_init(struct map* map, int x, int y, m_type type, int size, int life
 	monster->life = life;
 	monster->aggr= aggr;
 	monster->currentWay = SOUTH;
-	monster->moveTimer = game_get_real_ticks(game);
+	monster->moveTimer = game_get_frame(game);
 	monster->lifeTimer = -1;
 	monster->invincibility = 0;
 
@@ -51,7 +51,7 @@ int monster_get_movetimer(struct monster* monster)
 	return monster->moveTimer;
 }
 
-void monster_set_movetimer(struct monster* monster, float timer)
+void monster_set_movetimer(struct monster* monster, int timer)
 {
 	assert(monster);
 	monster->moveTimer = timer;
@@ -85,7 +85,7 @@ void monster_set_invincibility(struct monster* monster, int invincibility) { // 
 	monster->invincibility = invincibility;
 }
 
-float monster_get_life_timer(struct monster* monster) { // get nb_life
+int monster_get_life_timer(struct monster* monster) { // get nb_life
 	if(monster == NULL)
 		return 0;
 	return monster->lifeTimer;
@@ -109,7 +109,7 @@ struct list* monster_dec_nb_life(struct list* mList, int x, int y, struct game* 
 	
 	if(monster_get_nb_life(monster->data) > 0 && (monster_get_invincibility(monster->data) != 1 || monster_get_life_timer(monster->data) == -1) ) {
 		monster_set_nb_life(monster->data, monster_get_nb_life(monster->data)-1);
-		monster_set_life_timer(monster->data, game_get_real_ticks(game));
+		monster_set_life_timer(monster->data, game_get_frame(game));
 		monster_set_invincibility(monster->data, 1);
 	}
 	if(monster_get_nb_life(monster->data) <= 0)
@@ -177,7 +177,7 @@ int monster_move(struct list* mList, struct map* map, struct player* player, str
 	if(!mList) 
 		return 0;
 
-	if(game_get_real_ticks(game) - monster_get_movetimer(mList->data) < 1000.f)
+	if(game_get_frame(game) - monster_get_movetimer(mList->data) < DEFAULT_GAME_FPS * 1)
 		return 0;
 
 	// We get the next direction for the monster and its distance between it and the player
@@ -220,7 +220,7 @@ int monster_move(struct list* mList, struct map* map, struct player* player, str
 
 	if (move) {
 		monster_set_currentway(mList->data, dir);
-		monster_set_movetimer(mList->data, game_get_real_ticks(game));
+		monster_set_movetimer(mList->data, game_get_frame(game));
 		map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
 	}
@@ -233,13 +233,13 @@ void monster_display(struct map* map, struct player* player, struct game* game)
 
 	while(mList != NULL) {
 		if( monster_get_invincibility(mList->data) == 1 ) {
-			if( (int)floor( (game_get_real_ticks(game) - monster_get_life_timer(mList->data) )/500 )%2 == 0 )
+			if( (int)floor( (game_get_frame(game) - monster_get_life_timer(mList->data) ) )%4 == 0 )
 				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 128);
 			else
 				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 192);
 		}
 
-		if( game_get_real_ticks(game) - monster_get_life_timer(mList->data) > 3000.f ) {
+		if( game_get_frame(game) - monster_get_life_timer(mList->data) > DEFAULT_GAME_FPS * 3 ) {
 			monster_set_invincibility(mList->data, 0);
 			SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 255);
 		}

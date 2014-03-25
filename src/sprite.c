@@ -38,6 +38,8 @@
 #define BOMB_TTL3       "sprite/bomb3.png"
 #define BOMB_TTL4       "sprite/bomb4.png"
 
+#define BOMB			"sprite/bomb.png"
+
 // Sprites of menu
 #define MENU_BG_GREY 	"sprite/m_bg_grey.png"
 #define MENU_BG_MAIN	"sprite/m_bg_main.png"
@@ -97,6 +99,17 @@ SDL_Surface* monster_img[4];
 // bombs
 #define NB_BOMBS 5
 SDL_Surface* bombs[NB_BOMBS];
+
+#define SIZE_OF_SPRITE 40
+SDL_Surface* bomb;
+SDL_Rect bomb_rect_wait[4];
+SDL_Rect bomb_rect_center[10];
+SDL_Rect bomb_rect_v[10];
+SDL_Rect bomb_rect_up[10];
+SDL_Rect bomb_rect_down[10];
+SDL_Rect bomb_rect_left[10];
+SDL_Rect bomb_rect_right[10];
+SDL_Rect bomb_rect_h[10];
 
 void banner_load() {
 	// numbers imgs
@@ -195,12 +208,112 @@ void bombs_load()
 	bombs[2] = load_image(BOMB_TTL2);
 	bombs[3] = load_image(BOMB_TTL1);
 	bombs[4] = load_image(BOMB_TTL0);
+
+	bomb = load_image(BOMB);
+
+	for(int i = 0; i < 4; i++) {
+		bomb_rect_wait[i].x = SIZE_OF_SPRITE * i;
+		bomb_rect_wait[i].y = 0;
+		bomb_rect_wait[i].w = SIZE_OF_SPRITE;
+		bomb_rect_wait[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_center[i].x = SIZE_OF_SPRITE * 6;
+		bomb_rect_center[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_center[i].w = SIZE_OF_SPRITE;
+		bomb_rect_center[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_center[i].x = SIZE_OF_SPRITE * 6;
+		bomb_rect_center[i].y = bomb_rect_center[9-i].y;
+		bomb_rect_center[i].w = SIZE_OF_SPRITE;
+		bomb_rect_center[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_v[i].x = SIZE_OF_SPRITE * 4;
+		bomb_rect_v[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_v[i].w = SIZE_OF_SPRITE;
+		bomb_rect_v[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_v[i].x = SIZE_OF_SPRITE * 4;
+		bomb_rect_v[i].y = bomb_rect_v[9-i].y;
+		bomb_rect_v[i].w = SIZE_OF_SPRITE;
+		bomb_rect_v[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_up[i].x = 0;
+		bomb_rect_up[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_up[i].w = SIZE_OF_SPRITE;
+		bomb_rect_up[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_up[i].x = 0;
+		bomb_rect_up[i].y = bomb_rect_up[9-i].y;
+		bomb_rect_up[i].w = SIZE_OF_SPRITE;
+		bomb_rect_up[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_down[i].x = SIZE_OF_SPRITE * 1;
+		bomb_rect_down[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_down[i].w = SIZE_OF_SPRITE;
+		bomb_rect_down[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_down[i].x = SIZE_OF_SPRITE * 1;
+		bomb_rect_down[i].y = bomb_rect_down[9-i].y;
+		bomb_rect_down[i].w = SIZE_OF_SPRITE;
+		bomb_rect_down[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_left[i].x = SIZE_OF_SPRITE * 2;
+		bomb_rect_left[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_left[i].w = SIZE_OF_SPRITE;
+		bomb_rect_left[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_left[i].x = SIZE_OF_SPRITE * 2;
+		bomb_rect_left[i].y = bomb_rect_left[9-i].y;
+		bomb_rect_left[i].w = SIZE_OF_SPRITE;
+		bomb_rect_left[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_right[i].x = SIZE_OF_SPRITE * 3;
+		bomb_rect_right[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_right[i].w = SIZE_OF_SPRITE;
+		bomb_rect_right[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_right[i].x = SIZE_OF_SPRITE * 3;
+		bomb_rect_right[i].y = bomb_rect_right[9-i].y;
+		bomb_rect_right[i].w = SIZE_OF_SPRITE;
+		bomb_rect_right[i].h = SIZE_OF_SPRITE;
+	}
+
+	for(int i = 0; i < 5; i++) {
+		bomb_rect_h[i].x = SIZE_OF_SPRITE * 5;
+		bomb_rect_h[i].y = SIZE_OF_SPRITE * (1 + i);
+		bomb_rect_h[i].w = SIZE_OF_SPRITE;
+		bomb_rect_h[i].h = SIZE_OF_SPRITE;
+	}
+	for(int i = 5; i < 10; i++) {
+		bomb_rect_h[i].x = SIZE_OF_SPRITE * 5;
+		bomb_rect_h[i].y = bomb_rect_h[9-i].y;
+		bomb_rect_h[i].w = SIZE_OF_SPRITE;
+		bomb_rect_h[i].h = SIZE_OF_SPRITE;
+	}
 }
 
 void bombs_unload()
 {
 	for (int i = 0; i < NB_BOMBS; i++)
 		SDL_FreeSurface(bombs[i]);
+	SDL_FreeSurface(bomb);
 }
 
 void menu_load() {
@@ -240,6 +353,45 @@ void sprite_free() {
 SDL_Surface* sprite_get_bomb(short bombAnim) {
 	assert(bombAnim >= 0 && bombAnim < NB_BOMBS);
 	return bombs[bombAnim];
+}
+
+SDL_Surface* sprite_get_sprite_bomb() {
+	return bomb;
+}
+
+// Sprite function
+
+SDL_Rect sprite_get_br_wait(int i) {
+	assert(0 <= i && i <= 3);
+	return bomb_rect_wait[i];
+}
+SDL_Rect sprite_get_br_center(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_center[i];
+}
+SDL_Rect sprite_get_br_down(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_down[i];
+}
+SDL_Rect sprite_get_br_h(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_h[i];
+}
+SDL_Rect sprite_get_br_left(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_left[i];
+}
+SDL_Rect sprite_get_br_right(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_right[i];
+}
+SDL_Rect sprite_get_br_up(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_up[i];
+}
+SDL_Rect sprite_get_br_v(int i) {
+	assert(0 <= i && i <= 9);
+	return bomb_rect_v[i];
 }
 
 SDL_Surface* sprite_get_number(short number) {

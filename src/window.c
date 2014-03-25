@@ -40,6 +40,19 @@ void window_display_image(SDL_Surface* sprite, int x, int y) {
 	SDL_BlitSurface(sprite, NULL, window, &place);
 }
 
+void window_display_sprite(SDL_Surface* sprite, SDL_Rect rect, int x, int y) {
+	assert(window);
+	assert(sprite);
+
+	SDL_Rect place;
+	place.x = x;
+	place.y = y;
+	place.h = 40;
+	place.w = 40;
+
+	SDL_BlitSurface(sprite, &rect, window, &place);
+}
+
 void window_clear() {
 	assert(window);
 	SDL_FillRect(window, NULL, SDL_MapRGB(window->format, 255, 255, 255));

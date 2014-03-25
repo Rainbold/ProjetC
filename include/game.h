@@ -19,7 +19,7 @@ struct player* game_get_player(struct game* game);
 struct level* game_get_curr_level(struct game* game);
 
 // SDL_GetTicks minus the pause time
-float game_get_real_ticks(struct game* game);
+int game_get_frame(struct game* game);
 
 // Display the game of the screen
 void game_display(struct game* game);

@@ -15,7 +15,7 @@ struct player {
 	int nb_life;
 	int nb_range;
 	int invicibility;
-	float timer;
+	int timer;
 };
 
 struct player* player_init(int bomb_number, int life_number, int range_number) {
@@ -85,7 +85,7 @@ void player_dec_nb_life(struct player* player, struct game* game) { // nb_life--
 	assert(player);
 	if(player_get_nb_life(player) > 0 && (player->invicibility != 1 || player->timer == -1) ) {
 		player->nb_life -= 1;
-		player->timer = game_get_real_ticks(game);
+		player->timer = game_get_frame(game);
 		player->invicibility = 1;
 	}
 }
@@ -267,13 +267,13 @@ void player_display(struct player* player, struct game* game) {
 	assert(player);
 
 	if( player->invicibility == 1 ) {
-		if( (int)floor( (game_get_real_ticks(game) - player->timer)/500 )%2 == 0 )
+		if( (int)floor( (game_get_frame(game) - player->timer) )%4 == 0 )
 			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 128);
 		else
 			SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 192);
 	}
 
-	if( game_get_real_ticks(game) - player->timer > 3000.f ) {
+	if( game_get_frame(game) - player->timer > DEFAULT_GAME_FPS * 3 ) {
 		player->invicibility = 0;
 		SDL_SetAlpha(sprite_get_player(player->current_way), SDL_SRCALPHA, 255);
 	}
