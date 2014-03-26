@@ -124,6 +124,8 @@ void player_from_map(struct player* player, struct map* map) {
 
 static int player_move_aux(struct player* player, struct map* map, int x, int y, struct game* game) {
 	int cellType = 0;
+//	struct bomb* bomb;
+//	struct list* bList;
 
 	if (!map_is_inside(map, x, y))
 		return 0;
@@ -186,12 +188,13 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 		}
 		break;
 		case CELL_BOMB:
+		//	bList = map_get_bombs(map);
+		//	bomb = bList->data;
+		//	if(bomb->frame)
 			return 0;
-
 			break;
 		case CELL_GOAL: // todo : goal
 			break;
-
 		case CELL_MONSTER: // todo : monster
 			player_dec_nb_life(player, game);
 			break;

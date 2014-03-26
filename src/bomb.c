@@ -117,7 +117,7 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 							player_dec_nb_life(player, game);
 
 						cellType = map_get_cell_type(map, x, y);
-						switch(cellType){
+						switch(cellType & 15){
 						case CELL_PLAYER : // Player
 							if(x == player_get_x(player) && y == player_get_y(player))
 								player_dec_nb_life(player, game);
@@ -131,6 +131,9 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 						case CELL_BOMB : // Bomb
 							if((sbomb = search_bomb(map, x, y)) != NULL)
 									sbomb->frame =  game_get_frame(game) - DEFAULT_GAME_FPS * 4;
+							break;
+						case CELL_BONUS : // Case
+							map_set_cell_type(map, x, y, CELL_EMPTY);
 							break;
 						default: // Everything else
 							break;
