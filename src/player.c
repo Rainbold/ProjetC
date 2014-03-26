@@ -75,17 +75,67 @@ void player_from_map(struct player* player, struct map* map) {
 }
 
 static int player_move_aux(struct player* player, struct map* map, int x, int y) {
+	int cellType = 0;
 
 	if (!map_is_inside(map, x, y))
 		return 0;
-
+	
 	switch (map_get_cell_type(map, x, y)) {
 	case CELL_SCENERY:
-		return 0; // stop the function and the player do not move
+		return 0; // stop the function and the player movements
 		break;
 
-	case CELL_CASE: // todo : move the case
-		return 0;
+	case CELL_CASE: 
+		switch(player->current_way)
+		{
+			case NORTH:
+			if(y < 1)
+				return 0;
+			else {
+				cellType = map_get_cell_type(map, x, y - 1);
+				if( cellType != CELL_EMPTY || y < 1)
+					return 0;
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+				map_set_cell_type(map, x, y - 1, CELL_CASE);
+			}
+			break;
+
+			case SOUTH:
+			if(y >= map_get_height(map) - 1)
+				return 0;
+			else {
+				cellType = map_get_cell_type(map, x, y + 1);
+				if( cellType != CELL_EMPTY)
+					return 0;
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+				map_set_cell_type(map, x, y + 1, CELL_CASE);
+			}
+			break;
+
+			case EAST:
+			if(x >= map_get_width(map) - 1)
+				return 0;
+			else {
+				cellType = map_get_cell_type(map, x + 1, y);
+				if( cellType != CELL_EMPTY)
+					return 0;
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+				map_set_cell_type(map, x + 1, y, CELL_CASE);
+			}
+			break;
+
+			case WEST:
+			if(x < 1)
+				return 0;
+			else {
+				cellType = map_get_cell_type(map, x - 1, y);
+				if( cellType != CELL_EMPTY)
+					return 0;
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+				map_set_cell_type(map, x - 1, y, CELL_CASE);
+			}
+			break;
+		}
 		break;
 
 	case CELL_BONUS: // todo : bonus
