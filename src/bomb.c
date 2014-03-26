@@ -133,7 +133,7 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 									sbomb->frame =  game_get_frame(game) - DEFAULT_GAME_FPS * 4;
 							break;
 						case CELL_BONUS : // Case
-							map_set_cell_type(map, x, y, CELL_EMPTY);
+							//map_set_cell_type(map, x, y, CELL_EMPTY);
 							break;
 						default: // Everything else
 							break;
