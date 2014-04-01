@@ -43,7 +43,7 @@ void window_display_image(SDL_Surface* sprite, int x, int y) {
 void window_display_sprite(SDL_Surface* sprite, SDL_Rect rect, int x, int y) {
 	assert(window);
 	assert(sprite);
-
+	SDL_SetColorKey(sprite, SDL_SRCCOLORKEY, SDL_MapRGB(sprite->format, 32, 56, 144));
 	SDL_Rect place;
 	place.x = x;
 	place.y = y;

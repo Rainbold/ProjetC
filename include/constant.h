@@ -60,4 +60,8 @@ typedef enum type {
 	MAIN = 0
 } type_t;
 
+typedef enum key_event {
+	UP = 0,
+	DOWN
+} key_event_t;
 #endif /* CONSTANT */

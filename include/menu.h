@@ -5,7 +5,7 @@
 
 struct menu* new_menu(enum type type);
 
-enum state menu_update(struct menu* menu, int key);
+enum state menu_update(struct menu* menu, int key, key_event_t key_event);
 void menu_display(struct menu* menu);
 
 void menu_free(struct menu* menu);

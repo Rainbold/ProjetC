@@ -90,6 +90,10 @@ void game_banner_display(struct game* game) {
 void game_display(struct game* game) {
 	assert(game);
 
+	struct player* player = game->player;
+
+	if(player_get_moving(player) && game->game_state == PLAYING)
+		player_move(player, level_get_curr_map(game->curr_level), game);
 
 	window_clear();
 
@@ -99,11 +103,11 @@ void game_display(struct game* game) {
 	bomb_display(
 			game,
 			level_get_curr_map(game->curr_level), // map
-			game->player);
+			player);
 
-	monster_display(level_get_curr_map(game->curr_level), game->player, game);
+	monster_display(level_get_curr_map(game->curr_level), player, game);
 
-	player_display(game->player, game);
+	player_display(player, game);
 
 	if(game->game_state == PLAYING)
 		game->frame++;
@@ -113,91 +117,131 @@ void game_display(struct game* game) {
 		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
 		window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
 		window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
-		window_display_image(sprite_get_player(SOUTH), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
+		//window_display_image(sprite_get_player(SOUTH), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
 	}
 	window_refresh();
 }
 
-enum state game_update(struct game* game, int key) {
+enum state game_update(struct game* game, int key, key_event_t key_event) {
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
 
-	switch (key) {
-	case SDLK_ESCAPE:
-	case SDLK_p: // Pause
-		game->game_state = !(game->game_state);
-		game->pos = 0;
-		return GAME;
-		break;
-	case SDLK_RETURN:
-		if(game->game_state == PAUSED) {
-			switch(game->pos) {
-			case 0:
-				game->game_state = !(game->game_state);
-				game->pos = 0;
-				return GAME;
-				break;
-			case 1:
-				return ENDGAME;
-			case 2:
-				return QUIT;
+	if(key_event == DOWN) {
+		switch (key) {
+		case SDLK_ESCAPE:
+		case SDLK_p: // Pause
+			game->game_state = !(game->game_state);
+			game->pos = 0;
+			return GAME;
+			break;
+		case SDLK_RETURN:
+			if(game->game_state == PAUSED) {
+				switch(game->pos) {
+				case 0:
+					game->game_state = !(game->game_state);
+					game->pos = 0;
+					return GAME;
+					break;
+				case 1:
+					return ENDGAME;
+				case 2:
+					return QUIT;
+				}
 			}
+			break;
+		case SDLK_a:
+			player_inc_nb_life(player);
+			break;
+		case SDLK_z:
+			player_dec_nb_life(player, game);
+			break;
+		case SDLK_q:
+			player_inc_nb_bomb(player);
+			break;
+		case SDLK_s:
+			player_dec_nb_bomb(player);
+			break;
+		case SDLK_w:
+			player_inc_nb_range(player);
+			break;
+		case SDLK_x:
+			player_dec_nb_range(player);
+			break;
+		case SDLK_d:
+			player_dec_velocity(player);
+			break;
+		case SDLK_f:
+			player_inc_velocity(player);
+			break;
+		case SDLK_UP:
+			if(game->game_state == PLAYING){
+				player_set_way(player, NORTH);
+				player_set_current_way(player, NORTH);
+				player_inc_moving(player);
+			}
+			else if (game->game_state == PAUSED && game->pos > 0) {
+				game->pos--;
+			}
+			break;
+		case SDLK_DOWN:
+			if(game->game_state == PLAYING){
+				player_set_way(player, SOUTH);
+				player_set_current_way(player, SOUTH);
+				player_inc_moving(player);
+			}
+			else if (game->game_state == PAUSED && game->pos < 2) {
+				game->pos++;
+			}
+			break;
+		case SDLK_RIGHT:
+			if(game->game_state == PLAYING){
+				player_set_way(player, EAST);
+				player_set_current_way(player, EAST);
+				player_inc_moving(player);
+			}
+			break;
+		case SDLK_LEFT:
+			if(game->game_state == PLAYING){
+				player_set_way(player, WEST);
+				player_set_current_way(player, WEST);
+				player_inc_moving(player);
+			}
+			break;
+		case SDLK_SPACE:
+			if(game->game_state == PLAYING)
+				bomb_plant(game, map, player); // the bomb is planted if it is possible
+			break;
+		default:
+			break;
 		}
-		break;
-	case SDLK_a:
-		player_inc_nb_life(player);
-		break;
-	case SDLK_z:
-		player_dec_nb_life(player, game);
-		break;
-	case SDLK_q:
-		player_inc_nb_bomb(player);
-		break;
-	case SDLK_s:
-		player_dec_nb_bomb(player);
-		break;
-	case SDLK_w:
-		player_inc_nb_range(player);
-		break;
-	case SDLK_x:
-		player_dec_nb_range(player);
-		break;
-	case SDLK_UP:
-		if(game->game_state == PLAYING){
-			player_set_current_way(player, NORTH);
-			player_move(player, map, game);
+	}
+	else if(key_event == UP) {
+		switch (key) {
+		case SDLK_UP:
+			if(game->game_state == PLAYING) {
+				player_dec_moving(player);
+				player_unset_way(player, NORTH);
+			}
+			break;
+		case SDLK_DOWN:
+			if(game->game_state == PLAYING) {
+				player_dec_moving(player);
+				player_unset_way(player, SOUTH);
+			}
+			break;
+		case SDLK_RIGHT:
+			if(game->game_state == PLAYING) {
+				player_dec_moving(player);
+				player_unset_way(player, EAST);
+			}
+			break;
+		case SDLK_LEFT:
+			if(game->game_state == PLAYING) {
+				player_dec_moving(player);
+				player_unset_way(player, WEST);
+			}
+			break;
 		}
-		else if (game->game_state == PAUSED && game->pos > 0) {
-			game->pos--;
-		}
-		break;
-	case SDLK_DOWN:
-		if(game->game_state == PLAYING){
-			player_set_current_way(player, SOUTH);
-			player_move(player, map, game);
-		}
-		else if (game->game_state == PAUSED && game->pos < 2) {
-			game->pos++;
-		}
-		break;
-	case SDLK_RIGHT:
-		if(game->game_state == PLAYING){
-			player_set_current_way(player, EAST);
-			player_move(player, map, game);
-		}
-		break;
-	case SDLK_LEFT:
-		if(game->game_state == PLAYING){
-			player_set_current_way(player, WEST);
-			player_move(player, map, game);
-		}
-		break;
-	case SDLK_SPACE:
-		if(game->game_state == PLAYING)
-			bomb_plant(game, map, player); // the bomb is planted if it is possible
-		break;
-	default:
-		break;
 	}
 	return GAME;
 }

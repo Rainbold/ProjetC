@@ -30,42 +30,43 @@ struct menu* new_menu(enum type type){
 		menu->select_x[1] = 170;
 		menu->select_y[1] = 200;
 		menu->background = M_BG_MAINMENU;
-		menu->point = sprite_get_player(SOUTH);
+//		menu->point = sprite_get_player(SOUTH);
 		break;
 	}
 	return menu;
 }
 
-enum state menu_update(struct menu* menu, int key) {
-
-	switch (key) {
-	case SDLK_RETURN:
-		switch(menu->select[menu->pos]) {
-		case M_B_NEWGAME:
-			return NEWGAME;
+enum state menu_update(struct menu* menu, int key, key_event_t key_event) {
+	if(key_event == DOWN) {
+		switch (key) {
+		case SDLK_RETURN:
+			switch(menu->select[menu->pos]) {
+			case M_B_NEWGAME:
+				return NEWGAME;
+				break;
+			case M_B_QUIT:
+				return QUIT;
+				break;
+			default:
+				break;
+			}
 			break;
-		case M_B_QUIT:
-			return QUIT;
-			break;
-		default:
-			break;
+			case SDLK_UP:
+				if(menu->pos > 0){
+					menu->pos--;
+				}
+				break;
+			case SDLK_DOWN:
+				if(menu->pos < menu->nb_field - 1){
+					menu->pos++;
+				}
+				break;
+			case SDLK_ESCAPE:
+				return QUIT;
+				break;
+			default:
+				break;
 		}
-		break;
-	case SDLK_UP:
-		if(menu->pos > 0){
-			menu->pos--;
-		}
-		break;
-	case SDLK_DOWN:
-		if(menu->pos < menu->nb_field - 1){
-			menu->pos++;
-		}
-		break;
-	case SDLK_ESCAPE:
-		return QUIT;
-		break;
-	default:
-		break;
 	}
 	return MENU;
 }
@@ -78,7 +79,7 @@ void menu_display(struct menu* menu) {
 	for (int i = 0; i < menu->nb_field; i++) {
 		window_display_image(sprite_get_menu(menu->select[i]), menu->select_x[i], menu->select_y[i]);
 	}
-	window_display_image(menu->point, menu->select_x[menu->pos] - 40, menu->select_y[menu->pos]);
+//	window_display_image(menu->point, menu->select_x[menu->pos] - 40, menu->select_y[menu->pos]);
 
 	window_refresh();
 

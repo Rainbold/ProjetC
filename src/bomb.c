@@ -66,14 +66,16 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 			bomb = bList->data;
 			if(!(bomb->state)){ // bomb who's waiting
 				window_display_sprite(
-						sprite_get_sprite_bomb(),
-						sprite_get_br_wait((game_get_frame(game)/4)%4),
+						sprite_get_bombs(),
+						sprite_get_rect_bomb_anim(7, (game_get_frame(game)/4)%4 ),
 						bList->x * SIZE_BLOC, bList->y * SIZE_BLOC);
 			}
 			else { // bomb who's exploding
+				// Center
+				printf("anim: %d, cal: %d\n", bomb->anim, bomb->anim/4);
 				window_display_sprite(
-						sprite_get_sprite_bomb(),
-						sprite_get_br_center(bomb->anim / 3),
+						sprite_get_bombs(),
+						sprite_get_rect_bomb_anim(0, bomb->anim / 4),
 						bList->x * SIZE_BLOC, bList->y * SIZE_BLOC);
 
 				for(int d = 0; d < 4; d++){ // 0: SOUTH, 1: NORTH, 2: WEST, 3: EAST
@@ -82,32 +84,10 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 /* 0 | 0 | 1 */			y = bList->y + r * ((d - 3) / 2 * ((d * 2) - 1));	  // + r * dy
 /* 1 | 0 |-1 */			if(search_bomb(map, x, y) == NULL) {
 /* 2 |-1 | 0 */				if(r != bomb->range) {
-/* 3 | 1 | 0 */					switch(d) {
-									case 0:
-									case 1:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_v(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-									case 2:
-									case 3:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_h(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-								}
+/* 3 | 1 | 0 */					window_display_sprite(sprite_get_bombs(), sprite_get_rect_bomb_anim(d/2 +1, bomb->anim/4), x * SIZE_BLOC, y * SIZE_BLOC);
 							}
 							else {
-								switch(d) {
-									case 0:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_down(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-									case 1:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_up(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-									case 2:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_left(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-									case 3:
-										window_display_sprite(sprite_get_sprite_bomb(), sprite_get_br_right(bomb->anim / 3), x * SIZE_BLOC, y * SIZE_BLOC);
-										break;
-								}
+								window_display_sprite(sprite_get_bombs(), sprite_get_rect_bomb_anim(d+3, bomb->anim/4), x * SIZE_BLOC, y * SIZE_BLOC);
 							}
 						}
 						// Event
@@ -173,7 +153,7 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 			}
 		}
 		else{ // The bomb is exploding
-			if(game_get_frame(game) - bomb->frame > (DEFAULT_GAME_FPS  * 5) - 1 ) {
+			if(game_get_frame(game) - bomb->frame > DEFAULT_GAME_FPS  * 5 + 1) {
 				bomb_free(map, bList);
 				reload = 1;
 			}

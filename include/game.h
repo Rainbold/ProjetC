@@ -3,6 +3,7 @@
 
 #include <player.h>
 #include <level.h>
+#include <constant.h>
 
 struct game;
 
@@ -25,6 +26,6 @@ int game_get_frame(struct game* game);
 void game_display(struct game* game);
 
 // update
-enum state game_update(struct game* game, int key);
+enum state game_update(struct game* game, int key, key_event_t key_event);
 
 #endif /* GAME_H_ */

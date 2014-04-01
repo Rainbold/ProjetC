@@ -15,8 +15,15 @@ void player_free(struct player* player);
 int player_get_x(struct player* player);
 int player_get_y(struct player* player);
 
-// Set the direction of the next move of the player
+// Set and return the direction of the player
 void player_set_current_way(struct player* player, way_t way);
+void player_set_way(struct player* player, way_t way);
+void player_unset_way(struct player* player, way_t way);
+
+// Set and return if the player is moving or not
+void player_inc_moving(struct player* player);
+void player_dec_moving(struct player* player);
+int player_get_moving(struct player* player);
 
 // Set, Increase, Decrease the number of bomb that player can put
 int player_get_nb_bomb(struct player* player);
@@ -41,5 +48,8 @@ int player_move(struct player* player, struct map* map, struct game* game);
 
 // Display the player on the screen
 void player_display(struct player* player, struct game* game);
+
+void player_inc_velocity(struct player* player);
+void player_dec_velocity(struct player* player);
 
 #endif /* PLAYER_H_ */

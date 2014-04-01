@@ -9,7 +9,9 @@
 void		 sprite_load();
 
 SDL_Surface* sprite_get_bomb(short bombAnim);
-SDL_Surface* sprite_get_player(way_t direction);
+SDL_Surface* sprite_get_players();
+SDL_Rect sprite_get_rect_player_anim(int i,enum way direction);
+SDL_Surface* sprite_get_player(int i, way_t direction);
 SDL_Surface* sprite_get_monster(way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
 SDL_Surface* sprite_get_menu(enum select_menu select_menu);
@@ -27,15 +29,8 @@ SDL_Surface* sprite_get_banner_bomb();
 SDL_Surface* sprite_get_banner_line();
 SDL_Surface* sprite_get_banner_range();
 
-SDL_Surface* sprite_get_sprite_bomb();
+SDL_Surface* sprite_get_bombs();
 
-SDL_Rect sprite_get_br_wait(int i);
-SDL_Rect sprite_get_br_center(int i);
-SDL_Rect sprite_get_br_down(int i);
-SDL_Rect sprite_get_br_h(int i);
-SDL_Rect sprite_get_br_left(int i);
-SDL_Rect sprite_get_br_right(int i);
-SDL_Rect sprite_get_br_up(int i);
-SDL_Rect sprite_get_br_v(int i);
+SDL_Rect sprite_get_rect_bomb_anim(int i, int j);
 
 #endif /* SPRITE_H_ */
