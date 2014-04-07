@@ -143,6 +143,7 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 			return GAME;
 			break;
 		case SDLK_RETURN:
+		case SDLK_KP_ENTER:
 			if(game->game_state == PAUSED) {
 				switch(game->pos) {
 				case 0:
