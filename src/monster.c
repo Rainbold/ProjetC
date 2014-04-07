@@ -149,10 +149,12 @@ static int monster_move_aux(struct map* map, int x, int y) {
 	case CELL_MONSTER:
 		return 0;
 		break;
-
-	case CELL_PLAYER:
+	case CELL_DOOR:
+		return 0;
 		break;
-
+	case CELL_BONUS:
+		return 0;
+		break;
 	default:
 		break;
 	}
@@ -221,7 +223,8 @@ int monster_move(struct list* mList, struct map* map, struct player* player, str
 	if (move) {
 		monster_set_currentway(mList->data, dir);
 		monster_set_movetimer(mList->data, game_get_frame(game));
-		map_set_cell_type(map, x, y, CELL_EMPTY);
+		if(map_get_cell_type(map, x, y) == CELL_MONSTER)
+			map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
 	}
 	return move;
@@ -247,7 +250,7 @@ void monster_display(struct map* map, struct player* player, struct game* game)
 		
 		monster_move(mList, map, player, game);
 		if(mList->x == player_get_x(player) && mList->y == player_get_y(player))
-			player_dec_nb_life(player, game);
+			player_hit(player, 3*DEFAULT_GAME_FPS);
 		window_display_image(sprite_get_monster( monster_get_currentway(mList->data) ), mList->x * SIZE_BLOC, mList->y * SIZE_BLOC);
 		mList = mList->next;
 	}
@@ -293,7 +296,7 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 				weightArr[i][j][0] = 0;
 				weightArr[i][j][1] = 2;
 			}
-			else if( map_get_cell_type(map, j ,i) != CELL_MONSTER && map_get_cell_type(map, j ,i) != CELL_EMPTY && map_get_cell_type(map, j, i) != CELL_PLAYER )
+			else if( map_get_cell_type(map, j ,i) != CELL_MONSTER && map_get_cell_type(map, j ,i) != CELL_EMPTY) //&& map_get_cell_type(map, j, i) != CELL_PLAYER )
 				weightArr[i][j][0] = -2;
 			else
 				weightArr[i][j][0] = -1;

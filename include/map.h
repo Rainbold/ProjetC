@@ -14,16 +14,15 @@ typedef enum cell_type {
 	CELL_BOMB, // 7
 	CELL_KEY, // 8
 	CELL_DOOR, // 9
-	CELL_CLOSED_DOOR // 10
 } cell_type_t;
 
 typedef enum bonus_type {
-	BONUS_BOMB_RANGE_INC=0,
-	BONUS_BOMB_RANGE_DEC, // 1
-	BONUS_BOMB_NB_INC, // 2
-	BONUS_BOMB_NB_DEC, // 3
-	BONUS_LIFE, // 4
-	BONUS_MONSTER // 5
+	BONUS_RANGE_INC=1,
+	BONUS_RANGE_DEC, // 2
+	BONUS_BOMB_INC, // 3
+	BONUS_BOMB_DEC, // 4
+	BONUS_LIFE, // 5
+	BONUS_MONSTER // 6
 } bonus_type_t;
 
 enum scenery_type {
@@ -31,15 +30,30 @@ enum scenery_type {
 	SCENERY_TREE, // 1
 };
 
+enum door_type {
+	CLOSED_DOOR = 0,
+	OPENED_DOOR //1
+};
+
 enum compose_type {
-	CELL_STONE = CELL_SCENERY | (SCENERY_STONE << 4), // 0010 0000
-	CELL_TREE = CELL_SCENERY | (SCENERY_TREE << 4), // 0010 0001
-	CELL_CASE_BOMBINC = CELL_CASE | (BONUS_BOMB_NB_INC << 4), // 0100 0010
-    CELL_CASE_BOMBDEC = CELL_CASE | (BONUS_BOMB_NB_DEC << 4), // 0100 0011
-    CELL_CASE_RANGEINC = CELL_CASE | (BONUS_BOMB_RANGE_INC << 4), // 0100 0000
-    CELL_CASE_RANGEDEC = CELL_CASE | (BONUS_BOMB_RANGE_DEC << 4), // 0100 0001
-    CELL_CASE_LIFE = CELL_CASE | (BONUS_LIFE << 4), // 0100 0100
-    CELL_CASE_MONSTER = CELL_CASE | (BONUS_MONSTER << 4) // 0100 0101
+	CELL_STONE = CELL_SCENERY | (SCENERY_STONE << 4),			// 0000 0010 - 0 2
+	CELL_TREE = CELL_SCENERY | (SCENERY_TREE << 4),				// 0001 0010 - 1 2
+
+    CELL_CASE_RANGE_INC = CELL_CASE | (BONUS_RANGE_INC << 4),	// 0000 0100 - 1 4
+    CELL_CASE_RANGE_DEC = CELL_CASE | (BONUS_RANGE_DEC << 4),	// 0001 0100 - 2 4
+	CELL_CASE_BOMB_INC = CELL_CASE | (BONUS_BOMB_INC << 4),		// 0010 0100 - 3 4
+    CELL_CASE_BOMB_DEC = CELL_CASE | (BONUS_BOMB_DEC << 4),		// 0011 0100 - 4 4
+    CELL_CASE_LIFE = CELL_CASE | (BONUS_LIFE << 4),				// 0100 0100 - 5 4
+    CELL_CASE_MONSTER = CELL_CASE | (BONUS_MONSTER << 4),		// 0101 0100 - 6 4
+
+    CELL_BONUS_RANGE_INC = CELL_BONUS | (BONUS_RANGE_INC << 4),	// 0001 0101 - 1 5
+    CELL_BONUS_RANGE_DEC = CELL_BONUS | (BONUS_RANGE_DEC << 4),	// 0010 0101 - 2 5
+    CELL_BONUS_BOMB_INC = CELL_BONUS | (BONUS_BOMB_INC << 4),	// 0011 0101 - 3 5
+    CELL_BONUS_BOMB_DEC = CELL_BONUS | (BONUS_BOMB_DEC << 4),	// 0100 0101 - 4 5
+    CELL_BONUS_LIFE = CELL_BONUS | (BONUS_LIFE << 4),			// 0101 0100 - 5 5
+
+    CELL_CLOSED_DOOR = CELL_DOOR | (CLOSED_DOOR << 7),			// 0000 1001 - 0 9
+    CELL_OPENED_DOOR = CELL_DOOR | (OPENED_DOOR << 7)			// 1000 1001 - 1 9 128 +9 = 137
 };
 
 typedef enum type_struct {
@@ -53,7 +67,6 @@ struct game;
 // Create a new empty map
 struct map* map_new(int width, int height);
 void map_free(struct map* map);
-
 
 // Return the height and width of a map
 int map_get_width(struct map* map);
@@ -74,8 +87,8 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y);
 // Test if (x,y) is within the map
 int map_is_inside(struct map* map, int x, int y);
 
-// Return a default 12x12 static map
-struct map* map_get_default();
+// Return a default static map
+struct map* map_get_default(int n);
 
 // Display the map on the screen
 void map_display(struct map* map);

@@ -5,7 +5,7 @@
 
 void window_create(int width, int height);
 void window_free();
-
+void window_resize(int width, int height);
 void window_refresh();
 
 // display a SDL_Surface at location (x,y)

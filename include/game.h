@@ -10,6 +10,8 @@ struct game;
 // Create a new game
 struct game* game_new();
 
+struct level* game_next_lvl(struct game* game);
+
 // Free a game
 void game_free(struct game* game);
 

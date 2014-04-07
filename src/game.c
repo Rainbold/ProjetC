@@ -16,10 +16,10 @@ struct game {
 	int pos;
 };
 
-struct game* game_new(void) {
+struct game* game_new(int i) {
 
 	struct game* game = malloc(sizeof(*game));
-	game->curr_level = level_get_level(0, game); // get maps of the first level
+	game->curr_level = level_get_level(i, game); // get maps of the level 0
 
 	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
@@ -29,6 +29,12 @@ struct game* game_new(void) {
 	game->pos = 0;
 
 	return game;
+}
+
+struct level* game_next_lvl(struct game* game) {
+	assert(game);
+	game->curr_level = level_get_level(1, game);
+	return(game->curr_level);
 }
 
 void game_free(struct game* game) {
@@ -109,8 +115,10 @@ void game_display(struct game* game) {
 
 	player_display(player, game);
 
-	if(game->game_state == PLAYING)
+	if(game->game_state == PLAYING) {
+		player_update(player);
 		game->frame++;
+	}
 	if(game->game_state == PAUSED) {
 		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
 		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
@@ -153,7 +161,7 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 			player_inc_nb_life(player);
 			break;
 		case SDLK_z:
-			player_dec_nb_life(player, game);
+			player_dec_nb_life(player);
 			break;
 		case SDLK_q:
 			player_inc_nb_bomb(player);

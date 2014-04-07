@@ -9,8 +9,8 @@
 
 int main(int argc, char *argv[]) {
 
-	window_create(SIZE_BLOC * MAP_WIDTH,
-			SIZE_BLOC * MAP_HEIGHT + BANNER_HEIGHT + LINE_HEIGHT);
+	window_create(SIZE_BLOC * MENU_WIDTH,
+			SIZE_BLOC * MENU_HEIGHT + BANNER_HEIGHT + LINE_HEIGHT);
 
 	//SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -32,12 +32,14 @@ int main(int argc, char *argv[]) {
 		timer = SDL_GetTicks();
 
 		switch(state){
-		case NEWGAME:
+		case NEWGAME1:
+		case NEWGAME2:
+		case NEWGAME3:
 			if(menu != NULL) {
 				menu_free(menu);
 				menu = NULL;
 			}
-			game = game_new();
+			game = game_new(0); // lvl 0
 			thing = game;
 			state = GAME;
 			/* no break */

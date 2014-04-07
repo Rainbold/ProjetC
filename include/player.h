@@ -15,6 +15,9 @@ void player_free(struct player* player);
 int player_get_x(struct player* player);
 int player_get_y(struct player* player);
 
+
+void player_reset_way_mov(struct player* player);
+
 // Set and return the direction of the player
 void player_set_current_way(struct player* player, way_t way);
 void player_set_way(struct player* player, way_t way);
@@ -33,7 +36,10 @@ void player_dec_nb_bomb(struct player* player);
 // Set, Increase, Decrease the number of life that player has
 int player_get_nb_life(struct player* player);
 void player_inc_nb_life(struct player* player);
-void player_dec_nb_life(struct player* player, struct game* game);
+void player_dec_nb_life(struct player* player);
+
+void player_hit(struct player* player, int i);
+void player_set_invicibility(struct player* player, int invicibility_time);
 
 // Set, Increase the number of range that player has
 int player_get_nb_range(struct player* player);
@@ -51,5 +57,7 @@ void player_display(struct player* player, struct game* game);
 
 void player_inc_velocity(struct player* player);
 void player_dec_velocity(struct player* player);
+
+void player_update(struct player* player);
 
 #endif /* PLAYER_H_ */

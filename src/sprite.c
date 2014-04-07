@@ -176,10 +176,10 @@ void map_unload() {
 }
 
 void bonus_load() {
-	bonus[BONUS_BOMB_RANGE_INC] = load_image(IMG_BONUS_BOMB_RANGE_INC);
-	bonus[BONUS_BOMB_RANGE_DEC] = load_image(IMG_BONUS_BOMB_RANGE_DEC);
-	bonus[BONUS_BOMB_NB_INC] = load_image(IMG_BONUS_BOMB_NB_INC);
-	bonus[BONUS_BOMB_NB_DEC] = load_image(IMG_BONUS_BOMB_NB_DEC);
+	bonus[BONUS_RANGE_INC-1] = load_image(IMG_BONUS_BOMB_RANGE_INC);
+	bonus[BONUS_RANGE_DEC-1] = load_image(IMG_BONUS_BOMB_RANGE_DEC);
+	bonus[BONUS_BOMB_INC-1] = load_image(IMG_BONUS_BOMB_NB_INC);
+	bonus[BONUS_BOMB_DEC-1] = load_image(IMG_BONUS_BOMB_NB_DEC);
 }
 
 void bonus_unload() {
@@ -457,8 +457,8 @@ SDL_Surface* sprite_get_banner_range() {
 }
 
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
-	assert(bonus[bonus_type]);
-	return bonus[bonus_type];
+	assert(bonus[bonus_type-1]);
+	return bonus[bonus_type-1];
 }
 
 SDL_Surface* sprite_get_menu(select_menu_t select_menu) {

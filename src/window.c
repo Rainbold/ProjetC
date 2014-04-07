@@ -1,4 +1,5 @@
 #include <SDL/SDL_image.h> // IMG_Load
+#include <SDL/SDL_ttf.h>
 #include <assert.h>
 
 #include <constant.h> 
@@ -28,6 +29,16 @@ void window_free() {
 	assert(window);
 	SDL_FreeSurface(window);
 }
+
+void window_resize(int width, int height) {
+	if(window->w != (width * SIZE_BLOC) || window->h != (height * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT)) {
+		window_free();
+		SDL_Quit();
+		window_create(width * SIZE_BLOC, height * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
+	}
+}
+
+
 
 void window_display_image(SDL_Surface* sprite, int x, int y) {
 	assert(window);

@@ -14,6 +14,8 @@
 #define DEFAULT_GAME_FPS 30
 
 // map size
+#define MENU_WIDTH 12
+#define MENU_HEIGHT 12
 #define MAP_WIDTH 12
 #define MAP_HEIGHT 12
 
@@ -35,7 +37,9 @@ typedef enum bomb_currentAnimation {
 typedef enum state {
 	MENU = 0,
 	GAME,
-	NEWGAME,
+	NEWGAME1,
+	NEWGAME2,
+	NEWGAME3,
 	ENDGAME,
 	QUIT
 } state_t;

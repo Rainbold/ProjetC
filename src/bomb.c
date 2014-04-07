@@ -39,7 +39,7 @@ void bomb_plant(struct game* game, struct map* map, struct player* player) {
 	int x = player_get_x(player);
 	int y = player_get_y(player);
 
-	if(player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB) { // if player has at least one bomb and he is not on a bomb
+	if(player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_DOOR) { // if player has at least one bomb and he is not on a bomb
 
 		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player));
 		map_set_cell_type(map, x, y, CELL_BOMB);
@@ -72,7 +72,7 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 			}
 			else { // bomb who's exploding
 				// Center
-				printf("anim: %d, cal: %d\n", bomb->anim, bomb->anim/4);
+				//printf("anim: %d, cal: %d\n", bomb->anim, bomb->anim/4);
 				window_display_sprite(
 						sprite_get_bombs(),
 						sprite_get_rect_bomb_anim(0, bomb->anim / 4),
@@ -93,15 +93,11 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 						// Event
 
 						// If the player is standing on the bomb, he loses a life
-						if(bList->x == player_get_x(player) && bList->y == player_get_y(player))
-							player_dec_nb_life(player, game);
+						if((bList->x == player_get_x(player) && bList->y == player_get_y(player)) || (x == player_get_x(player) && y == player_get_y(player)))
+							player_hit(player, 3*DEFAULT_GAME_FPS);
 
 						cellType = map_get_cell_type(map, x, y);
 						switch(cellType & 15){
-						case CELL_PLAYER : // Player
-							if(x == player_get_x(player) && y == player_get_y(player))
-								player_dec_nb_life(player, game);
-							break;
 						case CELL_MONSTER : // Monster
 							map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), x, y, game) );
 							break;
@@ -179,7 +175,7 @@ void bomb_explo_init(struct map* map, struct player* player, struct list* bList)
 	int x;
 	int y;
 
-	if(map_get_cell_type(map, bList->x, bList->y) != CELL_PLAYER)
+	if(map_get_cell_type(map, bList->x, bList->y) == CELL_BOMB)
 		map_set_cell_type(map, bList->x, bList->y, CELL_EMPTY);
 
 	for(int d = 0; d < 4; d++){ // 0: NORTH, 1: SOUTH, 2: WEST, 3: EAST
@@ -196,8 +192,6 @@ void bomb_explo_init(struct map* map, struct player* player, struct list* bList)
 				case CELL_GOAL:
 				case CELL_SCENERY:
 				case CELL_KEY:
-				case CELL_DOOR:
-				case CELL_CLOSED_DOOR:
 					rt--;
 					/* no break */
 				case CELL_CASE:

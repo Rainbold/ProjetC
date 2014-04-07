@@ -42,7 +42,7 @@ enum state menu_update(struct menu* menu, int key, key_event_t key_event) {
 		case SDLK_RETURN:
 			switch(menu->select[menu->pos]) {
 			case M_B_NEWGAME:
-				return NEWGAME;
+				return NEWGAME1;
 				break;
 			case M_B_QUIT:
 				return QUIT;
