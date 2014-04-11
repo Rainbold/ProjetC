@@ -4,6 +4,7 @@
 #include <game.h>
 #include <keyboard.h>
 #include <menu.h>
+#include <wiimote.h>
 
 enum state input_keyboard(void* thing, enum state state) { // state : 0 = MENU, 1 = GAME
 	SDL_Event event;
@@ -17,6 +18,10 @@ enum state input_keyboard(void* thing, enum state state) { // state : 0 = MENU, 
 			key_event = UP;
 			/* no break */
 		case SDL_KEYDOWN:
+#ifdef USE_WIIMOTE
+			if(key_event == DOWN && event.key.keysym.sym == SDLK_F12)
+				wiimote_link(2);
+#endif
 			switch (state) {
 			case GAME:
 				assert(thing);

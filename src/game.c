@@ -14,14 +14,17 @@ struct game {
 	enum game_state game_state;
 	int	frame;
 	int pos;
+	int nb_curr_level;
 };
 
-struct game* game_new(int i) {
+struct game* game_new() {
 
 	struct game* game = malloc(sizeof(*game));
-	game->curr_level = level_get_level(i, game); // get maps of the level 0
+	game->nb_curr_level = 0;
 
-	game->player = player_init(1, 2, 1); // player init with nb_bomb, nb_life and nb_range
+	game->curr_level = level_get_level(game->nb_curr_level, game); // get maps of the level 0
+
+	game->player = player_init(1, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
 	player_from_map(game->player, level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
 
 	game->game_state = PLAYING;
@@ -33,7 +36,8 @@ struct game* game_new(int i) {
 
 struct level* game_next_lvl(struct game* game) {
 	assert(game);
-	game->curr_level = level_get_level(1, game);
+	game->nb_curr_level++;
+	game->curr_level = level_get_level(game->nb_curr_level, game);
 	return(game->curr_level);
 }
 
@@ -98,9 +102,6 @@ void game_display(struct game* game) {
 
 	struct player* player = game->player;
 
-	if(player_get_moving(player) && game->game_state == PLAYING)
-		player_move(player, level_get_curr_map(game->curr_level), game);
-
 	window_clear();
 
 	game_banner_display(game);
@@ -116,10 +117,16 @@ void game_display(struct game* game) {
 	player_display(player, game);
 
 	if(game->game_state == PLAYING) {
+		if(player_get_moving(player))
+			player_move(player, level_get_curr_map(game->curr_level), game);
+
+		if(map_get_bombs(level_get_curr_map(game->curr_level)) != NULL) // if there is at least one bomb
+			bomb_update(game, level_get_curr_map(game->curr_level), player);
+
 		player_update(player);
 		game->frame++;
 	}
-	if(game->game_state == PAUSED) {
+	else if(game->game_state == PAUSED) {
 		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
 		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
 		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
@@ -227,28 +234,20 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 	else if(key_event == UP) {
 		switch (key) {
 		case SDLK_UP:
-			if(game->game_state == PLAYING) {
 				player_dec_moving(player);
 				player_unset_way(player, NORTH);
-			}
 			break;
 		case SDLK_DOWN:
-			if(game->game_state == PLAYING) {
 				player_dec_moving(player);
 				player_unset_way(player, SOUTH);
-			}
 			break;
 		case SDLK_RIGHT:
-			if(game->game_state == PLAYING) {
 				player_dec_moving(player);
 				player_unset_way(player, EAST);
-			}
 			break;
 		case SDLK_LEFT:
-			if(game->game_state == PLAYING) {
 				player_dec_moving(player);
 				player_unset_way(player, WEST);
-			}
 			break;
 		}
 	}

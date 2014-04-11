@@ -63,6 +63,43 @@
 #define MONSTER_RIGHT    "sprite/monster_right.png"
 #define MONSTER_DOWN     "sprite/monster_down.png"
 
+/*	Main menu : main BG with sprites | id text[]
+ * 		1--Single player				1
+ * 		  |----New Game						6
+ * 		  |_-_-Load Game					7
+ * 		2--Multi players				2
+ * 		  |----2 players					8
+ * 		  |----3 players					9
+ * 		  |_-_-4 players					10
+ * 		3--Quit							3
+ *
+ * 	Pause menu : BG grey with alpha
+ * 		1--Continue						4
+ * 		2--Main menu					5
+ * 		  |----Save ?						11
+ * 		  |----yes							12
+ * 		  |_-_-No							13
+ * 		3--Quit							3
+ * 		  |----Save ?						11
+ *		  |----yes							12
+ * 		  |_-_-No							13
+ *
+ * 		  							Total : 13
+ */
+
+// text
+SDL_Surface* numbers_ttf[10];
+SDL_Surface* text[3];
+#ifdef USE_WIIMOTE
+/*Text : 						id
+ * Looking for wiimotes...		1
+ * wiimote id connected			2
+ * wiimote id disconnected		3
+ */
+SDL_Surface* text_wiimote[3];
+#endif
+
+
 // banner
 SDL_Surface* numbers[10];
 SDL_Surface* banner_life;

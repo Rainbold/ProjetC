@@ -81,7 +81,7 @@ void menu_display(struct menu* menu) {
 		window_display_image(sprite_get_menu(menu->select[i]), menu->select_x[i], menu->select_y[i]);
 	}
 //	window_display_image(menu->point, menu->select_x[menu->pos] - 40, menu->select_y[menu->pos]);
-
+	window_write(0, 50);
 	window_refresh();
 
 }

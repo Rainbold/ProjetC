@@ -6,6 +6,16 @@ struct list* list_new()
 	return NULL;
 }
 
+int list_get_x(struct list* l) {
+	assert(l);
+	return(l->x);
+}
+
+int list_get_y(struct list* l) {
+	assert(l);
+	return(l->y);
+}
+
 struct list* list_get_tail(struct list* l)
 {
 	if(l != NULL)

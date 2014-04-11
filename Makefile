@@ -4,7 +4,7 @@ SDLCFLAGS = `bash sdl-config  --cflags`
 SDLLDFLAGS = `bash sdl-config --libs` 
 
 CFLAGS = -Wall -O0 -g -std=c99 -Iinclude/ $(SDLCFLAGS)
-LDFLAGS = $(SDLLDFLAGS) -lSDL_image
+LDFLAGS = $(SDLLDFLAGS) -lSDL_image -lSDL_ttf -l:include/libwiiuse.so
 
 BINDIR = bin
 BIN = bomberman
@@ -42,7 +42,7 @@ $(DEPDIR) $(OBJDIR) $(BINDIR):
 
 clean :
 	-rm -rf $(BINDIR) $(OBJDIR) $(DEPDIR)
-	
+
 mrproper : clean
 	-rm -rf .project .cproject .settings
 

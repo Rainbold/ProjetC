@@ -10,18 +10,15 @@
 struct bomb {
 	b_type type;
 	b_curAnim curAnim;
-	int frame; // nb frame used as a timer
 	int range; // bomb's range
 	int range_dir[4]; // Real range
 	int state; //  0 = waiting, 1 = exploding
-	int anim;
+	int anim; // used as a timer
 };
 
 void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range) {
 	struct bomb* bomb = malloc( sizeof(*bomb) );
 	bomb->type = type;
-	bomb->curAnim = ANIM_1;
-	bomb->frame = game_get_frame(game);
 	bomb->range = range;
 
 	for(int i = 0; i <= 3; i ++){
@@ -58,7 +55,6 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 	int cellType = 0;
 
 	if(bList != NULL){ // if there is at least one bomb
-		bomb_update(game, map, player);
 
 		bList = map_get_bombs(map);
 		// Bomb Display And Event
@@ -67,7 +63,7 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 			if(!(bomb->state)){ // bomb who's waiting
 				window_display_sprite(
 						sprite_get_bombs(),
-						sprite_get_rect_bomb_anim(7, (game_get_frame(game)/4)%4 ),
+						sprite_get_rect_bomb_anim(7, ((bomb->anim)/4)%4),
 						bList->x * SIZE_BLOC, bList->y * SIZE_BLOC);
 			}
 			else { // bomb who's exploding
@@ -80,8 +76,8 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 
 				for(int d = 0; d < 4; d++){ // 0: SOUTH, 1: NORTH, 2: WEST, 3: EAST
 					for(int r = 1; r <= bomb->range_dir[d]; r++){
-/* d |dx |dy */ 		x = bList->x + r * ((d / 2) * ((d * 2) - 5)); // + r * dx
-/* 0 | 0 | 1 */			y = bList->y + r * ((d - 3) / 2 * ((d * 2) - 1));	  // + r * dy
+/* d |dx |dy */ 		x = bList->x + r * ((d / 2) * ((d * 2) - 5)); 		// + r * dx
+/* 0 | 0 | 1 */			y = bList->y + r * ((d - 3) / 2 * ((d * 2) - 1));	// + r * dy
 /* 1 | 0 |-1 */			if(search_bomb(map, x, y) == NULL) {
 /* 2 |-1 | 0 */				if(r != bomb->range) {
 /* 3 | 1 | 0 */					window_display_sprite(sprite_get_bombs(), sprite_get_rect_bomb_anim(d/2 +1, bomb->anim/4), x * SIZE_BLOC, y * SIZE_BLOC);
@@ -106,7 +102,7 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 							break;
 						case CELL_BOMB : // Bomb
 							if((sbomb = search_bomb(map, x, y)) != NULL)
-									sbomb->frame =  game_get_frame(game) - DEFAULT_GAME_FPS * 4;
+									sbomb->anim = 4 * DEFAULT_GAME_FPS;
 							break;
 						case CELL_BONUS : // Case
 							//map_set_cell_type(map, x, y, CELL_EMPTY);
@@ -133,27 +129,22 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 		bomb = bList->data;
 		if(!(bomb->state)) { // If the bomb has not exploded yet we display the animation of the bomb...
 			// Bomb's animation
-			if(game_get_frame(game) - bomb->frame < DEFAULT_GAME_FPS * 1) {
-				bomb->curAnim = ANIM_1;
-			} else if(game_get_frame(game) - bomb->frame < DEFAULT_GAME_FPS * 2) {
-				bomb->curAnim = ANIM_2;
-			} else if(game_get_frame(game) - bomb->frame < DEFAULT_GAME_FPS * 3) {
-				bomb->curAnim = ANIM_3;
-			} else if(game_get_frame(game) - bomb->frame < DEFAULT_GAME_FPS * 4) {
-				bomb->curAnim = ANIM_4;
-			} else {
-				bomb->curAnim = ANIM_5;
+			if(bomb->anim < 4 * DEFAULT_GAME_FPS)
+				bomb->anim++;
+			else {
 				bomb->state = 1;
 				bomb_explo_init(map, player, bList);
 				player_inc_nb_bomb(player);
+				bomb->anim = 0;
 			}
 		}
 		else{ // The bomb is exploding
-			if(game_get_frame(game) - bomb->frame > DEFAULT_GAME_FPS  * 5 + 1) {
+			if(bomb->anim >= 1 * DEFAULT_GAME_FPS) {
 				bomb_free(map, bList);
 				reload = 1;
 			}
 			else {
+				//if(bomb->anim >= 1 * DEFAULT_GAME_FPS)
 					bomb->anim++;
 			}
 		}

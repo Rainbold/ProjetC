@@ -15,6 +15,8 @@ struct list {
 };
 
 struct list* list_new();
+int list_get_x(struct list* l);
+int list_get_y(struct list* l);
 struct list* list_get_tail(struct list* l);
 struct list* list_insert_back(struct list* l, int x, int y, s_type type, void* data);
 struct list* list_cut_head(struct list* l);

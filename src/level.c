@@ -1,3 +1,4 @@
+#include <file.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stddef.h> // NULL (macos)
@@ -14,32 +15,29 @@ struct level {
 
 struct level* level_get_level(int num, struct game* game) {
 	struct level* level = malloc(sizeof(*level));
-	switch (num) {
-	case 0: // lvl 0
-		level->nb_maps = 2;
-		level->cur_map = 0;
+	int map_count = 0;
 
-		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
-
-		level->maps[0] = map_get_default(1);
-		level->maps[1] = map_get_default(2);
-
-		map_load_monsters(level->maps[0], game);
-		return level;
-		break;
-	case 1: // lvl 1
-		level->nb_maps = 1;
-		level->cur_map = 0;
-
-		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
-
-		level->maps[0] = map_get_default(3);
-
-		map_load_monsters(level->maps[0], game);
-		return level;
-		break;
+	for(int i = 0; i < 8; i++) {
+		if(file_map_exist(num, i))
+			map_count++;
+		else
+			i = 8;
 	}
-	return NULL ;
+
+	if(map_count == 0)
+		return NULL;
+
+	level->nb_maps = map_count;
+	level->cur_map = 0;
+	level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
+
+	for(int i = 0; i < level->nb_maps; i++) {
+		level->maps[i] = file_load_map(num, i);
+	}
+
+	map_load_monsters(level->maps[0], game);
+
+	return level;
 }
 
 void level_change_map(struct game* game, struct player* player, struct map* map, unsigned char num) {
@@ -52,13 +50,16 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 	assert(map);
 
 	while(bList != NULL) {
+		map_set_cell_type(map, list_get_x(bList), list_get_y(bList), CELL_EMPTY);
 		bList = list_cut_head(bList);
 		player_inc_nb_bomb(player);
 	}
 
+	map_set_bombs(map, NULL);
+
 	player_reset_way_mov(player);
 
-	if(num <= level->nb_maps) {
+	if(num < level->nb_maps) {
 		level->cur_map = num;
 		map_load_monsters(map, game);
 		printf("Next map\n");
@@ -66,10 +67,16 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 	else {
 		level_free(level);
 		level = game_next_lvl(game);
+		if(level == NULL) {
+			printf("END of GAME\n");
+			exit(EXIT_SUCCESS);
+		}
+		else {
 		printf("Next level\n");
+		}
 	}
 	player_from_map(player, level->maps[level->cur_map]);
-	window_resize(map_get_width(level->maps[level->cur_map]), map_get_height(level->maps[level->cur_map]));
+	window_resize(map_get_width(level_get_curr_map(level)), map_get_height(level_get_curr_map(level)));
 }
 
 struct map* level_get_curr_map(struct level* level) {

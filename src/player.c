@@ -7,6 +7,7 @@
 #include <window.h>
 #include <misc.h>
 #include <constant.h>
+#include <wiimote.h>
 
 struct player {
 	int x, y;
@@ -20,9 +21,11 @@ struct player {
 	int moving;
 	int velocity;
 	int anim;
+	int rumble;
+	int id; // # of player
 };
 
-struct player* player_init(int bomb_number, int life_number, int range_number) {
+struct player* player_init(int id, int bomb_number, int life_number, int range_number) {
 	struct player* player = malloc(sizeof(*player));
 	if (!player)
 		error("Memory error");
@@ -41,6 +44,8 @@ struct player* player_init(int bomb_number, int life_number, int range_number) {
 	player->x_sprite = 0;
 	player->y_sprite = 0;
 	player->anim = 0;
+	player->rumble = 0;
+	player->id = id;
 
 	return player;
 }
@@ -100,7 +105,8 @@ int player_get_moving(struct player* player) {
 
 void player_inc_velocity(struct player* player) {
 	assert(player);
-	player->velocity++;
+	if(player->velocity < 40)
+		player->velocity++;
 }
 
 void player_dec_velocity(struct player* player) {
@@ -140,6 +146,10 @@ void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if n
 	assert(player);
 	if(player_get_nb_life(player) > 0)
 		player->nb_life -= 1;
+#ifdef USE_WIIMOTE
+		wiimote_set_rumble(player->id, 1);
+		player->rumble = DEFAULT_GAME_FPS; // 1s of rumble
+#endif
 }
 
 void player_hit(struct player* player, int invicibility_time) { // invicibility_time in frame
@@ -436,7 +446,7 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 			case CELL_DOOR:
 				if(type >> 7)
 					level_change_map(game, player, map, (type & 112) >> 4);
-				printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
+				//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
 				break;
 			}
 		}
@@ -446,7 +456,7 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 			map_set_cell_type(map, x, y, CELL_EMPTY);
 		map_set_cell_type(map, player->x, player->y, CELL_PLAYER);
 	} */
-printf("mov: %d, x: %d, y: %d, x_sprite: %d, y_sprite: %d\n", player->moving, player->x, player->y, player->x_sprite, player->y_sprite);
+	//printf("mov: %d, x: %d, y: %d, x_sprite: %d, y_sprite: %d\n", player->moving, player->x, player->y, player->x_sprite, player->y_sprite);
 	return move;
 }
 
@@ -481,4 +491,11 @@ void player_update(struct player* player) {
 	assert(player);
 	if(player->invicibility > 0)
 		player->invicibility--;
+	if(player->rumble > 0) {
+		player->rumble--;
+#ifdef USE_WIIMOTE
+		if(player->rumble <= 0)
+			wiimote_set_rumble(player->id, 0);
+#endif
+	}
 }

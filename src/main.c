@@ -1,4 +1,5 @@
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 #include <assert.h>
 #include <constant.h>
 #include <game.h>
@@ -6,6 +7,7 @@
 #include <keyboard.h>
 #include <menu.h>
 #include <sprite.h>
+#include <wiimote.h>
 
 int main(int argc, char *argv[]) {
 
@@ -23,6 +25,11 @@ int main(int argc, char *argv[]) {
 	void* thing = NULL;
 
 	sprite_load(); // load sprites into process memory
+
+#ifdef USE_WIIMOTE
+	// Starting the link with remote
+	wiimote_init();
+#endif
 
 	// game loop
 	// fixed time rate implementation
@@ -74,13 +81,16 @@ int main(int argc, char *argv[]) {
 		}
 		if(thing != NULL)
 			state = input_keyboard(thing, state);
-
+#ifdef USE_WIIMOTE
+			state = input_wiimote(thing, state);
+#endif
 		execution_speed = SDL_GetTicks() - timer;
 		if (execution_speed < ideal_speed)
 			SDL_Delay(ideal_speed - execution_speed); // we are ahead of ideal time. let's wait.
 	}
 
 	window_free();
+	TTF_Quit();
 	SDL_Quit();
 
 	return EXIT_SUCCESS;
