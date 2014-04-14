@@ -6,7 +6,7 @@
 #include <menu.h>
 #include <wiimote.h>
 
-enum state input_keyboard(void* thing, enum state state) { // state : 0 = MENU, 1 = GAME
+enum state input_keyboard(struct game* game, enum state state) { // state : 0 = MENU, 1 = GAME
 	SDL_Event event;
 	key_event_t key_event = DOWN;
 
@@ -24,18 +24,13 @@ enum state input_keyboard(void* thing, enum state state) { // state : 0 = MENU, 
 #endif
 			switch (state) {
 			case GAME:
-				assert(thing);
-				struct game* game = thing;
-				return(game_update(game, event.key.keysym.sym, key_event));
-				break;
-			case MENU:
-				assert(thing);
-				struct menu* menu = thing;
-				return(menu_update(menu, event.key.keysym.sym, key_event));
+				assert(game);
+				return(game_update(state, game, event.key.keysym.sym, key_event));
 				break;
 			default:
 				break;
 			}
+			return(menu_update(state, event.key.keysym.sym, key_event));
 			break;
 		}
 	}

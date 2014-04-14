@@ -55,7 +55,7 @@ void wiimote_link(int time) { // time in s to find wiimotes
 }
 
 
-enum state input_wiimote(void* thing, enum state state) { // state : 0 = MENU, 1 = GAME
+enum state input_wiimote(struct game* game, enum state state) { // state : 0 = MENU, 1 = GAME
 
 	key_event_t key_event;
 	SDLKey key;
@@ -129,18 +129,13 @@ enum state input_wiimote(void* thing, enum state state) { // state : 0 = MENU, 1
 			if(send) {
 				switch (state) {
 				case GAME:
-					assert(thing);
-					struct game* game = thing;
-					return(game_update(game, key, key_event));
-					break;
-				case MENU:
-					assert(thing);
-					struct menu* menu = thing;
-					return(menu_update(menu, key, key_event));
+					assert(game);
+					return(game_update(state, game, key, key_event));
 					break;
 				default:
 					break;
 				}
+				return(menu_update(state, key, key_event));
 			}
 	//	}
 	}

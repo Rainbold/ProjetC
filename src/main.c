@@ -11,8 +11,7 @@
 
 int main(int argc, char *argv[]) {
 
-	window_create(SIZE_BLOC * MENU_WIDTH,
-			SIZE_BLOC * MENU_HEIGHT + BANNER_HEIGHT + LINE_HEIGHT);
+	window_create(MENU_WIDTH, MENU_HEIGHT);
 
 	//SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -21,8 +20,6 @@ int main(int argc, char *argv[]) {
 	int timer, execution_speed;
 	enum state state = ENDGAME;
 	struct game* game = NULL;
-	struct menu* menu = NULL;
-	void* thing = NULL;
 
 	sprite_load(); // load sprites into process memory
 
@@ -38,51 +35,42 @@ int main(int argc, char *argv[]) {
 	while (!done) {
 		timer = SDL_GetTicks();
 
-		switch(state){
-		case NEWGAME1:
-		case NEWGAME2:
-		case NEWGAME3:
-			if(menu != NULL) {
-				menu_free(menu);
-				menu = NULL;
-			}
+		switch(state) {
+		case NEWGAME_SINGLE:
+			menu_free(NULL);
 			game = game_new(0); // lvl 0
-			thing = game;
 			state = GAME;
 			/* no break */
 		case GAME:
-			assert(game);
 			game_display(game);
 			break;
+
 		case ENDGAME:
 			if(game != NULL) {
 				game_free(game);
 				game = NULL;
 			}
-			menu = new_menu(MAIN);
-			thing = menu;
-			state = MENU;
-			/* no break */
-		case MENU:
-			assert(menu);
-			menu_display(menu);
+			new_menu(MAIN, NULL);
+			window_resize(MENU_WIDTH, MENU_HEIGHT);
+			state = -1;
 			break;
+
 		case QUIT:
 			if(game != NULL) {
 				game_free(game);
 				game = NULL;
 			}
-			if(menu != NULL) {
-				menu_free(menu);
-				menu = NULL;
-			}
+			menu_free(NULL);
 			done = 1;
 			break;
+		default:
+			menu_display(MENU_WIDTH / 2, MENU_HEIGHT / 2, MAIN);
+			break;
 		}
-		if(thing != NULL)
-			state = input_keyboard(thing, state);
+
+			state = input_keyboard(game, state);
 #ifdef USE_WIIMOTE
-			state = input_wiimote(thing, state);
+			state = input_wiimote(game, state);
 #endif
 		execution_speed = SDL_GetTicks() - timer;
 		if (execution_speed < ideal_speed)

@@ -7,6 +7,7 @@
 #include <sprite.h>
 #include <bomb.h>
 #include <monster.h>
+#include <menu.h>
 
 struct game {
 	struct level* curr_level; // current level
@@ -127,17 +128,19 @@ void game_display(struct game* game) {
 		game->frame++;
 	}
 	else if(game->game_state == PAUSED) {
-		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
+/*		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
 		window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
 		window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
 		window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
 		window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
-		//window_display_image(sprite_get_player(SOUTH), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
+		window_display_image(sprite_get_menu(M_SELECT), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
+*/
+		menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, PAUSE);
 	}
 	window_refresh();
 }
 
-enum state game_update(struct game* game, int key, key_event_t key_event) {
+enum state game_update(enum state state, struct game* game, int key, key_event_t key_event) {
 	struct player* player = game_get_player(game);
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
 
@@ -145,23 +148,26 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 		switch (key) {
 		case SDLK_ESCAPE:
 		case SDLK_p: // Pause
-			game->game_state = !(game->game_state);
-			game->pos = 0;
+			if(game->game_state == PLAYING) {
+				new_menu(PAUSE, NULL);
+				game->game_state = PAUSED;
+			}
+			else {
+				menu_free(NULL);
+				game->game_state = PLAYING;
+			}
 			return GAME;
 			break;
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER:
 			if(game->game_state == PAUSED) {
-				switch(game->pos) {
-				case 0:
-					game->game_state = !(game->game_state);
-					game->pos = 0;
-					return GAME;
+				switch(menu_update(state, key, key_event)) {
+				case KEEP:
+					menu_free(NULL);
+					game->game_state = PLAYING;
 					break;
-				case 1:
-					return ENDGAME;
-				case 2:
-					return QUIT;
+				default:
+					break;
 				}
 			}
 			break;
@@ -195,8 +201,8 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 				player_set_current_way(player, NORTH);
 				player_inc_moving(player);
 			}
-			else if (game->game_state == PAUSED && game->pos > 0) {
-				game->pos--;
+			else if (game->game_state == PAUSED) {
+				return(menu_update(state, key, key_event));
 			}
 			break;
 		case SDLK_DOWN:
@@ -205,8 +211,8 @@ enum state game_update(struct game* game, int key, key_event_t key_event) {
 				player_set_current_way(player, SOUTH);
 				player_inc_moving(player);
 			}
-			else if (game->game_state == PAUSED && game->pos < 2) {
-				game->pos++;
+			else if (game->game_state == PAUSED) {
+				return(menu_update(state, key, key_event));
 			}
 			break;
 		case SDLK_RIGHT:

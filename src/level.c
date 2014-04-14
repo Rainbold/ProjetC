@@ -36,6 +36,7 @@ struct level* level_get_level(int num, struct game* game) {
 	}
 
 	map_load_monsters(level->maps[0], game);
+	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 
 	return level;
 }
@@ -76,7 +77,7 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 		}
 	}
 	player_from_map(player, level->maps[level->cur_map]);
-	window_resize(map_get_width(level_get_curr_map(level)), map_get_height(level_get_curr_map(level)));
+	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 }
 
 struct map* level_get_curr_map(struct level* level) {

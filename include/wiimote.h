@@ -3,7 +3,7 @@
 
 void wiimote_init();
 void wiimote_link(int time); // time in s to find wiimotes
-enum state input_wiimote(void* thing, enum state state);
+enum state input_wiimote(struct game* game, enum state state);
 
 void wiimote_set_rumble(int id, int state);
 

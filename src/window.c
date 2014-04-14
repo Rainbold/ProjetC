@@ -5,8 +5,7 @@
 #include <constant.h> 
 #include <misc.h>
 
-SDL_Surface* window, *text;
-TTF_Font *police = NULL;
+SDL_Surface* window;
 
 void window_create(int width, int height) {
 	assert(width > 0 && height > 0);
@@ -21,9 +20,6 @@ void window_create(int width, int height) {
 	    fprintf(stderr, "Erreur d'initialisation de TTF_Init : %s\n", TTF_GetError());
 	    exit(EXIT_FAILURE);
 	}
-	SDL_Color couleurBlanche = {255, 255, 255};
-	police = TTF_OpenFont("sprite/font.ttf", 28);
-	text = TTF_RenderText_Blended(police, "Nouvelle Partie", couleurBlanche);
 
 	SDL_WM_SetCaption(WINDOW_NAME, NULL );
 	window = SDL_SetVideoMode(width, height, 0, // If bits-per-pixel is 0, it is treated as the current display bits per pixel.
@@ -38,14 +34,13 @@ void window_create(int width, int height) {
 void window_free() {
 	assert(window);
 	SDL_FreeSurface(window);
-	TTF_CloseFont(police);
 }
 
 void window_resize(int width, int height) {
-	if(window->w != (width * SIZE_BLOC) || window->h != (height * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT)) {
-		window_free();
-		SDL_Quit();
-		window_create(width * SIZE_BLOC, height * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
+	if(window->w != width || window->h != height) {
+		window_free(window);
+		window = SDL_SetVideoMode(width, height, 0, // If bits-per-pixel is 0, it is treated as the current display bits per pixel.
+					SDL_HWSURFACE);
 	}
 }
 
@@ -71,13 +66,6 @@ void window_display_sprite(SDL_Surface* sprite, SDL_Rect rect, int x, int y) {
 	place.w = 40;
 
 	SDL_BlitSurface(sprite, &rect, window, &place);
-}
-
-void window_write(int x, int y) {
-	SDL_Rect position;
-	position.x = x;
-	position.y = y;
-	SDL_BlitSurface(text, NULL, window, &position); /* Blit du texte */
 }
 
 void window_clear() {

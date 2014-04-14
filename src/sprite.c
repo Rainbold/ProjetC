@@ -1,4 +1,5 @@
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
 #include <assert.h>
 
 #include <sprite.h>
@@ -14,6 +15,9 @@
 // Scenery elements
 #define MAP_STONE		"sprite/stone.png"
 #define MAP_TREE        "sprite/tree.png"
+
+// Font
+#define FONT 			"sprite/font.ttf"
 
 // Sprites of Banner
 #define BANNER_LINE		"sprite/banner_line.png"
@@ -64,32 +68,31 @@
 #define MONSTER_DOWN     "sprite/monster_down.png"
 
 /*	Main menu : main BG with sprites | id text[]
- * 		1--Single player				1
- * 		  |----New Game						6
- * 		  |_-_-Load Game					7
- * 		2--Multi players				2
- * 		  |----2 players					8
- * 		  |----3 players					9
- * 		  |_-_-4 players					10
- * 		3--Quit							3
+ * 		1--Single player				0
+ * 		  |----New Game						5
+ * 		  |_-_-Load Game					6
+ * 		2--Multi players				1
+ * 		  |----2 players					7
+ * 		  |----3 players					8
+ * 		  |_-_-4 players					9
  *
  * 	Pause menu : BG grey with alpha
- * 		1--Continue						4
- * 		2--Main menu					5
- * 		  |----Save ?						11
- * 		  |----yes							12
- * 		  |_-_-No							13
- * 		3--Quit							3
- * 		  |----Save ?						11
- *		  |----yes							12
- * 		  |_-_-No							13
+ * 		1--Continue						2
+ * 		2--Main menu					3
+ * 		  |----Save ?						10
+ * 		  |----yes							11
+ * 		  |_-_-No							12
+ * 		3--Quit							4
+ * 		  |----Save ?						10
+ *		  |----yes							11
+ * 		  |_-_-No							12
  *
- * 		  							Total : 13
+ * 		  							Total : 13 + 1 curseur + 1 Pause
  */
 
-// text
 SDL_Surface* numbers_ttf[10];
-SDL_Surface* text[3];
+SDL_Surface* menu[NB_SURFACE_MENU];
+
 #ifdef USE_WIIMOTE
 /*Text : 						id
  * Looking for wiimotes...		1
@@ -115,9 +118,6 @@ SDL_Surface* door;
 SDL_Surface* closed_door;
 SDL_Surface* stone;
 SDL_Surface* tree;
-
-// Menu
-SDL_Surface* menu[NB_SELECT_MENU];
 
 #define SIZE_OF_SPRITE 40
 
@@ -158,6 +158,45 @@ SDL_Rect bomb_rect_down[2*NB_ANIM_BOMBS - 1];
 SDL_Rect bomb_rect_left[2*NB_ANIM_BOMBS - 1];
 SDL_Rect bomb_rect_right[2*NB_ANIM_BOMBS - 1];
 SDL_Rect bomb_rect_h[2*NB_ANIM_BOMBS - 1];
+
+void menu_load() {
+	TTF_Font* police = TTF_OpenFont(FONT, 50);
+	SDL_Color couleurBlanche = {255, 255, 255};
+
+	menu[M_H_PAUSE] = TTF_RenderText_Blended(police, "PAUSE", couleurBlanche);
+
+	TTF_CloseFont(police);
+	police = TTF_OpenFont(FONT, 22);
+	menu[M_B_SINGLE] = TTF_RenderText_Blended(police, "Single Player", couleurBlanche);
+	menu[M_B_NEWGAME] = TTF_RenderText_Blended(police, "New Game", couleurBlanche);
+	menu[M_B_LOADGAME] = TTF_RenderText_Blended(police, "Load Game", couleurBlanche);
+
+	menu[M_B_MULTI] = TTF_RenderText_Blended(police, "Multi  Player", couleurBlanche);
+	menu[M_B_2PLAYER] = TTF_RenderText_Blended(police, "2 Players", couleurBlanche);
+	menu[M_B_3PLAYER] = TTF_RenderText_Blended(police, "3 Players", couleurBlanche);
+	menu[M_B_4PLAYER] = TTF_RenderText_Blended(police, "4 Players", couleurBlanche);
+
+	menu[M_B_KEEP] = TTF_RenderText_Blended(police, "Continue", couleurBlanche);
+	menu[M_B_MAINMENU] = TTF_RenderText_Blended(police, "Main Menu", couleurBlanche);
+	menu[M_B_QUIT] = TTF_RenderText_Blended(police, "Quit", couleurBlanche);
+
+	menu[M_H_SAVE] = TTF_RenderText_Blended(police, "Save ?", couleurBlanche);
+	menu[M_B_YES] = TTF_RenderText_Blended(police, "Yes", couleurBlanche);
+	menu[M_B_NO] = TTF_RenderText_Blended(police, "No", couleurBlanche);
+
+	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
+
+	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
+	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN); // 17/17 -> ok
+
+	TTF_CloseFont(police);
+}
+
+void menu_unload() {
+	for (int i = 0; i < NB_SURFACE_MENU; i++) {
+		SDL_FreeSurface(menu[i]);
+	}
+}
 
 void banner_load() {
 	// numbers imgs
@@ -397,20 +436,6 @@ void bombs_unload()
 	SDL_FreeSurface(bombs);
 }
 
-void menu_load() {
-	menu[M_B_NEWGAME] = load_image(MENU_B_NEWGAME);
-	menu[M_B_MAINMENU] = load_image(MENU_B_MAIN);
-	menu[M_B_QUIT] = load_image(MENU_B_QUIT);
-	menu[M_B_KEEP] = load_image(MENU_B_KEEP);
-	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
-	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN);
-	menu[M_H_PAUSE] = load_image(MENU_H_PAUSE);
-}
-
-void menu_unload() {
-	for (int i = 0; i < NB_SELECT_MENU; i++)
-	SDL_FreeSurface(menu[i]);
-}
 void sprite_load() {
 	map_load();
 	bonus_load();
@@ -430,12 +455,7 @@ void sprite_free() {
 	bombs_unload();
 	menu_unload();
 }
-/*
-SDL_Surface* sprite_get_bomb(short bombAnim) {
-	assert(bombAnim >= 0 && bombAnim < NB_BOMBS);
-	return bombs[bombAnim];
-}
-*/
+
 SDL_Surface* sprite_get_bombs() {
 	return bombs;
 }
@@ -452,19 +472,13 @@ SDL_Surface* sprite_get_number(short number) {
 	assert(number >= 0 && number <= 9);
 	return numbers[number];
 }
-/*
-SDL_Surface* sprite_get_player(enum way direction) {
-	assert(player_img[direction]);
-	return player_img[direction];
-} */
+
 SDL_Surface* sprite_get_players() {
 	return players;
 }
 
 SDL_Rect sprite_get_rect_player_anim(int i,enum way direction) {
-	//assert(players[direction]);
 	SDL_Rect* rect = player[direction];
-	//assert(rect[i]);
 	return rect[i];
 }
 

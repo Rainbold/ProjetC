@@ -17,8 +17,8 @@
 #define DEFAULT_GAME_FPS 30
 
 // map size
-#define MENU_WIDTH 12
-#define MENU_HEIGHT 12
+#define MENU_WIDTH 600
+#define MENU_HEIGHT 600
 #define MAP_WIDTH 12
 #define MAP_HEIGHT 12
 
@@ -40,11 +40,15 @@ typedef enum bomb_currentAnimation {
 typedef enum state {
 	MENU = 0,
 	GAME,
-	NEWGAME1,
-	NEWGAME2,
-	NEWGAME3,
+	NEWGAME_SINGLE,
+	LOADGAME,
+	NEWGAME_MULTI2,
+	NEWGAME_MULTI3,
+	NEWGAME_MULTI4,
 	ENDGAME,
-	QUIT
+	QUIT,
+	KEEP,
+	MAINMENU
 } state_t;
 
 typedef enum game_state {
@@ -52,19 +56,38 @@ typedef enum game_state {
 	PAUSED, // 1
 } game_state_t;
 
-#define NB_SELECT_MENU 7
+#define NB_SURFACE_MENU 17
 typedef enum select_menu {
-	M_B_NEWGAME = 0,
+	M_B_SINGLE = 0,
+	M_B_NEWGAME,
+	M_B_LOADGAME,
+
+	M_B_MULTI,
+	M_B_2PLAYER,
+	M_B_3PLAYER,
+	M_B_4PLAYER,
+
+	M_H_PAUSE,
+	M_B_KEEP,
 	M_B_MAINMENU,
 	M_B_QUIT,
-	M_B_KEEP,
+
+	M_H_SAVE,
+	M_B_YES,
+	M_B_NO,
+
 	M_BG_GREY,
 	M_BG_MAINMENU,
-	M_H_PAUSE
+
+	M_SELECT
 } select_menu_t;
 
-typedef enum type {
-	MAIN = 0
+typedef enum type_menu {
+	MAIN = 0,
+	SINGLE,
+	MULTI,
+	PAUSE,
+	SAVE
 } type_t;
 
 typedef enum key_event {
