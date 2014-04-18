@@ -58,6 +58,8 @@ void player_display(struct player* player, struct game* game);
 void player_inc_velocity(struct player* player);
 void player_dec_velocity(struct player* player);
 
+int player_get_key(struct player* player);
+
 void player_update(struct player* player);
 
 #endif /* PLAYER_H_ */

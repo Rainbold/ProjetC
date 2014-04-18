@@ -10,6 +10,7 @@
 #include <wiimote.h>
 
 struct player {
+	int id; // # of player
 	int x, y;
 	int x_sprite, y_sprite;
 	way_t current_way;
@@ -22,7 +23,7 @@ struct player {
 	int velocity;
 	int anim;
 	int rumble;
-	int id; // # of player
+	int key;
 };
 
 struct player* player_init(int id, int bomb_number, int life_number, int range_number) {
@@ -46,6 +47,7 @@ struct player* player_init(int id, int bomb_number, int life_number, int range_n
 	player->anim = 0;
 	player->rumble = 0;
 	player->id = id;
+	player->key = 0;
 
 	return player;
 }
@@ -182,6 +184,10 @@ void player_dec_nb_range(struct player* player) { // nb_range--
 		player->nb_range -= 1;
 }
 
+int player_get_key(struct player* player) {
+	assert(player);
+	return(player->key);
+}
 void player_from_map(struct player* player, struct map* map) {
 	assert(player);
 	assert(map);
@@ -284,7 +290,7 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 
 //printf("%d%d%d%d\n", player->way[0],  player->way[1],  player->way[2],  player->way[3]);
 
-	if(player->way[NORTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) || (player->x_sprite >= 15 && player_move_aux(player, map, x, y - 1, game))  || player_move_aux(player, map, x, y - 1, game)  || player->y_sprite > 0)) {
+	if(player->way[NORTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) || (player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y - 1, game))  || player_move_aux(player, map, x, y - 1, game)  || player->y_sprite > 0)) {
 		player->current_way = NORTH;
 		if (player_move_aux(player, map, x, y - 1, game) || player->y_sprite > 0) {
 			if(player->y_sprite > 0 && (player->y_sprite - player->velocity) < 0)
@@ -443,13 +449,21 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 			}
 			map_set_cell_type(map, player->x, player->y, CELL_EMPTY);
 			break;
-			case CELL_DOOR:
-				if(type >> 7)
-					level_change_map(game, player, map, (type & 112) >> 4);
-				//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
-				break;
+		case CELL_DOOR:
+			if(type >> 7)
+				level_change_map(game, player, map, (type & 112) >> 4);
+			else if(type >> 7 == 0 && player->key > 0) {
+				player->key--;
+				level_change_map(game, player, map, (type & 112) >> 4);
 			}
+			//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
+			break;
+		case CELL_KEY:
+			player->key++;
+			map_set_cell_type(map, player->x, player->y, CELL_EMPTY);
+			break;
 		}
+	}
 
 /*	if (move) {
 		if(map_get_cell_type(map, x, y) == CELL_PLAYER)

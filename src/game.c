@@ -69,6 +69,7 @@ void game_banner_display(struct game* game) {
 	assert(game);
 
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
+	struct player* player = game->player;
 
 	int y = (map_get_height(map)) * SIZE_BLOC;
 	for (int i = 0; i < map_get_width(map); i++)
@@ -95,7 +96,10 @@ void game_banner_display(struct game* game) {
 
 	x = 3 * white_bloc + 5 * SIZE_BLOC;
 	window_display_image(
-			sprite_get_number(player_get_nb_range(game_get_player(game))), x, y); // range number, todo : range variable
+			sprite_get_number(player_get_nb_range(game_get_player(game))), x, y); // range number
+
+	if(player_get_key(player))
+		window_display_image(sprite_get_key(), (map_get_width(map) -1) * SIZE_BLOC, y);
 }
 
 void game_display(struct game* game) {
@@ -135,7 +139,7 @@ void game_display(struct game* game) {
 		window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
 		window_display_image(sprite_get_menu(M_SELECT), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
 */
-		menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, PAUSE);
+		menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
 	}
 	window_refresh();
 }
@@ -149,7 +153,7 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 		case SDLK_ESCAPE:
 		case SDLK_p: // Pause
 			if(game->game_state == PLAYING) {
-				new_menu(PAUSE, NULL);
+				new_menu(PAUSE_SINGLE);
 				game->game_state = PAUSED;
 			}
 			else {
@@ -165,6 +169,12 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 				case KEEP:
 					menu_free(NULL);
 					game->game_state = PLAYING;
+					break;
+				case MAINMENU:
+					return(ENDGAME);
+					break;
+				case QUIT:
+					return(QUIT);
 					break;
 				default:
 					break;
@@ -198,7 +208,6 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 		case SDLK_UP:
 			if(game->game_state == PLAYING){
 				player_set_way(player, NORTH);
-				player_set_current_way(player, NORTH);
 				player_inc_moving(player);
 			}
 			else if (game->game_state == PAUSED) {
@@ -208,7 +217,6 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 		case SDLK_DOWN:
 			if(game->game_state == PLAYING){
 				player_set_way(player, SOUTH);
-				player_set_current_way(player, SOUTH);
 				player_inc_moving(player);
 			}
 			else if (game->game_state == PAUSED) {
@@ -218,14 +226,12 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 		case SDLK_RIGHT:
 			if(game->game_state == PLAYING){
 				player_set_way(player, EAST);
-				player_set_current_way(player, EAST);
 				player_inc_moving(player);
 			}
 			break;
 		case SDLK_LEFT:
 			if(game->game_state == PLAYING){
 				player_set_way(player, WEST);
-				player_set_current_way(player, WEST);
 				player_inc_moving(player);
 			}
 			break;

@@ -46,6 +46,7 @@
 #define MENU_B_KEEP		"sprite/m_b_continuer.png"
 #define MENU_B_MAIN		"sprite/m_b_main.png"
 #define MENU_H_PAUSE	"sprite/m_h_pause.png"
+#define MENU_STARS		"sprite/stars.png"
 
 // Sprites of Bonus
 #define IMG_BONUS_BOMB_RANGE_INC  "sprite/bonus_bomb_range_inc.png"
@@ -54,11 +55,6 @@
 #define IMG_BONUS_BOMB_NB_DEC     "sprite/bonus_bomb_nb_dec.png"
 
 // Sprites of Players
-#define PLAYER_LEFT     "sprite/player_left.png"
-#define PLAYER_UP       "sprite/player_up.png"
-#define PLAYER_RIGHT    "sprite/player_right.png"
-#define PLAYER_DOWN     "sprite/player_down.png"
-
 #define PLAYER			"sprite/bomberman40.png"
 
 // Sprites of Monsters
@@ -90,8 +86,13 @@
  * 		  							Total : 13 + 1 curseur + 1 Pause
  */
 
-SDL_Surface* numbers_ttf[10];
+SDL_Surface* numbers[10];
 SDL_Surface* menu[NB_SURFACE_MENU];
+
+#define NB_ANIM_STARS 4
+#define SIZE_OF_STARS 10
+SDL_Surface* menu_stars;
+SDL_Rect menu_rect_stars[2 * NB_ANIM_STARS - 1];
 
 #ifdef USE_WIIMOTE
 /*Text : 						id
@@ -104,7 +105,7 @@ SDL_Surface* text_wiimote[3];
 
 
 // banner
-SDL_Surface* numbers[10];
+//SDL_Surface* numbers[10];
 SDL_Surface* banner_life;
 SDL_Surface* banner_bomb;
 SDL_Surface* banner_range;
@@ -129,7 +130,7 @@ SDL_Surface* bonus[NB_BONUS];
 SDL_Surface* monster_img[4];
 
 // player
-SDL_Surface* player_img[4]; // old
+
 // sprites 40x60
 #define NB_ANIM_PLAYER 8
 #define TAILLE_TAB_ANIM_PLAYER 4
@@ -162,11 +163,28 @@ SDL_Rect bomb_rect_h[2*NB_ANIM_BOMBS - 1];
 void menu_load() {
 	TTF_Font* police = TTF_OpenFont(FONT, 50);
 	SDL_Color couleurBlanche = {255, 255, 255};
+	SDL_Color couleurNoir = {0, 0, 0};
 
 	menu[M_H_PAUSE] = TTF_RenderText_Blended(police, "PAUSE", couleurBlanche);
+	menu[M_H_SAVE] = TTF_RenderText_Blended(police, "Save ?", couleurBlanche);
+
+	TTF_CloseFont(police);
+	police = TTF_OpenFont(FONT, 40);
+
+	numbers[0] = TTF_RenderText_Blended(police, "0", couleurNoir);
+	numbers[1] = TTF_RenderText_Blended(police, "1", couleurNoir);
+	numbers[2] = TTF_RenderText_Blended(police, "2", couleurNoir);
+	numbers[3] = TTF_RenderText_Blended(police, "3", couleurNoir);
+	numbers[4] = TTF_RenderText_Blended(police, "4", couleurNoir);
+	numbers[5] = TTF_RenderText_Blended(police, "5", couleurNoir);
+	numbers[6] = TTF_RenderText_Blended(police, "6", couleurNoir);
+	numbers[7] = TTF_RenderText_Blended(police, "7", couleurNoir);
+	numbers[8] = TTF_RenderText_Blended(police, "8", couleurNoir);
+	numbers[9] = TTF_RenderText_Blended(police, "9", couleurNoir);
 
 	TTF_CloseFont(police);
 	police = TTF_OpenFont(FONT, 22);
+
 	menu[M_B_SINGLE] = TTF_RenderText_Blended(police, "Single Player", couleurBlanche);
 	menu[M_B_NEWGAME] = TTF_RenderText_Blended(police, "New Game", couleurBlanche);
 	menu[M_B_LOADGAME] = TTF_RenderText_Blended(police, "Load Game", couleurBlanche);
@@ -180,27 +198,46 @@ void menu_load() {
 	menu[M_B_MAINMENU] = TTF_RenderText_Blended(police, "Main Menu", couleurBlanche);
 	menu[M_B_QUIT] = TTF_RenderText_Blended(police, "Quit", couleurBlanche);
 
-	menu[M_H_SAVE] = TTF_RenderText_Blended(police, "Save ?", couleurBlanche);
 	menu[M_B_YES] = TTF_RenderText_Blended(police, "Yes", couleurBlanche);
 	menu[M_B_NO] = TTF_RenderText_Blended(police, "No", couleurBlanche);
 
 	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
 
-	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
-	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN); // 17/17 -> ok
+
 
 	TTF_CloseFont(police);
+
+	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
+	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN);
+	menu[M_STARS] = load_image(MENU_STARS); // 18/18 -> ok
+
+	for(int i = 0; i < NB_ANIM_STARS; i++) {
+			menu_rect_stars[i].x = SIZE_OF_STARS * i;
+			menu_rect_stars[i].y = 0;
+			menu_rect_stars[i].w = SIZE_OF_STARS;
+			menu_rect_stars[i].h = SIZE_OF_STARS;
+		}
+		for(int i = NB_ANIM_STARS; i < 2*NB_ANIM_STARS - 1; i++) {
+			menu_rect_stars[i].x = menu_rect_stars[2*NB_ANIM_STARS-1-i].x;
+			menu_rect_stars[i].y = 0;
+			menu_rect_stars[i].w = SIZE_OF_STARS;
+			menu_rect_stars[i].h = SIZE_OF_STARS;
+		}
 }
 
 void menu_unload() {
 	for (int i = 0; i < NB_SURFACE_MENU; i++) {
 		SDL_FreeSurface(menu[i]);
 	}
+	for (int i = 0; i < 10; i++) {
+		SDL_FreeSurface(numbers[i]);
+	}
+	SDL_FreeSurface(menu_stars);
 }
 
 void banner_load() {
 	// numbers imgs
-	numbers[0] = load_image(BANNER_0);
+/*	numbers[0] = load_image(BANNER_0);
 	numbers[1] = load_image(BANNER_1);
 	numbers[2] = load_image(BANNER_2);
 	numbers[3] = load_image(BANNER_3);
@@ -210,6 +247,8 @@ void banner_load() {
 	numbers[7] = load_image(BANNER_7);
 	numbers[8] = load_image(BANNER_8);
 	numbers[9] = load_image(BANNER_9);
+*/
+
 
 	// other banner sprites
 	banner_life = load_image(BANNER_LIFE);
@@ -264,11 +303,6 @@ void bonus_unload() {
 }
 
 void player_load() {
-	player_img[WEST] = load_image(PLAYER_LEFT);
-	player_img[EAST] = load_image(PLAYER_RIGHT);
-	player_img[NORTH] = load_image(PLAYER_UP);
-	player_img[SOUTH] = load_image(PLAYER_DOWN);
-
 	players = load_image(PLAYER);
 
 	player[SOUTH] =  player_rect_down;
@@ -304,8 +338,6 @@ void player_load() {
 }
 
 void player_unload() {
-	for (int i = 0; i < 4; i++)
-		SDL_FreeSurface(player_img[i]);
 	SDL_FreeSurface(players);
 }
 
@@ -515,6 +547,10 @@ SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 SDL_Surface* sprite_get_menu(select_menu_t select_menu) {
 	assert(menu[select_menu]);
 	return menu[select_menu];
+}
+
+SDL_Rect* sprite_get_rect_stars() {
+	return(menu_rect_stars);
 }
 
 SDL_Surface* sprite_get_tree() {

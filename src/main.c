@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
 		switch(state) {
 		case NEWGAME_SINGLE:
-			menu_free(NULL);
+			menu_free();
 			game = game_new(0); // lvl 0
 			state = GAME;
 			/* no break */
@@ -50,7 +50,8 @@ int main(int argc, char *argv[]) {
 				game_free(game);
 				game = NULL;
 			}
-			new_menu(MAIN, NULL);
+			menu_free();
+			new_menu(MAIN);
 			window_resize(MENU_WIDTH, MENU_HEIGHT);
 			state = -1;
 			break;
@@ -60,11 +61,11 @@ int main(int argc, char *argv[]) {
 				game_free(game);
 				game = NULL;
 			}
-			menu_free(NULL);
+			menu_free();
 			done = 1;
 			break;
 		default:
-			menu_display(MENU_WIDTH / 2, MENU_HEIGHT / 2, MAIN);
+			menu_display(MENU_WIDTH / 2, MENU_HEIGHT / 2);
 			break;
 		}
 

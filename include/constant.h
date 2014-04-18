@@ -56,7 +56,7 @@ typedef enum game_state {
 	PAUSED, // 1
 } game_state_t;
 
-#define NB_SURFACE_MENU 17
+#define NB_SURFACE_MENU 18
 typedef enum select_menu {
 	M_B_SINGLE = 0,
 	M_B_NEWGAME,
@@ -79,15 +79,14 @@ typedef enum select_menu {
 	M_BG_GREY,
 	M_BG_MAINMENU,
 
-	M_SELECT
+	M_SELECT,
+	M_STARS // 18/18
 } select_menu_t;
 
 typedef enum type_menu {
 	MAIN = 0,
-	SINGLE,
-	MULTI,
-	PAUSE,
-	SAVE
+	PAUSE_SINGLE,
+	PAUSE_MULTI
 } type_t;
 
 typedef enum key_event {
