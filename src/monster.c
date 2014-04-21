@@ -175,17 +175,17 @@ int monster_move(struct list* mList, struct map* map, struct player* player, str
 	map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
 
 
-	// A monster moves every second
 	if(!mList) 
 		return 0;
 
+	// A monster moves every second
 	if(game_get_frame(game) - monster_get_movetimer(mList->data) < DEFAULT_GAME_FPS * 1)
 		return 0;
 
 	// We get the next direction for the monster and its distance between it and the player
 	dir = monster_pathfinding(map, player, mList, &distMP);
 
-	// If the distance is grater than the agressivity of the monster or if the player is unreachable, 
+	// If the distance is greater than the agressivity of the monster or if the player is unreachable, 
 	// then the monster moves randomly
 	if(distMP > monster_get_aggr(mList->data) || dir == -1)
 		dir = rand_ab(0, 3);

@@ -9,9 +9,9 @@
 void		 sprite_load();
 
 SDL_Surface* sprite_get_bomb(short bombAnim);
-SDL_Surface* sprite_get_players();
-SDL_Rect sprite_get_rect_player_anim(int i,enum way direction);
-SDL_Surface* sprite_get_player(int i, way_t direction);
+SDL_Surface* sprite_get_players(int id);
+SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction);
+//SDL_Surface* sprite_get_player(int i, way_t direction);
 SDL_Surface* sprite_get_monster(way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
 

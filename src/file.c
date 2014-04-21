@@ -3,6 +3,8 @@
 #include <map.h>
 #include <file.h>
 #include <assert.h>
+#include <dirent.h>
+#include <misc.h>
 
 typedef enum mode {
 	READ = 0,
@@ -22,13 +24,43 @@ FILE* file_open(char* lien, mode_file mode) {
 	return(NULL);
 }
 
-struct map* file_load_map(int n_level, int n_map) {
+struct map* file_load_map(int n_level, int n_map, int nb_players) {
 
 	int map_width = 0;
 	int map_height = 0;
 	int type = 0;
-	char lien[50];
-	sprintf(lien, "data/map_%d_%d.lvl", n_level, n_map);
+	char lien[250];
+	char dirName[50];
+
+	if(nb_players <= 1)
+	{
+		sprintf(lien, "data/1/map_%d_%d.lvl", n_level, n_map);
+	}
+	else
+	{
+		sprintf(dirName, "data/%d", nb_players);
+		DIR* dir = NULL;
+		struct dirent* readfile = NULL;
+		dir = opendir(dirName);
+		
+		if(!dir)
+			printf("Error : unable to open %s\n", dirName);
+
+		for(int i=0; i<=n_map; i++)
+		{
+			if((readfile = readdir(dir)) != NULL) {
+				if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name)) {
+					sprintf(lien, "data/%d/%s", nb_players, readfile->d_name);
+				}
+				else
+					i--;
+			}
+		}
+
+
+		if(closedir(dir) == -1)
+			printf("Problème à la fermeture");
+	}
 
 	FILE* map_file = file_open(lien, READ);
 
@@ -68,7 +100,7 @@ struct map* file_load_map(int n_level, int n_map) {
 
 int file_map_exist(int n_level, int n_map) {
 	char lien[50];
-	sprintf(lien, "data/map_%d_%d.lvl", n_level, n_map);
+	sprintf(lien, "data/1/map_%d_%d.lvl", n_level, n_map);
 
 	FILE* file = file_open(lien, READ);
 

@@ -13,7 +13,7 @@ typedef enum bomb_type {
 
 struct bomb;
 
-void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range);
+void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range, int playerID);
 void bomb_plant(struct game* game, struct map* map, struct player* player);
 void bomb_display(struct game* game,struct map* map, struct player* player);
 void bomb_update(struct game* game, struct map* map, struct player* player);

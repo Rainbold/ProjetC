@@ -59,6 +59,7 @@ void player_inc_velocity(struct player* player);
 void player_dec_velocity(struct player* player);
 
 int player_get_key(struct player* player);
+int player_get_id(struct player* player);
 
 void player_update(struct player* player);
 

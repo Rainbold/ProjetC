@@ -33,3 +33,35 @@ int rand_ab(int a, int b)
 
 	return res+a;
 }
+
+int map_is_valid_format1(const char* mapFile)
+{
+   FILE* f = NULL;
+   unsigned char byte = 0;
+
+   f = fopen(mapFile, "rb");
+
+   if(!f) 
+      return 0;
+
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x6c )
+      return 0;
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x76 )
+      return 0;
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x6c )
+      return 0;
+
+   fclose(f);
+
+   return 1;
+}
+
+int map_is_valid_format2(const char* mapFile)
+{
+	int len = strlen(mapFile);
+
+   	if(len >= 5 && mapFile[len-1] == 'l' &&  mapFile[len-2] == 'v' && mapFile[len-3] == 'l' && mapFile[len-4] == '.')
+   		return 1;
+   	else
+   		return 0;
+}

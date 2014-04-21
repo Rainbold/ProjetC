@@ -8,17 +8,18 @@
 struct game;
 
 // Create a new game
-struct game* game_new();
+struct game* game_new(int curr_lvl, int nb_player);
 
 struct level* game_next_lvl(struct game* game);
 
 // Free a game
 void game_free(struct game* game);
 
-// Return the player of the current game
-struct player* game_get_player(struct game* game);
+// Returns the player of the current game
+struct player* game_get_player(struct game* game, int id);
+int game_get_nb_player(struct game* game);
 
-// Return the current level
+// Returns the current level
 struct level* game_get_curr_level(struct game* game);
 
 // SDL_GetTicks minus the pause time

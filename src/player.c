@@ -188,21 +188,41 @@ int player_get_key(struct player* player) {
 	assert(player);
 	return(player->key);
 }
+
+int player_get_id(struct player* player) {
+	assert(player);
+	return(player->id);
+}
+
 void player_from_map(struct player* player, struct map* map) {
 	assert(player);
 	assert(map);
 
+	int cont = 1;
+
+	int playerCount = player->id;
+	printf("%d\n", playerCount);
+
 	int i, j;
 	for (i = 0; i < map_get_width(map); i++) {
 		for (j = 0; j < map_get_height(map); j++) {
-			if (map_get_cell_type(map, i, j) == CELL_PLAYER) {
+			if (map_get_cell_type(map, i, j) == CELL_PLAYER && playerCount == 0) {
 				player->x = i;
 				player->y = j;
+				cont = 0;
+				break;
+			}
+			else if(map_get_cell_type(map, i, j) == CELL_PLAYER) {
+				playerCount--;
 			}
 		}
+		if(!cont)
+			break;
 	}
+
 	player->x_sprite = 0;
 	player->y_sprite = 0;
+	printf("test\n");
 }
 
 static int player_move_aux(struct player* player, struct map* map, int x, int y, struct game* game) {
@@ -480,12 +500,12 @@ void player_display(struct player* player, struct game* game) {
 
 	if(player->invicibility > 0) {
 		if(((player->invicibility)/2)%2)
-			SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 128);
+			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 128);
 		else
-			SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 192);
+			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 192);
 	}
 	else
-		SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 255);
+		SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 255);
 
 	if(player->moving) {
 		anim = (((game_get_frame(game) - player->anim)*(player->velocity)/12)+1)%8;
@@ -494,8 +514,8 @@ void player_display(struct player* player, struct game* game) {
 		anim = 0;
 	}
 
-	window_display_sprite(	sprite_get_players(),
-							sprite_get_rect_player_anim(anim, player->current_way),
+	window_display_sprite(	sprite_get_players(player->id),
+							sprite_get_rect_player_anim(anim, player->id, player->current_way),
 							player->x * SIZE_BLOC + player->x_sprite,
 							player->y * SIZE_BLOC + player->y_sprite - 20
 							);

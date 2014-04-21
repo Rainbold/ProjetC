@@ -10,23 +10,25 @@
 struct bomb {
 	b_type type;
 	b_curAnim curAnim;
+	int playerID;
 	int range; // bomb's range
 	int range_dir[4]; // Real range
 	int state; //  0 = waiting, 1 = exploding
 	int anim; // used as a timer
 };
 
-void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range) {
+void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range, int playerID) {
 	struct bomb* bomb = malloc( sizeof(*bomb) );
 	bomb->type = type;
 	bomb->range = range;
 
 	for(int i = 0; i <= 3; i ++){
 		bomb->range_dir[i] = bomb->range;
-
 	}
-	bomb-> state = 0; // 0 = waiting
+
+	bomb->state = 0; // 0 = waiting
 	bomb->anim = 0;
+	bomb->playerID = playerID;
 
 	s_type typeL = LIST_BOMB;
 	map_insert_bomb(map, x, y, typeL, bomb);
@@ -37,8 +39,7 @@ void bomb_plant(struct game* game, struct map* map, struct player* player) {
 	int y = player_get_y(player);
 
 	if(player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_DOOR) { // if player has at least one bomb and he is not on a bomb
-
-		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player));
+		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player), player_get_id(player));
 		map_set_cell_type(map, x, y, CELL_BOMB);
 		player_dec_nb_bomb(player);
 	}
@@ -127,33 +128,37 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 
 	while(bList != NULL) {
 		bomb = bList->data;
-		if(!(bomb->state)) { // If the bomb has not exploded yet we display the animation of the bomb...
-			// Bomb's animation
-			if(bomb->anim < 4 * DEFAULT_GAME_FPS)
-				bomb->anim++;
-			else {
-				bomb->state = 1;
-				bomb_explo_init(map, player, bList);
-				player_inc_nb_bomb(player);
-				bomb->anim = 0;
-			}
-		}
-		else{ // The bomb is exploding
-			if(bomb->anim >= 1 * DEFAULT_GAME_FPS) {
-				bomb_free(map, bList);
-				reload = 1;
-			}
-			else {
-				//if(bomb->anim >= 1 * DEFAULT_GAME_FPS)
-					bomb->anim++;
-			}
-		}
-		if(reload){
-			bList = map_get_bombs(map);
-			reload = 0;
-		}
-		else {
+		if(bomb->playerID != player_get_id(player))
 			bList = bList->next;
+		else {
+			if(!(bomb->state)) { // If the bomb has not exploded yet we display the animation of the bomb...
+				// Bomb's animation
+				if(bomb->anim < 4 * DEFAULT_GAME_FPS)
+					bomb->anim++;
+				else {
+					bomb->state = 1;
+					bomb_explo_init(map, player, bList);
+					player_inc_nb_bomb(player);
+					bomb->anim = 0;
+				}
+			}
+			else{ // The bomb is exploding
+				if(bomb->anim >= 1 * DEFAULT_GAME_FPS) {
+					bomb_free(map, bList);
+					reload = 1;
+				}
+				else {
+					//if(bomb->anim >= 1 * DEFAULT_GAME_FPS)
+						bomb->anim++;
+				}
+			}
+			if(reload){
+				bList = map_get_bombs(map);
+				reload = 0;
+			}
+			else {
+				bList = bList->next;
+			}
 		}
 	}
 }

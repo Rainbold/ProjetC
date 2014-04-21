@@ -1,6 +1,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 #include <assert.h>
+#include <dirent.h>
 
 #include <sprite.h>
 #include <misc.h>
@@ -55,7 +56,10 @@
 #define IMG_BONUS_BOMB_NB_DEC     "sprite/bonus_bomb_nb_dec.png"
 
 // Sprites of Players
-#define PLAYER			"sprite/bomberman40.png"
+#define PLAYER_1			"sprite/bomberman1_40.png"
+#define PLAYER_2			"sprite/bomberman2_40.png"
+#define PLAYER_3			"sprite/bomberman3_40.png"
+#define PLAYER_4			"sprite/bomberman4_40.png"
 
 // Sprites of Monsters
 #define MONSTER_LEFT     "sprite/monster_left.png"
@@ -136,13 +140,13 @@ SDL_Surface* monster_img[4];
 #define TAILLE_TAB_ANIM_PLAYER 4
 #define SIZE_OF_PLAYER_SPRITE 60
 
-SDL_Surface* players;
+SDL_Surface* players[4];
 
-SDL_Rect* player[TAILLE_TAB_ANIM_PLAYER];
-SDL_Rect player_rect_up[NB_ANIM_PLAYER];
-SDL_Rect player_rect_down[NB_ANIM_PLAYER];
-SDL_Rect player_rect_left[NB_ANIM_PLAYER];
-SDL_Rect player_rect_right[NB_ANIM_PLAYER];
+SDL_Rect* player[4][TAILLE_TAB_ANIM_PLAYER];
+SDL_Rect player_rect_up[4][NB_ANIM_PLAYER];
+SDL_Rect player_rect_down[4][NB_ANIM_PLAYER];
+SDL_Rect player_rect_left[4][NB_ANIM_PLAYER];
+SDL_Rect player_rect_right[4][NB_ANIM_PLAYER];
 
 // bombs
 #define TAILLE_TAB_ANIM_BOMB 8
@@ -202,6 +206,68 @@ void menu_load() {
 	menu[M_B_NO] = TTF_RenderText_Blended(police, "No", couleurBlanche);
 
 	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
+
+	DIR* dir = NULL;
+	struct dirent* readfile = NULL;
+	dir = opendir("./data/2");
+	
+	if(!dir)
+		printf("Error : unable to open data/2\n");
+
+	for(int i=M_B_2PLAYER_MAP_1; i<M_B_2PLAYER_MAP_1+10; i++)
+	{
+		if((readfile = readdir(dir)) != NULL) {
+			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
+				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
+			else
+				i--;
+		}
+		else
+			menu[i] = NULL;
+	}
+
+	if(closedir(dir) == -1)
+		printf("Problème à la fermeture");
+
+	dir = opendir("./data/3");
+
+	if(!dir)
+		printf("Error : unable to open data/3\n");
+	
+	for(int i=M_B_3PLAYER_MAP_1; i<M_B_3PLAYER_MAP_1+10; i++)
+	{
+		if((readfile = readdir(dir)) != NULL) {
+			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
+				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
+			else
+				i--;
+		}
+		else
+			menu[i] = NULL;
+	}
+
+	if(closedir(dir) == -1)
+		printf("Problème à la fermeture");
+
+	dir = opendir("./data/4");
+
+	if(!dir)
+		printf("Error : unable to open data/4\n");
+	
+	for(int i=M_B_4PLAYER_MAP_1; i<M_B_4PLAYER_MAP_1+10; i++)
+	{
+		if((readfile = readdir(dir)) != NULL) {
+			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
+				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
+			else
+				i--;
+		}
+		else
+			menu[i] = NULL;
+	}
+
+	if(closedir(dir) == -1)
+		printf("Problème à la fermeture");
 
 
 
@@ -303,42 +369,51 @@ void bonus_unload() {
 }
 
 void player_load() {
-	players = load_image(PLAYER);
+	players[0] = load_image(PLAYER_1);
+	players[1] = load_image(PLAYER_2);
+	players[2] = load_image(PLAYER_3);
+	players[3] = load_image(PLAYER_4);
 
-	player[SOUTH] =  player_rect_down;
-	player[NORTH] = player_rect_up;
-	player[EAST] = player_rect_right;
-	player[WEST] = player_rect_left;
+	for(int j=0; j<4; j++)
+	{
+		player[j][SOUTH] =  player_rect_down[j];
+		player[j][NORTH] = player_rect_up[j];
+		player[j][EAST] = player_rect_right[j];
+		player[j][WEST] = player_rect_left[j];
 
-	for(int i = 0; i < NB_ANIM_PLAYER; i++) {
-		player_rect_down[i].x = SIZE_OF_SPRITE * i;
-		player_rect_down[i].y = 0;
-		player_rect_down[i].w = SIZE_OF_SPRITE ;
-		player_rect_down[i].h = SIZE_OF_PLAYER_SPRITE;
-	}
-	for(int i = 0; i < NB_ANIM_PLAYER; i++) {
-		player_rect_up[i].x = SIZE_OF_SPRITE * i;
-		player_rect_up[i].y = 3 * SIZE_OF_PLAYER_SPRITE;
-		player_rect_up[i].w = SIZE_OF_SPRITE ;
-		player_rect_up[i].h = SIZE_OF_PLAYER_SPRITE;
-	}
-	for(int i = 0; i < NB_ANIM_PLAYER; i++) {
-		player_rect_right[i].x = SIZE_OF_SPRITE * i;
-		player_rect_right[i].y = SIZE_OF_PLAYER_SPRITE;
-		player_rect_right[i].w = SIZE_OF_SPRITE ;
-		player_rect_right[i].h = SIZE_OF_PLAYER_SPRITE;
-	}
-	for(int i = 0; i < NB_ANIM_PLAYER; i++) {
-		player_rect_left[i].x = SIZE_OF_SPRITE * i;
-		player_rect_left[i].y = 2 * SIZE_OF_PLAYER_SPRITE;
-		player_rect_left[i].w = SIZE_OF_SPRITE ;
-		player_rect_left[i].h = SIZE_OF_PLAYER_SPRITE;
+		for(int i = 0; i < NB_ANIM_PLAYER; i++) {
+			player_rect_down[j][i].x = SIZE_OF_SPRITE * i;
+			player_rect_down[j][i].y = 0;
+			player_rect_down[j][i].w = SIZE_OF_SPRITE ;
+			player_rect_down[j][i].h = SIZE_OF_PLAYER_SPRITE;
+		}
+		for(int i = 0; i < NB_ANIM_PLAYER; i++) {
+			player_rect_up[j][i].x = SIZE_OF_SPRITE * i;
+			player_rect_up[j][i].y = 3 * SIZE_OF_PLAYER_SPRITE;
+			player_rect_up[j][i].w = SIZE_OF_SPRITE ;
+			player_rect_up[j][i].h = SIZE_OF_PLAYER_SPRITE;
+		}
+		for(int i = 0; i < NB_ANIM_PLAYER; i++) {
+			player_rect_right[j][i].x = SIZE_OF_SPRITE * i;
+			player_rect_right[j][i].y = SIZE_OF_PLAYER_SPRITE;
+			player_rect_right[j][i].w = SIZE_OF_SPRITE ;
+			player_rect_right[j][i].h = SIZE_OF_PLAYER_SPRITE;
+		}
+		for(int i = 0; i < NB_ANIM_PLAYER; i++) {
+			player_rect_left[j][i].x = SIZE_OF_SPRITE * i;
+			player_rect_left[j][i].y = 2 * SIZE_OF_PLAYER_SPRITE;
+			player_rect_left[j][i].w = SIZE_OF_SPRITE ;
+			player_rect_left[j][i].h = SIZE_OF_PLAYER_SPRITE;
+		}
 	}
 
 }
 
 void player_unload() {
-	SDL_FreeSurface(players);
+	SDL_FreeSurface(players[0]);
+	SDL_FreeSurface(players[1]);
+	SDL_FreeSurface(players[2]);
+	SDL_FreeSurface(players[3]);
 }
 
 void monster_load() {
@@ -505,12 +580,12 @@ SDL_Surface* sprite_get_number(short number) {
 	return numbers[number];
 }
 
-SDL_Surface* sprite_get_players() {
-	return players;
+SDL_Surface* sprite_get_players(int id) {
+	return players[id];
 }
 
-SDL_Rect sprite_get_rect_player_anim(int i,enum way direction) {
-	SDL_Rect* rect = player[direction];
+SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction) {
+	SDL_Rect* rect = player[id][direction];
 	return rect[i];
 }
 
@@ -545,7 +620,7 @@ SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 }
 
 SDL_Surface* sprite_get_menu(select_menu_t select_menu) {
-	assert(menu[select_menu]);
+	//assert(menu[select_menu]);
 	return menu[select_menu];
 }
 

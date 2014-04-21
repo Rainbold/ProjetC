@@ -38,9 +38,165 @@ int main(int argc, char *argv[]) {
 		switch(state) {
 		case NEWGAME_SINGLE:
 			menu_free();
-			game = game_new(0); // lvl 0
+			game = game_new(0, 1); // lvl 0
 			state = GAME;
-			/* no break */
+			break;
+
+		case NEWGAME_MULTI2_1:
+			menu_free();
+			game = game_new(0, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_2:
+			menu_free();
+			game = game_new(1, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_3:
+			menu_free();
+			game = game_new(2, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_4:
+			menu_free();
+			game = game_new(3, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_5:
+			menu_free();
+			game = game_new(4, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_6:
+			menu_free();
+			game = game_new(5, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_7:
+			menu_free();
+			game = game_new(6, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_8:
+			menu_free();
+			game = game_new(7, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_9:
+			menu_free();
+			game = game_new(8, 2); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI2_10:
+			menu_free();
+			game = game_new(9, 2); // lvl 0
+			state = GAME;
+			break;
+
+		case NEWGAME_MULTI3_1:
+			menu_free();
+			game = game_new(0, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_2:
+			menu_free();
+			game = game_new(1, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_3:
+			menu_free();
+			game = game_new(2, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_4:
+			menu_free();
+			game = game_new(3, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_5:
+			menu_free();
+			game = game_new(4, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_6:
+			menu_free();
+			game = game_new(5, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_7:
+			menu_free();
+			game = game_new(6, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_8:
+			menu_free();
+			game = game_new(7, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_9:
+			menu_free();
+			game = game_new(8, 3); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI3_10:
+			menu_free();
+			game = game_new(9, 3); // lvl 0
+			state = GAME;
+			break;
+
+		case NEWGAME_MULTI4_1:
+			menu_free();
+			game = game_new(0, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_2:
+			menu_free();
+			game = game_new(1, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_3:
+			menu_free();
+			game = game_new(2, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_4:
+			menu_free();
+			game = game_new(3, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_5:
+			menu_free();
+			game = game_new(4, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_6:
+			menu_free();
+			game = game_new(5, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_7:
+			menu_free();
+			game = game_new(6, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_8:
+			menu_free();
+			game = game_new(7, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_9:
+			menu_free();
+			game = game_new(8, 4); // lvl 0
+			state = GAME;
+			break;
+		case NEWGAME_MULTI4_10:
+			menu_free();
+			game = game_new(9, 4); // lvl 0
+			state = GAME;
+			break;
+
+
+
 		case GAME:
 			game_display(game);
 			break;

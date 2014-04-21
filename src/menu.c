@@ -7,7 +7,7 @@
 #include <constant.h>
 #include <menu.h>
 
-#define MAX_FIELD_MENU		3
+#define MAX_FIELD_MENU 20
 
 struct animation{
 	int x, y, offset;
@@ -56,10 +56,12 @@ void new_menu(enum type_menu type) {
 	switch(type) {
 	case MAIN:
 		menu->type = MAIN;
-		menu->nb_field = 3;
+		menu->nb_field = 5;
 		menu->nb_sub[0] = 2;
-		menu->nb_sub[1] = 3;
+		menu->nb_sub[1] = 0;
 		menu->nb_sub[2] = 0;
+		menu->nb_sub[3] = 0;
+		menu->nb_sub[4] = 0;
 
 		menu->pos_field = 0;
 		menu->pos_sub = 0;
@@ -68,12 +70,42 @@ void new_menu(enum type_menu type) {
 		menu->select[0][1] = M_B_NEWGAME;
 		menu->select[0][2] = M_B_LOADGAME;
 
-		menu->select[1][0] = M_B_MULTI;
-		menu->select[1][1] = M_B_2PLAYER;
-		menu->select[1][2] = M_B_3PLAYER;
-		menu->select[1][3] = M_B_4PLAYER;
+		menu->select[1][0] = M_B_2PLAYER;
 
-		menu->select[2][0] = M_B_QUIT;
+		int cont = M_B_2PLAYER_MAP_1;
+		int i = 0;
+		while(sprite_get_menu(cont) && i<=10)
+		{
+			i++;
+			menu->nb_sub[1] = i;
+			menu->select[1][i] = cont;
+			cont++;
+		}
+
+		cont = M_B_3PLAYER_MAP_1;
+		i = 0;
+		while(sprite_get_menu(cont) && i<=10)
+		{
+			i++;
+			menu->nb_sub[2] = i;
+			menu->select[2][i] = cont;
+			cont++;
+		}
+
+		cont = M_B_4PLAYER_MAP_1;
+		i = 0;
+		while(sprite_get_menu(cont) && i<=10)
+		{
+			i++;
+			menu->nb_sub[3] = i;
+			menu->select[3][i] = cont;
+			cont++;
+		}
+
+		menu->select[2][0] = M_B_3PLAYER;
+		menu->select[3][0] = M_B_4PLAYER;
+
+		menu->select[4][0] = M_B_QUIT;
 
 		menu->header = -1;
 		menu->pos_header_x = 0;
@@ -83,6 +115,14 @@ void new_menu(enum type_menu type) {
 		menu->pos_select_y[0] = -120;
 		menu->pos_select_y[1] = -90;
 		menu->pos_select_y[2] = -60;
+		menu->pos_select_y[3] = -30;
+		menu->pos_select_y[4] = 0;
+		menu->pos_select_y[5] = 30;
+		menu->pos_select_y[6] = 60;
+		menu->pos_select_y[7] = 90;
+		menu->pos_select_y[8] = 120;
+		menu->pos_select_y[9] = 150;
+		menu->pos_select_y[10] = 180;
 
 		menu->selector = M_SELECT;
 		menu->selector_offset = -15;
@@ -172,6 +212,7 @@ void new_menu(enum type_menu type) {
 		menu->pos_select_y[1] = 0;
 		menu->pos_select_y[2] = 30;
 
+
 		menu->selector = M_SELECT;
 		menu->selector_offset = -15;
 
@@ -201,6 +242,9 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 			case SDLK_KP_ENTER:
 				switch(g_menu->select[g_menu->pos_field][g_menu->pos_sub]) {
 
+				case M_B_2PLAYER:
+				case M_B_3PLAYER:
+				case M_B_4PLAYER:
 				case M_B_SINGLE:
 				case M_B_MULTI:
 					g_menu->pos_sub = 1;
@@ -227,15 +271,108 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 				case M_B_LOADGAME:
 					//return LOADGAME; todo
 					break;
-
+				/*
 				case M_B_2PLAYER:
-					//return NEWGAME_MULTI2; todo multi2
+					return NEWGAME_MULTI2;
 					break;
 				case M_B_3PLAYER:
-					//return NEWGAME_MULTI3; todo multi3
+					return NEWGAME_MULTI3;
 					break;
 				case M_B_4PLAYER:
-					//return NEWGAME_MULTI4; todo multi4
+					return NEWGAME_MULTI4;
+				*/
+
+				case M_B_2PLAYER_MAP_1:
+					return NEWGAME_MULTI2_1;
+					break;
+				case M_B_2PLAYER_MAP_2:
+					return NEWGAME_MULTI2_2;
+					break;
+				case M_B_2PLAYER_MAP_3:
+					return NEWGAME_MULTI2_3;
+					break;
+				case M_B_2PLAYER_MAP_4:
+					return NEWGAME_MULTI2_4;
+					break;
+				case M_B_2PLAYER_MAP_5:
+					return NEWGAME_MULTI2_5;
+					break;
+				case M_B_2PLAYER_MAP_6:
+					return NEWGAME_MULTI2_6;
+					break;
+				case M_B_2PLAYER_MAP_7:
+					return NEWGAME_MULTI2_7;
+					break;
+				case M_B_2PLAYER_MAP_8:
+					return NEWGAME_MULTI2_8;
+					break;
+				case M_B_2PLAYER_MAP_9:
+					return NEWGAME_MULTI2_9;
+					break;
+				case M_B_2PLAYER_MAP_10:
+					return NEWGAME_MULTI2_10;
+					break;
+
+				case M_B_3PLAYER_MAP_1:
+					return NEWGAME_MULTI3_1;
+					break;
+				case M_B_3PLAYER_MAP_2:
+					return NEWGAME_MULTI3_2;
+					break;
+				case M_B_3PLAYER_MAP_3:
+					return NEWGAME_MULTI3_3;
+					break;
+				case M_B_3PLAYER_MAP_4:
+					return NEWGAME_MULTI3_4;
+					break;
+				case M_B_3PLAYER_MAP_5:
+					return NEWGAME_MULTI3_5;
+					break;
+				case M_B_3PLAYER_MAP_6:
+					return NEWGAME_MULTI3_6;
+					break;
+				case M_B_3PLAYER_MAP_7:
+					return NEWGAME_MULTI3_7;
+					break;
+				case M_B_3PLAYER_MAP_8:
+					return NEWGAME_MULTI3_8;
+					break;
+				case M_B_3PLAYER_MAP_9:
+					return NEWGAME_MULTI3_9;
+					break;
+				case M_B_3PLAYER_MAP_10:
+					return NEWGAME_MULTI3_10;
+					break;
+
+				case M_B_4PLAYER_MAP_1:
+					return NEWGAME_MULTI4_1;
+					break;
+				case M_B_4PLAYER_MAP_2:
+					return NEWGAME_MULTI4_2;
+					break;
+				case M_B_4PLAYER_MAP_3:
+					return NEWGAME_MULTI4_3;
+					break;
+				case M_B_4PLAYER_MAP_4:
+					return NEWGAME_MULTI4_4;
+					break;
+				case M_B_4PLAYER_MAP_5:
+					return NEWGAME_MULTI4_5;
+					break;
+				case M_B_4PLAYER_MAP_6:
+					return NEWGAME_MULTI4_6;
+					break;
+				case M_B_4PLAYER_MAP_7:
+					return NEWGAME_MULTI4_7;
+					break;
+				case M_B_4PLAYER_MAP_8:
+					return NEWGAME_MULTI4_8;
+					break;
+				case M_B_4PLAYER_MAP_9:
+					return NEWGAME_MULTI4_9;
+					break;
+				case M_B_4PLAYER_MAP_10:
+					return NEWGAME_MULTI4_10;
 					break;
 
 				case M_B_KEEP:
@@ -324,10 +461,11 @@ void menu_display(int mid_w, int mid_h) {
 									mid_h + g_menu->pos_select_y[g_menu->pos_field]);
 		}
 		else {
-			for(int i = 0; i < g_menu->nb_sub[g_menu->pos_field]; i++)
+			for(int i = 0; i < g_menu->nb_sub[g_menu->pos_field]; i++) {
 							window_display_image(	sprite_get_menu(g_menu->select[g_menu->pos_field][i+1]),
 													mid_w + g_menu->pos_select_x,
 													mid_h + g_menu->pos_select_y[i]);
+			}
 			window_display_image(	sprite_get_menu(g_menu->selector),
 									mid_w + g_menu->pos_select_x + g_menu->selector_offset,
 									mid_h + g_menu->pos_select_y[g_menu->pos_sub-1]);
