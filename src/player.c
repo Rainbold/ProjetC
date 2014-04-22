@@ -74,6 +74,16 @@ int player_get_y(struct player* player) {
 	return player->y;
 }
 
+int player_get_x_real(struct player* player) {
+	assert(player != NULL);
+	return player->x_sprite+player->x*40;
+}
+
+int player_get_y_real(struct player* player) {
+	assert(player != NULL);
+	return player->y_sprite+player->y*40;
+}
+
 void player_set_current_way(struct player* player, way_t way) {
 	assert(player);
 	player->current_way = way;

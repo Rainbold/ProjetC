@@ -123,43 +123,76 @@ void game_display(struct game* game) {
 	level_display(game_get_curr_level(game));
 
 	struct player* player[game->nb_player];
+	
+	int minYLast = -1;
+	int maxY = -1;
+
+
 	for(int i=0; i<game->nb_player; i++) 
 	{
 		player[i] = game->player[i];
-
-		bomb_display(
-				game,
-				level_get_curr_map(game->curr_level), // map
-				player[i]);
-
-		monster_display(level_get_curr_map(game->curr_level), player[i], game);
-
-		player_display(player[i], game);
-
 		if(game->game_state == PLAYING) {
-			if(player_get_moving(player[i]))
-				player_move(player[i], level_get_curr_map(game->curr_level), game);
+				if(player_get_moving(player[i]))
+					player_move(player[i], level_get_curr_map(game->curr_level), game);
 
-			if(map_get_bombs(level_get_curr_map(game->curr_level)) != NULL) // if there is at least one bomb
-				bomb_update(game, level_get_curr_map(game->curr_level), player[i]);
+		if(player_get_y(game->player[i]) > maxY)
+			maxY = player_get_y(game->player[i]);
+				if(map_get_bombs(level_get_curr_map(game->curr_level)) != NULL) // if there is at least one bomb
+					bomb_update(game, level_get_curr_map(game->curr_level), player[i]);
 
-			player_update(player[i]);
-			if(!frameChanged)
+				player_update(player[i]);
+				if(!frameChanged)
+				{
+					frameChanged = !frameChanged;
+					game->frame++;
+				}
+			}
+			else if(game->game_state == PAUSED) {
+		/*		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
+				window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
+				window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
+				window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
+				window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
+				window_display_image(sprite_get_menu(M_SELECT), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
+		*/
+				menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
+			}
+	}
+	for(int i=0; i<game->nb_player; i++) 
+	{
+		if(player_get_y_real(game->player[i]) > maxY)
+			maxY = player_get_y_real(game->player[i]);
+	}
+
+	int minY = maxY;
+
+	for(int k=0; k<game->nb_player; k++) 
+	{
+		for(int j=0; j<game->nb_player; j++) 
+		{
+			if(player_get_y_real(game->player[j]) < minY && player_get_y_real(game->player[j]) > minYLast)
+				minY = player_get_y_real(game->player[j]);
+			printf("MIN : %d(j) %d(min) %d(pla) %d(minL)\n", j, minY, player_get_y_real(game->player[j]), minYLast);
+		}
+
+		for(int i=0; i<game->nb_player; i++)
+		{
+			player[i] = game->player[i];
+			if(player_get_y_real(player[i]) == minY)
 			{
-				frameChanged = !frameChanged;
-				game->frame++;
+
+				bomb_display(
+						game,
+						level_get_curr_map(game->curr_level), // map
+						player[i]);
+
+				monster_display(level_get_curr_map(game->curr_level), player[i], game);
+
+				player_display(player[i], game);
 			}
 		}
-		else if(game->game_state == PAUSED) {
-	/*		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
-			window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
-			window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
-			window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
-			window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
-			window_display_image(sprite_get_menu(M_SELECT), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
-	*/
-			menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
-		}
+		minYLast = minY;
+		minY = maxY;
 	}
 	window_refresh();
 }
