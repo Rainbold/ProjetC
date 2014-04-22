@@ -180,7 +180,7 @@ void player_inc_nb_range(struct player* player) { // nb_range++
 
 void player_dec_nb_range(struct player* player) { // nb_range--
 	assert(player);
-	if(player_get_nb_range(player) > 1)
+	if(player_get_nb_range(player) > 1 )
 		player->nb_range -= 1;
 }
 
@@ -228,8 +228,8 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 				cellType = map_get_cell_type(map, x, y - 1);
 				if( cellType != CELL_EMPTY || y < 1)
 					return 0;
+				map_set_cell_type(map, x, y - 1, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
-				map_set_cell_type(map, x, y - 1, CELL_CASE);
 			}
 			break;
 
@@ -240,8 +240,8 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 				cellType = map_get_cell_type(map, x, y + 1);
 				if( cellType != CELL_EMPTY)
 					return 0;
+				map_set_cell_type(map, x, y + 1, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
-				map_set_cell_type(map, x, y + 1, CELL_CASE);
 			}
 			break;
 
@@ -252,8 +252,8 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 				cellType = map_get_cell_type(map, x + 1, y);
 				if( cellType != CELL_EMPTY)
 					return 0;
+				map_set_cell_type(map, x + 1, y, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
-				map_set_cell_type(map, x + 1, y, CELL_CASE);
 			}
 			break;
 
@@ -264,8 +264,8 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 				cellType = map_get_cell_type(map, x - 1, y);
 				if( cellType != CELL_EMPTY)
 					return 0;
+				map_set_cell_type(map, x - 1, y, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
-				map_set_cell_type(map, x - 1, y, CELL_CASE);
 			}
 			break;
 		}
@@ -488,7 +488,8 @@ void player_display(struct player* player, struct game* game) {
 		SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 255);
 
 	if(player->moving) {
-		anim = (((game_get_frame(game) - player->anim)*(player->velocity)/12)+1)%8;
+		anim = (((player->anim)*(player->velocity)/12)+1)%8;
+		player->anim++;
 	}
 	else {
 		anim = 0;

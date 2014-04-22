@@ -84,6 +84,11 @@ struct map* level_get_curr_map(struct level* level) {
 	return level->maps[level->cur_map];
 }
 
+int level_get_curr_nb_map(struct level* level) {
+	assert(level);
+	return(level->cur_map);
+}
+
 struct map* level_get_map(struct level* level, int num) {
 	assert(num <= level->nb_maps);
 	return level->maps[num];
@@ -92,8 +97,8 @@ struct map* level_get_map(struct level* level, int num) {
 void level_free(struct level* level) {
 	for (int i = 0; i < level->nb_maps; i++)
 		map_free(level->maps[i]);
-
 	free(level->maps);
+	free(level);
 }
 
 void level_display(struct level* level) {

@@ -47,6 +47,7 @@ void game_free(struct game* game) {
 
 	player_free(game->player);
 	level_free(game->curr_level);
+	free(game);
 }
 
 struct player* game_get_player(struct game* game) {
@@ -68,38 +69,51 @@ int game_get_frame(struct game* game)
 void game_banner_display(struct game* game) {
 	assert(game);
 
-	struct map* map = level_get_curr_map(game_get_curr_level(game));
 	struct player* player = game->player;
+	struct level* level = game->curr_level;
+	struct map* map = level_get_curr_map(level);
+
 
 	int y = (map_get_height(map)) * SIZE_BLOC;
 	for (int i = 0; i < map_get_width(map); i++)
 		window_display_image(sprite_get_banner_line(), i * SIZE_BLOC, y);
 
-	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 6 * SIZE_BLOC) / 4;
+	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 9 * SIZE_BLOC) / 6;
 	int x = white_bloc;
 	y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
+
+	window_display_image(sprite_get_number(game->nb_curr_level), x, y);
+
+	x += SIZE_BLOC - 5;
+	window_display_image(sprite_get_number(10), x, y);
+
+	x += 10;
+	window_display_image(sprite_get_number(level_get_curr_nb_map(level)),x, y);
+
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_life(), x, y); // sprite life
 
-	x = white_bloc + SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_life(game_get_player(game))), x, y); // life number
 
-	x = 2 * white_bloc + 2 * SIZE_BLOC;
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
 
-	x = 2 * white_bloc + 3 * SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_bomb(game_get_player(game))), x, y); // bomb number
 
-	x = 3 * white_bloc + 4 * SIZE_BLOC;
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_range(), x, y); // range sprite
 
-	x = 3 * white_bloc + 5 * SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_range(game_get_player(game))), x, y); // range number
 
+	x += white_bloc + SIZE_BLOC;
 	if(player_get_key(player))
-		window_display_image(sprite_get_key(), (map_get_width(map) -1) * SIZE_BLOC, y);
+		window_display_image(sprite_get_key(), x, y);
 }
 
 void game_display(struct game* game) {
@@ -124,11 +138,15 @@ void game_display(struct game* game) {
 	if(game->game_state == PLAYING) {
 		if(player_get_moving(player))
 			player_move(player, level_get_curr_map(game->curr_level), game);
+		player_update(player);
+
+		monster_move(level_get_curr_map(game->curr_level), player, game);
+		monster_update(level_get_curr_map(game->curr_level));
 
 		if(map_get_bombs(level_get_curr_map(game->curr_level)) != NULL) // if there is at least one bomb
 			bomb_update(game, level_get_curr_map(game->curr_level), player);
 
-		player_update(player);
+
 		game->frame++;
 	}
 	else if(game->game_state == PAUSED) {

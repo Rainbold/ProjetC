@@ -12,7 +12,7 @@ SDL_Surface* sprite_get_bomb(short bombAnim);
 SDL_Surface* sprite_get_players();
 SDL_Rect sprite_get_rect_player_anim(int i,enum way direction);
 SDL_Surface* sprite_get_player(int i, way_t direction);
-SDL_Surface* sprite_get_monster(way_t direction);
+SDL_Surface* sprite_get_monster(m_type type, way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
 
 SDL_Surface* sprite_get_menu(enum select_menu select_menu);

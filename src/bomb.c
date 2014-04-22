@@ -44,41 +44,70 @@ void bomb_plant(struct game* game, struct map* map, struct player* player) {
 	}
 }
 
+void bomb_event(struct game* game, struct map* map, struct bomb* bomb, int x, int y) {
+	struct player* player = game_get_player(game);
+	struct bomb* sbomb = NULL;
+
+	if((x == player_get_x(player) && y == player_get_y(player)))
+		player_hit(player, 3*DEFAULT_GAME_FPS);
+
+	int cellType = map_get_cell_type(map, x, y);
+	switch(cellType & 15){
+	case CELL_BONUS : // Case
+		map_set_cell_type(map, x, y, CELL_EMPTY);
+		break;
+	case CELL_MONSTER : // Monster
+		map_set_monsters( map, monster_hit(map_get_monsters(map), x, y, game) );
+		break;
+	case CELL_CASE : // Case
+		if(bomb->anim >= DEFAULT_GAME_FPS)
+			map_case_destroyed(game, map, x, y);
+		break;
+	case CELL_BOMB : // Bomb
+		if((sbomb = search_bomb(map, x, y, 0)) != NULL)
+				sbomb->anim = 4 * DEFAULT_GAME_FPS;
+		break;
+	default: // Everything else
+		break;
+	}
+}
+
 void bomb_display(struct game* game, struct map* map, struct player* player) {
 	assert(map);
 	assert(player);
 	struct list* bList = map_get_bombs(map);
 	struct bomb* bomb = NULL;
-	struct bomb* sbomb = NULL;
 	int x;
 	int y;
-	int cellType = 0;
 
 	if(bList != NULL){ // if there is at least one bomb
 
 		bList = map_get_bombs(map);
 		// Bomb Display And Event
 		while(bList != NULL) { // For each bombs
-			bomb = bList->data;
+			bomb = list_get_data(bList);
 			if(!(bomb->state)){ // bomb who's waiting
 				window_display_sprite(
 						sprite_get_bombs(),
 						sprite_get_rect_bomb_anim(7, ((bomb->anim)/4)%4),
-						bList->x * SIZE_BLOC, bList->y * SIZE_BLOC);
+						list_get_x(bList) * SIZE_BLOC, list_get_y(bList) * SIZE_BLOC);
 			}
 			else { // bomb who's exploding
-				// Center
 				//printf("anim: %d, cal: %d\n", bomb->anim, bomb->anim/4);
+
+				// Center
 				window_display_sprite(
 						sprite_get_bombs(),
 						sprite_get_rect_bomb_anim(0, bomb->anim / 4),
-						bList->x * SIZE_BLOC, bList->y * SIZE_BLOC);
+						list_get_x(bList) * SIZE_BLOC, list_get_y(bList) * SIZE_BLOC);
+				// Event
+				bomb_event(game, map, bomb, list_get_x(bList), list_get_y(bList));
 
 				for(int d = 0; d < 4; d++){ // 0: SOUTH, 1: NORTH, 2: WEST, 3: EAST
 					for(int r = 1; r <= bomb->range_dir[d]; r++){
-/* d |dx |dy */ 		x = bList->x + r * ((d / 2) * ((d * 2) - 5)); 		// + r * dx
-/* 0 | 0 | 1 */			y = bList->y + r * ((d - 3) / 2 * ((d * 2) - 1));	// + r * dy
-/* 1 | 0 |-1 */			if(search_bomb(map, x, y) == NULL) {
+/* d |dx |dy */ 		x = list_get_x(bList) + r * ((d / 2) * ((d * 2) - 5)); 		// + r * dx
+/* 0 | 0 | 1 */			y = list_get_y(bList) + r * ((d - 3) / 2 * ((d * 2) - 1));	// + r * dy
+/* 1 | 0 |-1 */			if(list_find(map_get_bombs(map), x, y) == NULL) {
 /* 2 |-1 | 0 */				if(r != bomb->range) {
 /* 3 | 1 | 0 */					window_display_sprite(sprite_get_bombs(), sprite_get_rect_bomb_anim(d/2 +1, bomb->anim/4), x * SIZE_BLOC, y * SIZE_BLOC);
 							}
@@ -87,33 +116,11 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 							}
 						}
 						// Event
-
-						// If the player is standing on the bomb, he loses a life
-						if((bList->x == player_get_x(player) && bList->y == player_get_y(player)) || (x == player_get_x(player) && y == player_get_y(player)))
-							player_hit(player, 3*DEFAULT_GAME_FPS);
-
-						cellType = map_get_cell_type(map, x, y);
-						switch(cellType & 15){
-						case CELL_MONSTER : // Monster
-							map_set_monsters( map, monster_dec_nb_life(map_get_monsters(map), x, y, game) );
-							break;
-						case CELL_CASE : // Case
-							map_case_destroyed(game, map, x, y);
-							break;
-						case CELL_BOMB : // Bomb
-							if((sbomb = search_bomb(map, x, y)) != NULL)
-									sbomb->anim = 4 * DEFAULT_GAME_FPS;
-							break;
-						case CELL_BONUS : // Case
-							//map_set_cell_type(map, x, y, CELL_EMPTY);
-							break;
-						default: // Everything else
-							break;
-						}
-					}
-				}
+						bomb_event(game, map, bomb, x, y);
+					} // end for (range)
+				} // end for (direction)
 			}
-			bList = bList->next;
+			bList = list_get_next(bList);
 		}
 	}
 }
@@ -126,7 +133,7 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 	int reload = 0;
 
 	while(bList != NULL) {
-		bomb = bList->data;
+		bomb = list_get_data(bList);
 		if(!(bomb->state)) { // If the bomb has not exploded yet we display the animation of the bomb...
 			// Bomb's animation
 			if(bomb->anim < 4 * DEFAULT_GAME_FPS)
@@ -153,26 +160,26 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 			reload = 0;
 		}
 		else {
-			bList = bList->next;
+			bList = list_get_next(bList);
 		}
 	}
 }
 
 void bomb_explo_init(struct map* map, struct player* player, struct list* bList){ // When the bomb explode, used once per bomb
 	assert(bList);
-	struct bomb* bomb = bList->data;
+	struct bomb* bomb = list_get_data(bList);
 	int cellType = 0;
 	int rt = 0;
 	int x;
 	int y;
 
-	if(map_get_cell_type(map, bList->x, bList->y) == CELL_BOMB)
-		map_set_cell_type(map, bList->x, bList->y, CELL_EMPTY);
+	if(map_get_cell_type(map, list_get_x(bList), list_get_y(bList)) == CELL_BOMB)
+		map_set_cell_type(map, list_get_x(bList), list_get_y(bList), CELL_EMPTY);
 
 	for(int d = 0; d < 4; d++){ // 0: NORTH, 1: SOUTH, 2: WEST, 3: EAST
 		for(int r = 1; r <= bomb->range; r++){
-			x = bList->x + r * ((d / 2) * ((d * 2) - 5));		// + r * dx
-			y = bList->y + r * ((d - 3) / 2 * ((d * 2) - 1));	// + r * dy
+			x = list_get_x(bList) + r * ((d / 2) * ((d * 2) - 5));		// + r * dx
+			y = list_get_y(bList) + r * ((d - 3) / 2 * ((d * 2) - 1));	// + r * dy
 			//printf("\nd: %d, x: %d, y: %d, dx: %d, dy: %d", d, x, y, ((d - 3) / 2 * ((d * 2) - 1)), ((d / 2) * ((d * 2) - 5)));
 
 			if(0 <= x  && x < map_get_width(map) && 0 <= y && y < map_get_height(map)) { // if in map
@@ -204,15 +211,18 @@ void bomb_explo_init(struct map* map, struct player* player, struct list* bList)
 void bomb_free(struct map* map,struct list* bList){
 	assert(map);
 	assert(bList);
-	map_set_bombs(map, list_remove(map_get_bombs(map), bList->x, bList->y));
+	map_set_bombs(map, list_remove2(map_get_bombs(map), bList));
 }
 
-struct bomb* search_bomb(struct map* map, int x, int y) {
+struct bomb* search_bomb(struct map* map, int x, int y, int state) {
 	struct list* bList = map_get_bombs(map);
 	while(bList != NULL) {
-		if(bList->x == x && bList->y == y)
-			return bList->data;
-		bList = bList->next;
+		if(list_get_x(bList) == x && list_get_y(bList) == y) {
+			struct bomb* bomb = list_get_data(bList);
+			if(bomb->state == state)
+				return list_get_data(bList);
+		}
+		bList = list_get_next(bList);
 	}
 	return NULL;
 }

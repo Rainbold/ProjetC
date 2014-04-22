@@ -58,10 +58,11 @@
 #define PLAYER			"sprite/bomberman40.png"
 
 // Sprites of Monsters
-#define MONSTER_LEFT     "sprite/monster_left.png"
-#define MONSTER_UP       "sprite/monster_up.png"
-#define MONSTER_RIGHT    "sprite/monster_right.png"
-#define MONSTER_DOWN     "sprite/monster_down.png"
+#define MONSTER_LEFT	"sprite/monster_left.png"
+#define MONSTER_UP		"sprite/monster_up.png"
+#define MONSTER_RIGHT	"sprite/monster_right.png"
+#define MONSTER_DOWN	"sprite/monster_down.png"
+#define MONSTER_IMG_ALIEN1	"sprite/alien1.png"
 
 /*	Main menu : main BG with sprites | id text[]
  * 		1--Single player				0
@@ -127,7 +128,9 @@ SDL_Surface* tree;
 SDL_Surface* bonus[NB_BONUS];
 
 // monster
-SDL_Surface* monster_img[4];
+SDL_Surface** monsters[2];
+SDL_Surface* monster_img_norm[4];
+SDL_Surface* monster_img_alien[4];
 
 // player
 
@@ -181,6 +184,7 @@ void menu_load() {
 	numbers[7] = TTF_RenderText_Blended(police, "7", couleurNoir);
 	numbers[8] = TTF_RenderText_Blended(police, "8", couleurNoir);
 	numbers[9] = TTF_RenderText_Blended(police, "9", couleurNoir);
+	numbers[10] = TTF_RenderText_Blended(police, ":", couleurNoir);
 
 	TTF_CloseFont(police);
 	police = TTF_OpenFont(FONT, 22);
@@ -229,7 +233,7 @@ void menu_unload() {
 	for (int i = 0; i < NB_SURFACE_MENU; i++) {
 		SDL_FreeSurface(menu[i]);
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 11; i++) {
 		SDL_FreeSurface(numbers[i]);
 	}
 	SDL_FreeSurface(menu_stars);
@@ -258,11 +262,6 @@ void banner_load() {
 }
 
 void banner_unload() {
-	// numbers imgs
-	for (int i = 0; i < 10; i++) {
-		SDL_FreeSurface(numbers[i]);
-	}
-
 	// other banner sprites
 	SDL_FreeSurface(banner_life);
 	SDL_FreeSurface(banner_bomb);
@@ -342,15 +341,27 @@ void player_unload() {
 }
 
 void monster_load() {
-	monster_img[WEST] = load_image(MONSTER_LEFT);
-	monster_img[EAST] = load_image(MONSTER_RIGHT);
-	monster_img[NORTH] = load_image(MONSTER_UP);
-	monster_img[SOUTH] = load_image(MONSTER_DOWN);
+
+	monsters[MONSTER_NORMAL] = monster_img_norm;
+	monsters[MONSTER_ALIEN1] = monster_img_alien;
+
+	monster_img_norm[WEST] = load_image(MONSTER_LEFT);
+	monster_img_norm[EAST] = load_image(MONSTER_RIGHT);
+	monster_img_norm[NORTH] = load_image(MONSTER_UP);
+	monster_img_norm[SOUTH] = load_image(MONSTER_DOWN);
+
+	monster_img_alien[NORTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[WEST] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[SOUTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[EAST] = load_image(MONSTER_IMG_ALIEN1);
 }
 
 void monster_unload() {
-	for (int i = 0; i < 4; i++)
-		SDL_FreeSurface(monster_img[i]);
+	for (int i = 0; i < 4; i++) {
+		SDL_FreeSurface(monster_img_norm[i]);
+		SDL_FreeSurface(monster_img_alien[i]);
+	}
+
 }
 
 void bombs_load()
@@ -501,7 +512,7 @@ SDL_Rect sprite_get_rect_bomb_anim(int i, int j) {
 }
 
 SDL_Surface* sprite_get_number(short number) {
-	assert(number >= 0 && number <= 9);
+	assert(number >= 0 && number <= 10);
 	return numbers[number];
 }
 
@@ -514,9 +525,10 @@ SDL_Rect sprite_get_rect_player_anim(int i,enum way direction) {
 	return rect[i];
 }
 
-SDL_Surface* sprite_get_monster(enum way direction) {
-	assert(monster_img[direction]);
-	return monster_img[direction];
+SDL_Surface* sprite_get_monster(m_type type, enum way direction) {
+	//assert(monster_img[direction]);
+	SDL_Surface** monster = monsters[type];
+	return monster[direction];
 }
 
 SDL_Surface* sprite_get_banner_life() {

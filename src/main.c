@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
 		}
 
 			state = input_keyboard(game, state);
+
 #ifdef USE_WIIMOTE
 			state = input_wiimote(game, state);
 #endif

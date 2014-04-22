@@ -21,10 +21,10 @@ struct menu {
 	int nb_sub[MAX_FIELD_MENU];
 	int pos_field, pos_sub;
 
-	/*	   -       -  nb_field	// 0
-	 * 	   |       |  nb_sub1	// 1
-	 * 	   |       |  nb_sub2	// 2
-	 *     |       |  nb_sub3	// 3
+	/*	   f1     f2  nb_field	// 0
+	 * 	   s1     s2  nb_sub1	// 1
+	 * 	   s1     s2  nb_sub2	// 2
+	 *     s1     s2  nb_sub3	// 3
 	 */
 
 	enum select_menu select[MAX_FIELD_MENU][MAX_FIELD_MENU + 1];
