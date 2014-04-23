@@ -42,6 +42,13 @@ typedef enum monster_type {
 	MONSTER_ALIEN3  //3
 } m_type;
 
+typedef enum players_numbers {
+	PLAYER1 = 0,
+	PLAYER2, //1
+	PLAYER3, //2
+	PLAYER4  //3
+} players_t;
+
 enum compose_type {
 	CELL_STONE = CELL_SCENERY | (SCENERY_STONE << 4),			// 0000 0010 - 0 2
 	CELL_TREE = CELL_SCENERY | (SCENERY_TREE << 4),				// 0001 0010 - 1 2
@@ -65,7 +72,12 @@ enum compose_type {
     CELL_MONSTER_NORMAL = CELL_MONSTER | (MONSTER_NORMAL << 4),	// 0000 0110 - 0 6 = 6
     CELL_MONSTER_ALIEN1 = CELL_MONSTER | (MONSTER_ALIEN1 << 4),	// 0001 0110 - 1 6 = 22
     CELL_MONSTER_ALIEN2 = CELL_MONSTER | (MONSTER_ALIEN2 << 4),	// 0010 0110 - 2 6
-    CELL_MONSTER_ALIEN3 = CELL_MONSTER | (MONSTER_ALIEN3 << 4)	// 0011 0110 - 3 6
+    CELL_MONSTER_ALIEN3 = CELL_MONSTER | (MONSTER_ALIEN3 << 4),	// 0011 0110 - 3 6
+
+    CELL_PLAYER_1 = CELL_PLAYER | (PLAYER1 << 4),				// 0000 0011 - 0 3 = 3
+    CELL_PLAYER_2 = CELL_PLAYER | (PLAYER2 << 4),				// 0001 0011 - 1 3 = 19
+    CELL_PLAYER_3 = CELL_PLAYER | (PLAYER3 << 4),				// 0010 0011 - 2 3 = 35
+    CELL_PLAYER_4 = CELL_PLAYER | (PLAYER4 << 4),				// 0011 0011 - 3 3 = 51
 };
 
 typedef enum type_struct {
@@ -103,7 +115,7 @@ int map_is_inside(struct map* map, int x, int y);
 struct map* map_get_default(int n);
 
 // Display the map on the screen
-void map_display(struct map* map);
+void map_display(struct map* map, int offset_x, int offset_y);
 
 
 // Monsters functions

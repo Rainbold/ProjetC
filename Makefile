@@ -4,7 +4,7 @@ SDLCFLAGS = `bash sdl-config  --cflags`
 SDLLDFLAGS = `bash sdl-config --libs` 
 
 CFLAGS = -Wall -O0 -g -std=c99 -Iinclude/ $(SDLCFLAGS)
-LDFLAGS = $(SDLLDFLAGS) -lSDL_image -lSDL_ttf -l:include/libwiiuse.so
+LDFLAGS = $(SDLLDFLAGS) -lSDL_image -lSDL_ttf
 
 BINDIR = bin
 BIN = bomberman

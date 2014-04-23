@@ -168,7 +168,7 @@ static int monster_move_aux(struct map* map, int x, int y) {
 	return 1;
 }
 
-void monster_move(struct map* map, struct player* player, struct game* game) {
+void monster_move(struct map* map, struct player* player) {
 	struct list* mList = map_get_monsters(map);
 
 	while(mList != NULL) {
@@ -178,7 +178,6 @@ void monster_move(struct map* map, struct player* player, struct game* game) {
 
 		if(monster->moving) {
 			int distMP = -1;
-
 			if(monster->moveTimer <= 0) {
 				monster->currentWay = monster_pathfinding(map, player, mList, &distMP);
 
@@ -198,6 +197,7 @@ void monster_move(struct map* map, struct player* player, struct game* game) {
 					monster->currentWay = SOUTH;
 				}
 			}
+
 
 			switch (monster->currentWay) {
 			case NORTH:
@@ -309,7 +309,7 @@ void monster_move(struct map* map, struct player* player, struct game* game) {
 		//map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 }
 
-void monster_display(struct map* map, struct player* player, struct game* game)
+void monster_display(struct map* map)
 {
 	struct list* mList = map_get_monsters(map);
 
@@ -330,7 +330,7 @@ void monster_display(struct map* map, struct player* player, struct game* game)
 		window_display_image(	sprite_get_monster(monster->type, monster->currentWay),
 								list_get_x(mList) * SIZE_BLOC + monster->x_sprite,
 								list_get_y(mList) * SIZE_BLOC + monster->y_sprite);
-		printf("type: %d, way: %d\n", monster->type, monster->currentWay);
+		//printf("type: %d, way: %d\n", monster->type, monster->currentWay);
 		mList = list_get_next(mList);
 	}
 }

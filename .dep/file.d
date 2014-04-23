@@ -1,1 +1,1 @@
-.obj/file.o: src/file.c include/map.h include/file.h
+.obj/file.o: src/file.c include/map.h include/file.h include/misc.h

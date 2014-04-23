@@ -7,7 +7,7 @@
 #include <constant.h>
 #include <menu.h>
 
-#define MAX_FIELD_MENU		3
+#define MAX_FIELD_MENU 3
 
 struct animation{
 	int x, y, offset;
@@ -172,6 +172,7 @@ void new_menu(enum type_menu type) {
 		menu->pos_select_y[1] = 0;
 		menu->pos_select_y[2] = 30;
 
+
 		menu->selector = M_SELECT;
 		menu->selector_offset = -15;
 
@@ -229,14 +230,13 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 					break;
 
 				case M_B_2PLAYER:
-					//return NEWGAME_MULTI2; todo multi2
+					return NEWGAME_MULTI2;
 					break;
 				case M_B_3PLAYER:
-					//return NEWGAME_MULTI3; todo multi3
+					return NEWGAME_MULTI3;
 					break;
 				case M_B_4PLAYER:
-					//return NEWGAME_MULTI4; todo multi4
-					break;
+					return NEWGAME_MULTI4;
 
 				case M_B_KEEP:
 					return KEEP;
@@ -324,10 +324,11 @@ void menu_display(int mid_w, int mid_h) {
 									mid_h + g_menu->pos_select_y[g_menu->pos_field]);
 		}
 		else {
-			for(int i = 0; i < g_menu->nb_sub[g_menu->pos_field]; i++)
+			for(int i = 0; i < g_menu->nb_sub[g_menu->pos_field]; i++) {
 							window_display_image(	sprite_get_menu(g_menu->select[g_menu->pos_field][i+1]),
 													mid_w + g_menu->pos_select_x,
 													mid_h + g_menu->pos_select_y[i]);
+			}
 			window_display_image(	sprite_get_menu(g_menu->selector),
 									mid_w + g_menu->pos_select_x + g_menu->selector_offset,
 									mid_h + g_menu->pos_select_y[g_menu->pos_sub-1]);

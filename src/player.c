@@ -74,6 +74,16 @@ int player_get_y(struct player* player) {
 	return player->y;
 }
 
+int player_get_x_real(struct player* player) {
+	assert(player != NULL);
+	return player->x_sprite+player->x*40;
+}
+
+int player_get_y_real(struct player* player) {
+	assert(player != NULL);
+	return player->y_sprite+player->y*40;
+}
+
 void player_set_current_way(struct player* player, way_t way) {
 	assert(player);
 	player->current_way = way;
@@ -188,24 +198,56 @@ int player_get_key(struct player* player) {
 	assert(player);
 	return(player->key);
 }
-void player_from_map(struct player* player, struct map* map) {
+
+int player_get_id(struct player* player) {
 	assert(player);
+	return(player->id);
+}
+
+void players_from_map(struct game* game, struct map* map) {
+	assert(game);
 	assert(map);
+
+	int nb_players = game_get_nb_player(game);
+	struct player** players;
+	players = game_get_players(game);
+
+	int x[4] = {-1, -1, -1, -1};
+	int y[4] = {-1, -1, -1, -1};
+
+	int cell;
 
 	int i, j;
 	for (i = 0; i < map_get_width(map); i++) {
 		for (j = 0; j < map_get_height(map); j++) {
-			if (map_get_cell_type(map, i, j) == CELL_PLAYER) {
-				player->x = i;
-				player->y = j;
+
+			cell = map_get_cell_compose_type(map, i, j);
+
+			if((cell & 15) == CELL_PLAYER) {
+				if(cell >> 4 >= 0 && cell >> 4 <= 3) {
+					x[cell >> 4] = i;
+					y[cell >> 4] = j;
+				}
+				map_set_cell_type(map, i, j, CELL_EMPTY);
 			}
 		}
 	}
-	player->x_sprite = 0;
-	player->y_sprite = 0;
+
+	for(int i = 0; i < nb_players; i++) {
+		if(x[i] != -1 && y[i] != -1) {
+			players[i]->x = x[i];
+			players[i]->y = y[i];
+		}
+		else {
+			players[i]->x = 0;
+			players[i]->y = 0;
+		}
+		players[i]->x_sprite = 0;
+		players[i]->y_sprite = 0;
+	}
 }
 
-static int player_move_aux(struct player* player, struct map* map, int x, int y, struct game* game) {
+static int player_move_aux(struct player* player, struct map* map, int x, int y) {
 	int cellType = 0;
 //	struct bomb* bomb;
 //	struct list* bList;
@@ -283,16 +325,16 @@ static int player_move_aux(struct player* player, struct map* map, int x, int y,
 	return 1;
 }
 
-int player_move(struct player* player, struct map* map, struct game* game) {
+int player_move(struct game* game, struct player* player, struct map* map) {
 	int x = player->x;
 	int y = player->y;
 	int move = 0;
 
 //printf("%d%d%d%d\n", player->way[0],  player->way[1],  player->way[2],  player->way[3]);
 
-	if(player->way[NORTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) || (player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y - 1, game))  || player_move_aux(player, map, x, y - 1, game)  || player->y_sprite > 0)) {
+	if(player->way[NORTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1)) || (player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y - 1))  || player_move_aux(player, map, x, y - 1)  || player->y_sprite > 0)) {
 		player->current_way = NORTH;
-		if (player_move_aux(player, map, x, y - 1, game) || player->y_sprite > 0) {
+		if (player_move_aux(player, map, x, y - 1) || player->y_sprite > 0) {
 			if(player->y_sprite > 0 && (player->y_sprite - player->velocity) < 0)
 				player->y_sprite = 0;
 			else
@@ -308,18 +350,18 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 					player->x_sprite = 0;
 			}
 		}
-		else if(player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) {
+		else if(player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1)) {
 			player->x_sprite -= player->velocity;
 			player->current_way = WEST;
 		}
-		else if(player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y - 1, game)) {
+		else if(player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y - 1)) {
 			player->x_sprite += player->velocity;
 			player->current_way = EAST;
 		}
 	}
-	else if(player->way[SOUTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y + 1, game))|| (player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1, game)) || (player_move_aux(player, map, x, y + 1, game) || player->y_sprite < 0) )) {
+	else if(player->way[SOUTH] && (player->moving == 1 || (player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y + 1))|| (player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1)) || (player_move_aux(player, map, x, y + 1) || player->y_sprite < 0) )) {
 		player->current_way = SOUTH;
-		if (player_move_aux(player, map, x, y + 1, game) || player->y_sprite < 0) {
+		if (player_move_aux(player, map, x, y + 1) || player->y_sprite < 0) {
 			if(player->y_sprite < 0 && (player->y_sprite + player->velocity) > 0)
 				player->y_sprite = 0;
 			else
@@ -335,18 +377,18 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 					player->x_sprite = 0;
 			}
 		}
-		else if(player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y + 1, game)) {
+		else if(player->x_sprite <= -15 && player_move_aux(player, map, x - 1, y + 1)) {
 			player->x_sprite -= player->velocity;
 			player->current_way = WEST;
 		}
-		else if(player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1, game)) {
+		else if(player->x_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1)) {
 			player->x_sprite += player->velocity;
 			player->current_way = EAST;
 		}
 	}
-	else if(player->way[WEST] && (player->moving == 1 || (player->y_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) || (player->y_sprite >= 15 && player_move_aux(player, map, x - 1, y + 1, game)) || player_move_aux(player, map, x - 1, y, game)  || player->x_sprite > 0)) {
+	else if(player->way[WEST] && (player->moving == 1 || (player->y_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1)) || (player->y_sprite >= 15 && player_move_aux(player, map, x - 1, y + 1)) || player_move_aux(player, map, x - 1, y)  || player->x_sprite > 0)) {
 		player->current_way = WEST;
-		if (player_move_aux(player, map, x - 1, y, game) || player->x_sprite > 0) {
+		if (player_move_aux(player, map, x - 1, y) || player->x_sprite > 0) {
 			if(player->x_sprite > 0 && (player->x_sprite - player->velocity) < 0)
 				player->x_sprite = 0;
 			else
@@ -362,18 +404,18 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 					player->y_sprite = 0;
 			}
 		}
-		else if(player->y_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1, game)) {
+		else if(player->y_sprite <= -15 && player_move_aux(player, map, x - 1, y - 1)) {
 			player->y_sprite -= player->velocity;
 			player->current_way = NORTH;
 		}
-		else if(player->y_sprite >= 15 && player_move_aux(player, map, x - 1, y + 1, game)) {
+		else if(player->y_sprite >= 15 && player_move_aux(player, map, x - 1, y + 1)) {
 			player->y_sprite += player->velocity;
 			player->current_way = SOUTH;
 		}
 	}
-	else if(player->way[EAST] && (player->moving == 1 || (player->y_sprite <= -15 && player_move_aux(player, map, x + 1, y - 1, game)) || (player->y_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1, game)) || player_move_aux(player, map, x + 1, y, game) || player->x_sprite < 0)) {
+	else if(player->way[EAST] && (player->moving == 1 || (player->y_sprite <= -15 && player_move_aux(player, map, x + 1, y - 1)) || (player->y_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1)) || player_move_aux(player, map, x + 1, y) || player->x_sprite < 0)) {
 		player->current_way = EAST;
-		if (player_move_aux(player, map, x + 1, y, game) || player->x_sprite < 0) {
+		if (player_move_aux(player, map, x + 1, y) || player->x_sprite < 0) {
 			if(player->x_sprite < 0 && (player->x_sprite + player->velocity) > 0)
 				player->x_sprite = 0;
 			else
@@ -389,11 +431,11 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 					player->y_sprite = 0;
 			}
 		}
-		else if(player->y_sprite <= -15 && player_move_aux(player, map, x + 1, y - 1, game)) {
+		else if(player->y_sprite <= -15 && player_move_aux(player, map, x + 1, y - 1)) {
 			player->y_sprite -= player->velocity;
 			player->current_way = NORTH;
 		}
-		else if(player->y_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1, game)) {
+		else if(player->y_sprite >= 15 && player_move_aux(player, map, x + 1, y + 1)) {
 			player->y_sprite += player->velocity;
 			player->current_way = SOUTH;
 		}
@@ -474,18 +516,18 @@ int player_move(struct player* player, struct map* map, struct game* game) {
 	return move;
 }
 
-void player_display(struct player* player, struct game* game) {
+void player_display(struct player* player) {
 	assert(player);
 	int anim;
 
 	if(player->invicibility > 0) {
 		if(((player->invicibility)/2)%2)
-			SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 128);
+			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 128);
 		else
-			SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 192);
+			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 192);
 	}
 	else
-		SDL_SetAlpha(sprite_get_players(), SDL_SRCALPHA, 255);
+		SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 255);
 
 	if(player->moving) {
 		anim = (((player->anim)*(player->velocity)/12)+1)%8;
@@ -495,8 +537,8 @@ void player_display(struct player* player, struct game* game) {
 		anim = 0;
 	}
 
-	window_display_sprite(	sprite_get_players(),
-							sprite_get_rect_player_anim(anim, player->current_way),
+	window_display_sprite(	sprite_get_players(player->id),
+							sprite_get_rect_player_anim(anim, player->id, player->current_way),
 							player->x * SIZE_BLOC + player->x_sprite,
 							player->y * SIZE_BLOC + player->y_sprite - 20
 							);

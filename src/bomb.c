@@ -10,23 +10,25 @@
 struct bomb {
 	b_type type;
 	b_curAnim curAnim;
+	struct player* player;
 	int range; // bomb's range
 	int range_dir[4]; // Real range
 	int state; //  0 = waiting, 1 = exploding
 	int anim; // used as a timer
 };
 
-void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range) {
+void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range, struct player* player) {
 	struct bomb* bomb = malloc( sizeof(*bomb) );
 	bomb->type = type;
 	bomb->range = range;
 
 	for(int i = 0; i <= 3; i ++){
 		bomb->range_dir[i] = bomb->range;
-
 	}
-	bomb-> state = 0; // 0 = waiting
+
+	bomb->state = 0; // 0 = waiting
 	bomb->anim = 0;
+	bomb->player = player;
 
 	s_type typeL = LIST_BOMB;
 	map_insert_bomb(map, x, y, typeL, bomb);
@@ -37,19 +39,22 @@ void bomb_plant(struct game* game, struct map* map, struct player* player) {
 	int y = player_get_y(player);
 
 	if(player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_DOOR) { // if player has at least one bomb and he is not on a bomb
-
-		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player));
+		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player), player);
 		map_set_cell_type(map, x, y, CELL_BOMB);
 		player_dec_nb_bomb(player);
 	}
 }
 
 void bomb_event(struct game* game, struct map* map, struct bomb* bomb, int x, int y) {
-	struct player* player = game_get_player(game);
+	struct player** players = game_get_players(game);
+	struct player* player = NULL;
 	struct bomb* sbomb = NULL;
 
-	if((x == player_get_x(player) && y == player_get_y(player)))
-		player_hit(player, 3*DEFAULT_GAME_FPS);
+	for(int i = 0; i < game_get_nb_player(game); i++) {
+		player = players[i];
+		if((x == player_get_x(player) && y == player_get_y(player)))
+			player_hit(player, 3*DEFAULT_GAME_FPS);
+	}
 
 	int cellType = map_get_cell_type(map, x, y);
 	switch(cellType & 15){
@@ -72,9 +77,10 @@ void bomb_event(struct game* game, struct map* map, struct bomb* bomb, int x, in
 	}
 }
 
-void bomb_display(struct game* game, struct map* map, struct player* player) {
+void bomb_display(struct game* game, struct map* map) {
+	assert(game);
 	assert(map);
-	assert(player);
+
 	struct list* bList = map_get_bombs(map);
 	struct bomb* bomb = NULL;
 	int x;
@@ -82,7 +88,6 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 
 	if(bList != NULL){ // if there is at least one bomb
 
-		bList = map_get_bombs(map);
 		// Bomb Display And Event
 		while(bList != NULL) { // For each bombs
 			bomb = list_get_data(bList);
@@ -125,9 +130,9 @@ void bomb_display(struct game* game, struct map* map, struct player* player) {
 	}
 }
 
-void bomb_update(struct game* game, struct map* map, struct player* player) {
+void bomb_update(struct map* map) {
 	assert(map);
-	assert(player);
+
 	struct list* bList = map_get_bombs(map);
 	struct bomb* bomb = NULL;
 	int reload = 0;
@@ -140,8 +145,8 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 				bomb->anim++;
 			else {
 				bomb->state = 1;
-				bomb_explo_init(map, player, bList);
-				player_inc_nb_bomb(player);
+				bomb_explo_init(map, bList);
+				player_inc_nb_bomb(bomb->player);
 				bomb->anim = 0;
 			}
 		}
@@ -155,6 +160,7 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 					bomb->anim++;
 			}
 		}
+
 		if(reload){
 			bList = map_get_bombs(map);
 			reload = 0;
@@ -162,10 +168,10 @@ void bomb_update(struct game* game, struct map* map, struct player* player) {
 		else {
 			bList = list_get_next(bList);
 		}
-	}
+	} // end while
 }
 
-void bomb_explo_init(struct map* map, struct player* player, struct list* bList){ // When the bomb explode, used once per bomb
+void bomb_explo_init(struct map* map, struct list* bList){ // When the bomb explode, used once per bomb
 	assert(bList);
 	struct bomb* bomb = list_get_data(bList);
 	int cellType = 0;

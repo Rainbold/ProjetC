@@ -14,28 +14,41 @@ struct level {
 };
 
 struct level* level_get_level(int num, struct game* game) {
+	
+
 	struct level* level = malloc(sizeof(*level));
 	int map_count = 0;
+	int nb_players = game_get_nb_player(game);
 
-	for(int i = 0; i < 8; i++) {
-		if(file_map_exist(num, i))
-			map_count++;
-		else
-			i = 8;
+	if(nb_players >= 2) {
+		level->nb_maps = 1;
+		level->cur_map = 0;
+		level->maps = malloc(sizeof(*level->maps));
+		level->maps[0] = file_load_map_multi(0, nb_players);
 	}
+	else {
+		for(int i = 0; i < 8; i++) {
+			if(file_map_exist(num, i))
+				map_count++;
+			else
+				i = 8;
+		}
 
-	if(map_count == 0)
-		return NULL;
+		if(map_count == 0)
+			return NULL;
 
-	level->nb_maps = map_count;
-	level->cur_map = 0;
-	level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
+		level->nb_maps = map_count;
+		level->cur_map = 0;
 
-	for(int i = 0; i < level->nb_maps; i++) {
-		level->maps[i] = file_load_map(num, i);
-	}
+		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
 
-	map_load_monsters(level->maps[0], game);
+		for(int i = 0; i < level->nb_maps; i++) {
+			level->maps[i] = file_load_map(num, i);
+		}
+
+		map_load_monsters(level->maps[0], game);
+	} // end else
+
 	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 
 	return level;
@@ -76,7 +89,7 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 		printf("Next level\n");
 		}
 	}
-	player_from_map(player, level->maps[level->cur_map]);
+	players_from_map(game, level->maps[level->cur_map]);
 	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 }
 
@@ -102,5 +115,5 @@ void level_free(struct level* level) {
 }
 
 void level_display(struct level* level) {
-	map_display(level->maps[level->cur_map]);
+	map_display(level->maps[level->cur_map], 0, 0);
 }

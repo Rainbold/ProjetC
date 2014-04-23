@@ -19,9 +19,9 @@ int monster_get_aggr(struct monster* monster);
 
 int monster_pathfinding(struct map* map, struct player* player, struct list* mList, int* getDist);
 
-void monster_move(struct map* map, struct player* player, struct game* game);
+void monster_move(struct map* map, struct player* player);
 
-void monster_display(struct map* map, struct player* player, struct game* game);
+void monster_display(struct map* map);
 
 void monster_update(struct map* map);
 

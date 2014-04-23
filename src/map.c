@@ -160,8 +160,12 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 		else if( 30 <= r && r < 35 )
 			map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
 		else if( 35 <= r && r < 40 ) {
-			map_set_cell_type(map, x, y, CELL_MONSTER);
-			monster_init(map,x, y, MONSTER_NORMAL);
+			if(game_get_nb_player(game) == 1) {
+				map_set_cell_type(map, x, y, CELL_MONSTER);
+				monster_init(map,x, y, MONSTER_NORMAL);
+			}
+			else
+				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
 		}
 		else if( 40 <= r && r < 55 )
 			map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
@@ -250,7 +254,7 @@ void display_door(struct map* map, int x, int  y, unsigned char type)
 	}
 }
 
-void map_display(struct map* map)
+void map_display(struct map* map, int offset_x, int offset_y)
 {
 	assert(map != NULL);
 	assert(map->height > 0 && map->width > 0);
@@ -258,8 +262,8 @@ void map_display(struct map* map)
 	int x, y;
 	for (int i = 0; i < map->width; i++) {
 		for (int j = 0; j < map->height; j++) {
-			x = i * SIZE_BLOC;
-			y = j * SIZE_BLOC;
+			x = i * SIZE_BLOC + offset_x;
+			y = j * SIZE_BLOC + offset_y;
 
 			char type = map->grid[CELL(i,j)];
 
