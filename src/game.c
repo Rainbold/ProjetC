@@ -119,7 +119,8 @@ void game_display(struct game* game) {
 
 	int frameChanged = 0;
 
-	game_banner_display(game);
+	if(game->nb_player < 2)
+		game_banner_display(game);
 	level_display(game_get_curr_level(game));
 
 	struct player* player[game->nb_player];
@@ -158,6 +159,18 @@ void game_display(struct game* game) {
 				menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
 			}
 	}
+
+	/*
+	 * In order to make players pass through each others smootly,
+	 * the initial minimum y-position is first set to the maximum one
+	 * (because setting it to a greater value doesn't work).
+	 * Then, the minimum y-position is set to the actual one and players with the same y-position
+	 * are displayed.
+	 * This value is then recorded and stored into minYLast.
+	 * The algorithm is repeated with the minimum y-position that is greater than minYLast 
+	 * and all players are sorted to be displayed in the correct order.
+	 */
+
 	for(int i=0; i<game->nb_player; i++) 
 	{
 		if(player_get_y_real(game->player[i]) > maxY)
@@ -172,7 +185,6 @@ void game_display(struct game* game) {
 		{
 			if(player_get_y_real(game->player[j]) < minY && player_get_y_real(game->player[j]) > minYLast)
 				minY = player_get_y_real(game->player[j]);
-			printf("MIN : %d(j) %d(min) %d(pla) %d(minL)\n", j, minY, player_get_y_real(game->player[j]), minYLast);
 		}
 
 		for(int i=0; i<game->nb_player; i++)
