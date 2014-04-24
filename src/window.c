@@ -73,6 +73,11 @@ void window_clear() {
 	SDL_FillRect(window, NULL, SDL_MapRGB(window->format, 255, 255, 255));
 }
 
+void window_clear_black() {
+	assert(window);
+	SDL_FillRect(window, NULL, SDL_MapRGB(window->format, 0, 0, 0));
+}
+
 void window_refresh() {
 	assert(window);
 	SDL_Flip(window);

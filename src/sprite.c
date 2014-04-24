@@ -62,10 +62,11 @@
 #define PLAYER_4			"sprite/bomberman4_40.png"
 
 // Sprites of Monsters
-#define MONSTER_LEFT     "sprite/monster_left.png"
-#define MONSTER_UP       "sprite/monster_up.png"
-#define MONSTER_RIGHT    "sprite/monster_right.png"
-#define MONSTER_DOWN     "sprite/monster_down.png"
+#define MONSTER_LEFT	"sprite/monster_left.png"
+#define MONSTER_UP		"sprite/monster_up.png"
+#define MONSTER_RIGHT	"sprite/monster_right.png"
+#define MONSTER_DOWN	"sprite/monster_down.png"
+#define MONSTER_IMG_ALIEN1	"sprite/alien1.png"
 
 /*	Main menu : main BG with sprites | id text[]
  * 		1--Single player				0
@@ -92,6 +93,9 @@
 
 SDL_Surface* numbers[10];
 SDL_Surface* menu[NB_SURFACE_MENU];
+SDL_Surface* map_multi[20];
+int nb_map_multi;
+int max_width;
 
 #define NB_ANIM_STARS 4
 #define SIZE_OF_STARS 10
@@ -131,7 +135,9 @@ SDL_Surface* tree;
 SDL_Surface* bonus[NB_BONUS];
 
 // monster
-SDL_Surface* monster_img[4];
+SDL_Surface** monsters[2];
+SDL_Surface* monster_img_norm[4];
+SDL_Surface* monster_img_alien[4];
 
 // player
 
@@ -185,6 +191,7 @@ void menu_load() {
 	numbers[7] = TTF_RenderText_Blended(police, "7", couleurNoir);
 	numbers[8] = TTF_RenderText_Blended(police, "8", couleurNoir);
 	numbers[9] = TTF_RenderText_Blended(police, "9", couleurNoir);
+	numbers[10] = TTF_RenderText_Blended(police, ":", couleurNoir);
 
 	TTF_CloseFont(police);
 	police = TTF_OpenFont(FONT, 22);
@@ -206,71 +213,28 @@ void menu_load() {
 	menu[M_B_NO] = TTF_RenderText_Blended(police, "No", couleurBlanche);
 
 	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
+	menu[M_SELECT_BLACK] = TTF_RenderText_Blended(police, ">", couleurNoir);
 
+	// Maps multiplayer
 	DIR* dir = NULL;
 	struct dirent* readfile = NULL;
-	dir = opendir("./data/2");
+	dir = opendir("./data/multi");
 	
 	if(!dir)
-		printf("Error : unable to open data/2\n");
+		printf("Error : unable to open data/multi\n");
 
-	for(int i=M_B_2PLAYER_MAP_1; i<M_B_2PLAYER_MAP_1+10; i++)
-	{
-		if((readfile = readdir(dir)) != NULL) {
-			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
-				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
-			else
-				i--;
-		}
-		else
-			menu[i] = NULL;
+	max_width = 0;
+	for(int i = 0; (readfile = readdir(dir)) != NULL; i++) {
+
+		map_multi[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurNoir);
+		nb_map_multi = i+1;
+		if(map_multi[i]->w >= max_width)
+			max_width = map_multi[i]->w;
 	}
-
 	if(closedir(dir) == -1)
 		printf("Problème à la fermeture");
 
-	dir = opendir("./data/3");
-
-	if(!dir)
-		printf("Error : unable to open data/3\n");
 	
-	for(int i=M_B_3PLAYER_MAP_1; i<M_B_3PLAYER_MAP_1+10; i++)
-	{
-		if((readfile = readdir(dir)) != NULL) {
-			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
-				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
-			else
-				i--;
-		}
-		else
-			menu[i] = NULL;
-	}
-
-	if(closedir(dir) == -1)
-		printf("Problème à la fermeture");
-
-	dir = opendir("./data/4");
-
-	if(!dir)
-		printf("Error : unable to open data/4\n");
-	
-	for(int i=M_B_4PLAYER_MAP_1; i<M_B_4PLAYER_MAP_1+10; i++)
-	{
-		if((readfile = readdir(dir)) != NULL) {
-			if(map_is_valid_format1(readfile->d_name) || map_is_valid_format2(readfile->d_name))
-				menu[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurBlanche);
-			else
-				i--;
-		}
-		else
-			menu[i] = NULL;
-	}
-
-	if(closedir(dir) == -1)
-		printf("Problème à la fermeture");
-
-
-
 	TTF_CloseFont(police);
 
 	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
@@ -295,7 +259,7 @@ void menu_unload() {
 	for (int i = 0; i < NB_SURFACE_MENU; i++) {
 		SDL_FreeSurface(menu[i]);
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 11; i++) {
 		SDL_FreeSurface(numbers[i]);
 	}
 	SDL_FreeSurface(menu_stars);
@@ -324,11 +288,6 @@ void banner_load() {
 }
 
 void banner_unload() {
-	// numbers imgs
-	for (int i = 0; i < 10; i++) {
-		SDL_FreeSurface(numbers[i]);
-	}
-
 	// other banner sprites
 	SDL_FreeSurface(banner_life);
 	SDL_FreeSurface(banner_bomb);
@@ -417,15 +376,27 @@ void player_unload() {
 }
 
 void monster_load() {
-	monster_img[WEST] = load_image(MONSTER_LEFT);
-	monster_img[EAST] = load_image(MONSTER_RIGHT);
-	monster_img[NORTH] = load_image(MONSTER_UP);
-	monster_img[SOUTH] = load_image(MONSTER_DOWN);
+
+	monsters[MONSTER_NORMAL] = monster_img_norm;
+	monsters[MONSTER_ALIEN1] = monster_img_alien;
+
+	monster_img_norm[WEST] = load_image(MONSTER_LEFT);
+	monster_img_norm[EAST] = load_image(MONSTER_RIGHT);
+	monster_img_norm[NORTH] = load_image(MONSTER_UP);
+	monster_img_norm[SOUTH] = load_image(MONSTER_DOWN);
+
+	monster_img_alien[NORTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[WEST] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[SOUTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien[EAST] = load_image(MONSTER_IMG_ALIEN1);
 }
 
 void monster_unload() {
-	for (int i = 0; i < 4; i++)
-		SDL_FreeSurface(monster_img[i]);
+	for (int i = 0; i < 4; i++) {
+		SDL_FreeSurface(monster_img_norm[i]);
+		SDL_FreeSurface(monster_img_alien[i]);
+	}
+
 }
 
 void bombs_load()
@@ -576,7 +547,7 @@ SDL_Rect sprite_get_rect_bomb_anim(int i, int j) {
 }
 
 SDL_Surface* sprite_get_number(short number) {
-	assert(number >= 0 && number <= 9);
+	assert(number >= 0 && number <= 10);
 	return numbers[number];
 }
 
@@ -589,9 +560,10 @@ SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction) {
 	return rect[i];
 }
 
-SDL_Surface* sprite_get_monster(enum way direction) {
-	assert(monster_img[direction]);
-	return monster_img[direction];
+SDL_Surface* sprite_get_monster(m_type type, enum way direction) {
+	//assert(monster_img[direction]);
+	SDL_Surface** monster = monsters[type];
+	return monster[direction];
 }
 
 SDL_Surface* sprite_get_banner_life() {
@@ -622,6 +594,19 @@ SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 SDL_Surface* sprite_get_menu(select_menu_t select_menu) {
 	//assert(menu[select_menu]);
 	return menu[select_menu];
+}
+
+SDL_Surface* sprite_get_map_multi(int i) {
+	assert(i < nb_map_multi);
+	return map_multi[i];
+}
+
+int sprite_get_nb_map_multi() {
+	return nb_map_multi;
+}
+
+int sprite_get_max_width() {
+	return max_width;
 }
 
 SDL_Rect* sprite_get_rect_stars() {

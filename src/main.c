@@ -8,6 +8,7 @@
 #include <menu.h>
 #include <sprite.h>
 #include <wiimote.h>
+#include <multi.h>
 
 int main(int argc, char *argv[]) {
 
@@ -31,31 +32,11 @@ int main(int argc, char *argv[]) {
 	// game loop
 	// fixed time rate implementation
 	int done = 0;
+	int nb_players = 1;
 
 	while (!done) {
 		timer = SDL_GetTicks();
-
-		if(state >= NEWGAME_MULTI2_1 && state <= NEWGAME_MULTI2_10)
-		{
-			menu_free();
-			game = game_new(state-NEWGAME_MULTI2_1, 2);
-			state = GAME;
-		}
-
-		if(state >= NEWGAME_MULTI3_1 && state <= NEWGAME_MULTI3_10)
-		{
-			menu_free();
-			game = game_new(state-NEWGAME_MULTI3_1, 3);
-			state = GAME;
-		}
-
-		if(state >= NEWGAME_MULTI4_1 && state <= NEWGAME_MULTI4_10)
-		{
-			menu_free();
-			game = game_new(state-NEWGAME_MULTI4_1, 4);
-			state = GAME;
-		}
-
+		
 		switch(state) {
 		case NEWGAME_SINGLE:
 			menu_free();
@@ -63,8 +44,26 @@ int main(int argc, char *argv[]) {
 			state = GAME;
 			break;
 
+		case NEWGAME_MULTI4:
+			nb_players++;
+			/* no break */
+		case NEWGAME_MULTI3:
+			nb_players++;
+			/* no break */
+		case NEWGAME_MULTI2:
+			nb_players++;
+
+			menu_free();
+			game = game_new(0, nb_players); // lvl 0, 1 player
+			game_set_state(game, CHOOSE_MAP);
+			state = GAME;
+			break;
+
 		case GAME:
-			game_display(game);
+			if(nb_players == 1)
+				game_display(game);
+			else
+				multi_display(game);
 			break;
 
 		case ENDGAME:
@@ -76,6 +75,7 @@ int main(int argc, char *argv[]) {
 			new_menu(MAIN);
 			window_resize(MENU_WIDTH, MENU_HEIGHT);
 			state = -1;
+			nb_players = 1;
 			break;
 
 		case QUIT:
@@ -92,6 +92,7 @@ int main(int argc, char *argv[]) {
 		}
 
 			state = input_keyboard(game, state);
+
 #ifdef USE_WIIMOTE
 			state = input_wiimote(game, state);
 #endif

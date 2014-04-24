@@ -4,32 +4,67 @@
 #include <math.h>
 
 struct monster {
+	// Common data
 	m_type type;
 	way_t currentWay;
+
+	// Timers
+	int moveTimer;		// timer used to change direction when not following a player
+	int invicibility;	// timer used to invicibility
+
+	// Display data
+	int moving;
+	int x_sprite, y_sprite;
+	int velocity;
+	int anim;
+
+	// Specific data
 	int size;
-	int life;
-	int aggr;
-	int moveTimer;
-	int lifeTimer;
-	int invincibility;
+	int nb_life;
+	int aggr;			// path max to find the player
+	int velocity_aggr;
+	int velocity_norm;
 };
 
-
-void monster_init(struct map* map, int x, int y, m_type type, int size, int life, int aggr, struct game* game)
+void monster_init(struct map* map, int x, int y, m_type type)
 {
+	// Common data
 	struct monster* monster = malloc( sizeof(*monster) );
-	monster->type = type;
-	monster->size = size;
-	monster->life = life;
-	monster->aggr= aggr;
+	monster->type = type; // type of monster
 	monster->currentWay = SOUTH;
-	monster->moveTimer = game_get_frame(game);
-	monster->lifeTimer = -1;
-	monster->invincibility = 0;
 
-	s_type typeL = LIST_MONSTER;
+	monster->moveTimer = 0;
+	monster->invicibility = 0;
 
-	map_insert_monster(map, x, y, typeL, monster);
+	monster->moving = 1;
+	monster->x_sprite = 0;
+	monster->y_sprite = 0;
+	monster->anim = 0;
+
+	switch(type) {
+	case MONSTER_NORMAL:
+		monster->size = 1;
+		monster->nb_life = 1;
+		monster->aggr = 5;
+		monster->velocity_norm = 1;
+		monster->velocity_aggr = 2;
+
+		break;
+	case MONSTER_ALIEN1:
+		monster->size = 1;
+		monster->nb_life = 2;
+		monster->aggr = 5;
+		monster->velocity_norm = 0;
+		monster->velocity_aggr = 3;
+
+		break;
+	default:
+		break;
+	}
+
+	monster->velocity = monster->velocity_norm;
+
+	map_insert_monster(map, x, y, LIST_MONSTER, monster);
 }
 
 int monster_get_currentway(struct monster* monster)
@@ -66,56 +101,40 @@ int monster_get_aggr(struct monster* monster)
 int monster_get_nb_life(struct monster* monster) { // get nb_life
 	if(monster == NULL)
 		return 0;
-	return monster->life;
+	return monster->nb_life;
 }
 
-void monster_set_nb_life(struct monster* monster, int life) { // get nb_life
+void monster_set_nb_life(struct monster* monster, int life) { // set nb_life
 	assert(monster);
-	monster->life = life;
+	monster->nb_life = life;
 }
 
-int monster_get_invincibility(struct monster* monster) { // get nb_life
-	if(monster == NULL)
-		return 0;
-	return monster->invincibility;
-}
-
-void monster_set_invincibility(struct monster* monster, int invincibility) { // get nb_life
+void monster_set_invicibility(struct monster* monster, int invicibility_time) {
 	assert(monster);
-	monster->invincibility = invincibility;
+	monster->invicibility = invicibility_time;
 }
 
-int monster_get_life_timer(struct monster* monster) { // get nb_life
-	if(monster == NULL)
-		return 0;
-	return monster->lifeTimer;
-}
-
-void monster_set_life_timer(struct monster* monster, int lifeTimer) { // get nb_life
-	assert(monster);
-	monster->lifeTimer = lifeTimer;
-}
-
-struct list* monster_dec_nb_life(struct list* mList, int x, int y, struct game* game) { // nb_life
-	assert(game);
-
+struct list* monster_hit(struct list* mList, int x, int y, struct game* game) { // nb_life
 	if(mList == NULL) 
 		return NULL;
+	struct list* l_return = mList;
+	struct list* l = list_find(mList, x, y);
 
-	struct list* monster = list_find(mList, x, y);
-
-	if(!monster) 
+	if(!l)
 		return NULL;
 	
-	if(monster_get_nb_life(monster->data) > 0 && (monster_get_invincibility(monster->data) != 1 || monster_get_life_timer(monster->data) == -1) ) {
-		monster_set_nb_life(monster->data, monster_get_nb_life(monster->data)-1);
-		monster_set_life_timer(monster->data, game_get_frame(game));
-		monster_set_invincibility(monster->data, 1);
-	}
-	if(monster_get_nb_life(monster->data) <= 0)
-		mList = monster_kill(mList, x, y, level_get_curr_map(game_get_curr_level(game)));
+	struct monster* monster = list_get_data(l);
 
-	return mList;
+	if(!monster->invicibility) {
+		if(monster->nb_life > 1) {
+			monster->nb_life--;
+			monster->invicibility = 3 * DEFAULT_GAME_FPS;
+			monster->moving = 0;
+		}
+		else
+			l_return = monster_kill(mList, x, y, level_get_curr_map(game_get_curr_level(game)));
+	}
+	return l_return;
 }
 
 struct list* monster_kill(struct list* mList, int x, int y, struct map* map)
@@ -129,31 +148,17 @@ static int monster_move_aux(struct map* map, int x, int y) {
 
 	if (!map_is_inside(map, x, y))
 		return 0;
-	
-	switch (map_get_cell_type(map, x, y)) {
+	int cell = map_get_cell_type(map, x, y);
+	switch (cell) {
 	case CELL_SCENERY:
+	case CELL_CASE:
+	case CELL_BOMB:
+	case CELL_MONSTER:
+	case CELL_DOOR:
+	case CELL_BONUS:
 		return 0; // stop the function and the monster's movements
 		break;
-
-	case CELL_CASE: 
-		return 0;
-		break;
-
 	case CELL_GOAL:
-		break;
-
-	case CELL_BOMB:
-		return 0;
-		break;
-
-	case CELL_MONSTER:
-		return 0;
-		break;
-	case CELL_DOOR:
-		return 0;
-		break;
-	case CELL_BONUS:
-		return 0;
 		break;
 	default:
 		break;
@@ -163,99 +168,193 @@ static int monster_move_aux(struct map* map, int x, int y) {
 	return 1;
 }
 
-int monster_move(struct list* mList, struct map* map, struct player* player, struct game* game) {
-	int x = mList->x;
-	int y = mList->y;
-	int move = 0;
-	way_t dir;
+void monster_move(struct map* map, struct player* player) {
+	struct list* mList = map_get_monsters(map);
 
-	int distMP = -1;
+	while(mList != NULL) {
+		struct monster* monster = list_get_data(mList);
+		int x = list_get_x(mList);
+		int y = list_get_y(mList);
 
-	// We set the cell type to monster again in case something erased it
-	map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
+		if(monster->moving) {
+			int distMP = -1;
+			if(monster->moveTimer <= 0) {
+				monster->currentWay = monster_pathfinding(map, player, mList, &distMP);
+
+				// If the distance is grater than the agressivity of the monster or if the player is unreachable,
+				// then the monster moves randomly
+				if((distMP > monster->aggr || monster->currentWay == -1)) {
+						monster->currentWay = rand_ab(0, 3);
+						monster->velocity = monster->velocity_norm;
+				}
+				else
+					monster->velocity = monster->velocity_aggr;
+
+				if(monster->velocity != 0)
+					monster->moveTimer = SIZE_BLOC / monster->velocity;
+				else {
+					monster->moveTimer = DEFAULT_GAME_FPS;
+					monster->currentWay = SOUTH;
+				}
+			}
 
 
-	if(!mList) 
-		return 0;
+			switch (monster->currentWay) {
+			case NORTH:
+				if(monster_move_aux(map, x, y - 1) || (monster->y_sprite > 0 && monster->y_sprite - monster->velocity >= 0))
+					monster->y_sprite-= monster->velocity;
+				else if((monster->y_sprite > 0 && monster->y_sprite - monster->velocity <= 0))
+					monster->y_sprite = 0;
 
-	// A monster moves every second
-	if(game_get_frame(game) - monster_get_movetimer(mList->data) < DEFAULT_GAME_FPS * 1)
-		return 0;
+				if(monster->x_sprite > 0 && monster->x_sprite - monster->velocity >= 0)
+					monster->x_sprite-= monster->velocity;
+				else if(monster->x_sprite > 0 && monster->x_sprite - monster->velocity < 0)
+					monster->x_sprite = 0;
 
-	// We get the next direction for the monster and its distance between it and the player
-	dir = monster_pathfinding(map, player, mList, &distMP);
+				if(monster->x_sprite < 0 && monster->x_sprite + monster->velocity <= 0)
+					monster->x_sprite+= monster->velocity;
+				else if(monster->x_sprite < 0 && monster->x_sprite + monster->velocity > 0)
+					monster->x_sprite = 0;
+				break;
 
-	// If the distance is greater than the agressivity of the monster or if the player is unreachable, 
-	// then the monster moves randomly
-	if(distMP > monster_get_aggr(mList->data) || dir == -1)
-		dir = rand_ab(0, 3);
+			case SOUTH:
+				if(monster_move_aux(map, x, y + 1) || (monster->y_sprite < 0 && monster->y_sprite + monster->velocity <= 0))
+					monster->y_sprite+= monster->velocity;
+				else if((monster->y_sprite < 0 && monster->y_sprite + monster->velocity >= 0))
+					monster->y_sprite = 0;
 
-	switch (dir) {
-	case NORTH:
-		if (monster_move_aux(map, x, y - 1)) {
-			mList->y--;
-			move = 1;
+				if(monster->x_sprite > 0 && monster->x_sprite - monster->velocity >= 0)
+					monster->x_sprite-= monster->velocity;
+				else if(monster->x_sprite > 0 && monster->x_sprite - monster->velocity < 0)
+					monster->x_sprite = 0;
+
+				if(monster->x_sprite < 0 && monster->x_sprite + monster->velocity <= 0)
+					monster->x_sprite+= monster->velocity;
+				else if(monster->x_sprite < 0 && monster->x_sprite + monster->velocity > 0)
+					monster->x_sprite = 0;
+				break;
+
+			case WEST:
+				if(monster_move_aux(map, x - 1, y) || (monster->x_sprite > 0 && monster->x_sprite - monster->velocity >= 0))
+					monster->x_sprite-= monster->velocity;
+				else if((monster->x_sprite > 0 && monster->x_sprite - monster->velocity <= 0))
+					monster->x_sprite = 0;
+
+				if(monster->y_sprite > 0 && monster->y_sprite - monster->velocity >= 0)
+					monster->y_sprite-= monster->velocity;
+				else if(monster->y_sprite > 0 && monster->y_sprite - monster->velocity < 0)
+					monster->y_sprite = 0;
+
+				if(monster->y_sprite < 0 && monster->y_sprite + monster->velocity <= 0)
+					monster->y_sprite+= monster->velocity;
+				else if(monster->y_sprite < 0 && monster->y_sprite + monster->velocity > 0)
+					monster->y_sprite = 0;
+				break;
+
+			case EAST:
+				if(monster_move_aux(map, x + 1, y) || (monster->x_sprite < 0 && monster->x_sprite + monster->velocity <= 0))
+					monster->x_sprite+= monster->velocity;
+				else if((monster->x_sprite < 0 && monster->x_sprite + monster->velocity >= 0))
+					monster->x_sprite = 0;
+
+				if(monster->y_sprite > 0 && monster->y_sprite - monster->velocity >= 0)
+					monster->y_sprite-= monster->velocity;
+				else if(monster->y_sprite > 0 && monster->y_sprite - monster->velocity < 0)
+					monster->y_sprite = 0;
+
+				if(monster->y_sprite < 0 && monster->y_sprite + monster->velocity <= 0)
+					monster->y_sprite+= monster->velocity;
+				else if(monster->y_sprite < 0 && monster->y_sprite + monster->velocity > 0)
+					monster->y_sprite = 0;
+				break;
+			}
+		} // end if moving
+
+		if(monster->x_sprite > 20) {
+			list_inc_x(mList);
+			monster->x_sprite -= 40;
+			if(map_get_cell_type(map, x, y) == CELL_MONSTER)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 		}
-		break;
-
-	case SOUTH:
-		if (monster_move_aux(map, x, y + 1)) {
-			mList->y++;
-			move = 1;
+		if(monster->x_sprite < -20) {
+			list_dec_x(mList);
+			monster->x_sprite += 40;
+			if(map_get_cell_type(map, x, y) == CELL_MONSTER)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 		}
-		break;
-
-	case WEST:
-		if (monster_move_aux(map, x - 1, y)) {
-			mList->x--;
-			move = 1;
+		if(monster->y_sprite > 20) {
+			list_inc_y(mList);
+			monster->y_sprite -= 40;
+			if(map_get_cell_type(map, x, y) == CELL_MONSTER)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 		}
-		break;
-
-	case EAST:
-		if (monster_move_aux(map, x + 1, y)) {
-			mList->x++;
-			move = 1;
+		if(monster->y_sprite < -20) {
+			list_dec_y(mList);
+			monster->y_sprite += 40;
+			if(map_get_cell_type(map, x, y) == CELL_MONSTER)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 		}
-		break;
-	}
 
-	if (move) {
-		monster_set_currentway(mList->data, dir);
-		monster_set_movetimer(mList->data, game_get_frame(game));
-		if(map_get_cell_type(map, x, y) == CELL_MONSTER)
-			map_set_cell_type(map, x, y, CELL_EMPTY);
-		map_set_cell_type(map, mList->x, mList->y, CELL_MONSTER);
-	}
-	return move;
+		if(list_get_x(mList) == player_get_x(player) && list_get_y(mList) == player_get_y(player))
+			player_hit(player, 3*DEFAULT_GAME_FPS);
+
+		//printf("dir: %d, x: %d, y: %d, x_sprite: %d, y_sprite: %d\n", monster->currentWay, list_get_x(mList), list_get_y(mList), monster->x_sprite, monster->y_sprite);
+		mList = list_get_next(mList);
+	} // end of while
+		// We set the cell type to monster again in case something erased it
+		//map_set_cell_type(map, list_get_x(mList), list_get_y(mList), CELL_MONSTER);
 }
 
-void monster_display(struct map* map, struct player* player, struct game* game)
+void monster_display(struct map* map)
 {
 	struct list* mList = map_get_monsters(map);
 
 	while(mList != NULL) {
-		if( monster_get_invincibility(mList->data) == 1 ) {
-			if( (int)floor( (game_get_frame(game) - monster_get_life_timer(mList->data) ) )%4 == 0 )
-				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 128);
+
+		struct monster* monster = list_get_data(mList);
+
+
+		if(monster->invicibility > 0) {
+			if(((monster->invicibility)/2)%2)
+				SDL_SetAlpha(sprite_get_monster(monster->type, monster->currentWay), SDL_SRCALPHA, 128);
 			else
-				SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 192);
+				SDL_SetAlpha(sprite_get_monster(monster->type, monster->currentWay), SDL_SRCALPHA, 192);
 		}
+		else
+			SDL_SetAlpha(sprite_get_monster(monster->type, monster->currentWay), SDL_SRCALPHA, 255);
 
-		if( game_get_frame(game) - monster_get_life_timer(mList->data) > DEFAULT_GAME_FPS * 3 ) {
-			monster_set_invincibility(mList->data, 0);
-			SDL_SetAlpha(sprite_get_monster(monster_get_currentway(mList->data)), SDL_SRCALPHA, 255);
-		}
-
-		
-		monster_move(mList, map, player, game);
-		if(mList->x == player_get_x(player) && mList->y == player_get_y(player))
-			player_hit(player, 3*DEFAULT_GAME_FPS);
-		window_display_image(sprite_get_monster( monster_get_currentway(mList->data) ), mList->x * SIZE_BLOC, mList->y * SIZE_BLOC);
-		mList = mList->next;
+		window_display_image(	sprite_get_monster(monster->type, monster->currentWay),
+								list_get_x(mList) * SIZE_BLOC + monster->x_sprite,
+								list_get_y(mList) * SIZE_BLOC + monster->y_sprite);
+		//printf("type: %d, way: %d\n", monster->type, monster->currentWay);
+		mList = list_get_next(mList);
 	}
 }
 
+void monster_update(struct map* map) {
+	assert(map);
+	struct list* mList = map_get_monsters(map);
+
+	while(mList != NULL) {
+		struct monster* monster = list_get_data(mList);
+
+		if(monster->invicibility > 1)
+			monster->invicibility--;
+		else if(monster->invicibility == 1) {
+			monster->invicibility--;
+			monster->moving = 1;
+		}
+
+		if(monster->moveTimer >  0)
+			monster->moveTimer--;
+
+		mList = list_get_next(mList);
+	}
+}
 
 int monster_pathfinding(struct map* map, struct player* player, struct list* mList, int* getDist)
 {
@@ -264,8 +363,8 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 
 	int loop = 1;
 
-	int xSrc = mList->x;
-	int ySrc = mList->y;
+	int xSrc = list_get_x(mList);
+	int ySrc = list_get_y(mList);
 	int xDest = player_get_x(player);
 	int yDest = player_get_y(player);
 
@@ -407,5 +506,5 @@ int monster_pathfinding(struct map* map, struct player* player, struct list* mLi
 	else if(ySrc < y)
 		return SOUTH;
 	else
-		return -2;
+		return -1;
 }

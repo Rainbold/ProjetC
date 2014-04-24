@@ -65,3 +65,10 @@ int map_is_valid_format2(const char* mapFile)
    	else
    		return 0;
 }
+
+int max(int a, int b) {
+	if(b <= a)
+		return a;
+	else
+		return b;
+}

@@ -20,17 +20,13 @@ struct level* level_get_level(int num, struct game* game) {
 	int map_count = 0;
 	int nb_players = game_get_nb_player(game);
 
-	if(game_get_nb_player(game)>=2)
-	{
+	if(nb_players >= 2) {
 		level->nb_maps = 1;
 		level->cur_map = 0;
 		level->maps = malloc(sizeof(*level->maps));
-		level->maps[0] = file_load_map(0, num, nb_players);
-
-		map_load_monsters(level->maps[0], game);
+		level->maps[0] = file_load_map_multi(0, nb_players);
 	}
-	else
-	{
+	else {
 		for(int i = 0; i < 8; i++) {
 			if(file_map_exist(num, i))
 				map_count++;
@@ -47,11 +43,11 @@ struct level* level_get_level(int num, struct game* game) {
 		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
 
 		for(int i = 0; i < level->nb_maps; i++) {
-			level->maps[i] = file_load_map(num, i, nb_players);
+			level->maps[i] = file_load_map(num, i);
 		}
 
 		map_load_monsters(level->maps[0], game);
-	}
+	} // end else
 
 	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 
@@ -93,12 +89,17 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 		printf("Next level\n");
 		}
 	}
-	player_from_map(player, level->maps[level->cur_map]);
+	players_from_map(game, level->maps[level->cur_map]);
 	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 }
 
 struct map* level_get_curr_map(struct level* level) {
 	return level->maps[level->cur_map];
+}
+
+int level_get_curr_nb_map(struct level* level) {
+	assert(level);
+	return(level->cur_map);
 }
 
 struct map* level_get_map(struct level* level, int num) {
@@ -109,10 +110,10 @@ struct map* level_get_map(struct level* level, int num) {
 void level_free(struct level* level) {
 	for (int i = 0; i < level->nb_maps; i++)
 		map_free(level->maps[i]);
-
 	free(level->maps);
+	free(level);
 }
 
 void level_display(struct level* level) {
-	map_display(level->maps[level->cur_map]);
+	map_display(level->maps[level->cur_map], 0, 0);
 }

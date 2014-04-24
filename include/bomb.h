@@ -13,12 +13,12 @@ typedef enum bomb_type {
 
 struct bomb;
 
-void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range, int playerID);
+void bomb_init(struct game* game, struct map* map, int x, int y, b_type type, int range, struct player* player);
 void bomb_plant(struct game* game, struct map* map, struct player* player);
-void bomb_display(struct game* game,struct map* map, struct player* player);
-void bomb_update(struct game* game, struct map* map, struct player* player);
-void bomb_explo_init(struct map* map, struct player* player, struct list* bList);
+void bomb_display(struct game* game,struct map* map);
+void bomb_update(struct map* map);
+void bomb_explo_init(struct map* map, struct list* bList);
 void bomb_free(struct map* map, struct list* bList);
-struct bomb* search_bomb(struct map* map, int x, int y);
+struct bomb* search_bomb(struct map* map, int x, int y, int state);
 
 #endif /* BOMB_H_ */

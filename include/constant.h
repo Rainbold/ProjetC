@@ -4,7 +4,7 @@
 #define WINDOW_NAME "[PG110] Bomberman 2014"
 
 // Comment if you don't want to use wiimote or if you cannot compile
-// #define USE_WIIMOTE
+//#define USE_WIIMOTE
 
 // Size (# of pixels) of a cell of the map 
 #define SIZE_BLOC       40
@@ -43,7 +43,11 @@ typedef enum state {
 	NEWGAME_SINGLE,
 	LOADGAME,
 
-	NEWGAME_MULTI2_1,
+	NEWGAME_MULTI2,
+	NEWGAME_MULTI3,
+	NEWGAME_MULTI4,
+
+/*	NEWGAME_MULTI2_1,
 	NEWGAME_MULTI2_2,
 	NEWGAME_MULTI2_3,
 	NEWGAME_MULTI2_4,
@@ -75,7 +79,7 @@ typedef enum state {
 	NEWGAME_MULTI4_8,
 	NEWGAME_MULTI4_9,
 	NEWGAME_MULTI4_10,
-
+*/
 	ENDGAME,
 	QUIT,
 	KEEP,
@@ -85,9 +89,10 @@ typedef enum state {
 typedef enum game_state {
 	PLAYING = 0,
 	PAUSED, // 1
+	CHOOSE_MAP, //2
 } game_state_t;
 
-#define NB_SURFACE_MENU 50
+#define NB_SURFACE_MENU 19
 typedef enum select_menu {
 	M_B_SINGLE = 0,
 	M_B_NEWGAME,
@@ -97,39 +102,6 @@ typedef enum select_menu {
 	M_B_2PLAYER,
 	M_B_3PLAYER,
 	M_B_4PLAYER,
-
-	M_B_2PLAYER_MAP_1,
-	M_B_2PLAYER_MAP_2,
-	M_B_2PLAYER_MAP_3,
-	M_B_2PLAYER_MAP_4,
-	M_B_2PLAYER_MAP_5,
-	M_B_2PLAYER_MAP_6,
-	M_B_2PLAYER_MAP_7,
-	M_B_2PLAYER_MAP_8,
-	M_B_2PLAYER_MAP_9,
-	M_B_2PLAYER_MAP_10,
-
-	M_B_3PLAYER_MAP_1,
-	M_B_3PLAYER_MAP_2,
-	M_B_3PLAYER_MAP_3,
-	M_B_3PLAYER_MAP_4,
-	M_B_3PLAYER_MAP_5,
-	M_B_3PLAYER_MAP_6,
-	M_B_3PLAYER_MAP_7,
-	M_B_3PLAYER_MAP_8,
-	M_B_3PLAYER_MAP_9,
-	M_B_3PLAYER_MAP_10,
-
-	M_B_4PLAYER_MAP_1,
-	M_B_4PLAYER_MAP_2,
-	M_B_4PLAYER_MAP_3,
-	M_B_4PLAYER_MAP_4,
-	M_B_4PLAYER_MAP_5,
-	M_B_4PLAYER_MAP_6,
-	M_B_4PLAYER_MAP_7,
-	M_B_4PLAYER_MAP_8,
-	M_B_4PLAYER_MAP_9,
-	M_B_4PLAYER_MAP_10,
 
 	M_H_PAUSE,
 	M_B_KEEP,
@@ -144,13 +116,14 @@ typedef enum select_menu {
 	M_BG_MAINMENU,
 
 	M_SELECT,
-	M_STARS // 18/18
+	M_SELECT_BLACK,
+	M_STARS // 19/19
 } select_menu_t;
 
 typedef enum type_menu {
 	MAIN = 0,
 	PAUSE_SINGLE,
-	PAUSE_MULTI
+	PAUSE_MULTI,
 } type_t;
 
 typedef enum key_event {

@@ -49,14 +49,14 @@ int player_get_nb_range(struct player* player);
 void player_inc_nb_range(struct player* player);
 void player_dec_nb_range(struct player* player);
 
-// Load the player position from the map
-void player_from_map(struct player* player, struct map* map);
+// Load the players positions from the map
+void players_from_map(struct game* game, struct map* map);
 
 // Move the player according to the current direction
-int player_move(struct player* player, struct map* map, struct game* game);
+int player_move(struct game* game, struct player* player, struct map* map);
 
 // Display the player on the screen
-void player_display(struct player* player, struct game* game);
+void player_display(struct player* player);
 
 void player_inc_velocity(struct player* player);
 void player_dec_velocity(struct player* player);

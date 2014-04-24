@@ -1,6 +1,13 @@
 #include <list.h>
 #include <assert.h>
 
+struct list {
+	void* data;
+	int x, y;
+	s_type type;
+	struct list* next;
+};
+
 struct list* list_new()
 {
 	return NULL;
@@ -14,6 +21,36 @@ int list_get_x(struct list* l) {
 int list_get_y(struct list* l) {
 	assert(l);
 	return(l->y);
+}
+
+void list_inc_x(struct list* l) {
+	assert(l);
+	l->x++;
+}
+
+void list_dec_x(struct list* l) {
+	assert(l);
+	l->x--;
+}
+
+void list_inc_y(struct list* l) {
+	assert(l);
+	l->y++;
+}
+
+void list_dec_y(struct list* l) {
+	assert(l);
+	l->y--;
+}
+
+struct list* list_get_next(struct list* l) {
+	assert(l);
+	return l->next;
+}
+
+void* list_get_data(struct list* l) {
+	assert(l);
+	return l->data;
 }
 
 struct list* list_get_tail(struct list* l)
@@ -89,6 +126,29 @@ struct list* list_remove(struct list* l, int x, int y)
 	l_or = list_delete(l_or);
 
 	return l_new;
+}
+
+struct list* list_remove2(struct list* l_head, struct list* l) {
+	assert(l_head);
+	struct list* l_return = NULL;
+	struct list* lb = l_head;
+
+	if(l->data != NULL)
+		free(l->data);
+
+	if(l == l_head) {
+		l_return = l->next;
+		free(l);
+	}
+	else {
+		l_return = l_head;
+		while(lb->next != l) {
+			lb = lb->next;
+		}
+		lb->next = l->next;
+		free(l);
+	}
+	return(l_return);
 }
 
 struct list* list_delete(struct list* l)

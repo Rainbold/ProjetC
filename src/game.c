@@ -11,7 +11,7 @@
 
 struct game {
 	struct level* curr_level; // current level
-	struct player* player[4];
+	struct player* players[4];
 	enum game_state game_state;
 	int nb_player;
 	int	frame;
@@ -26,11 +26,15 @@ struct game* game_new(int curr_lvl, int nb_player) {
 	game->nb_player = nb_player;
 	game->curr_level = level_get_level(game->nb_curr_level, game); // get maps of the level 0
 
-	for(int i=0; i<nb_player; i++) {
-		game->player[i] = player_init(i, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
-		player_from_map(game->player[i], level_get_map(game->curr_level, 0)); // get x,y of the player on the first map
+	if(nb_player == 1)
+		game->players[0] = player_init(0, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
+	else {
+		for(int i=0; i<nb_player; i++) {
+			game->players[i] = player_init(i, 1, 1, 2); // player init : #1, nb_bomb, nb_life and nb_range
+		}
 	}
 
+	players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
 	game->game_state = PLAYING;
 	game->frame = 0;
 	game->pos = 0;
@@ -49,8 +53,19 @@ void game_free(struct game* game) {
 	assert(game);
 
 	for(int i=0; i<game->nb_player; i++)
-		player_free(game->player[i]);
+		player_free(game->players[i]);
 	level_free(game->curr_level);
+	free(game);
+}
+
+enum game_state game_get_state(struct game* game) {
+	assert(game);
+	return(game->game_state);
+}
+
+void game_set_state(struct game* game, enum game_state state) {
+	assert(game);
+	game->game_state = state;
 }
 
 int game_get_nb_player(struct game* game) {
@@ -58,10 +73,20 @@ int game_get_nb_player(struct game* game) {
 	return game->nb_player;
 }
 
+int game_get_pos(struct game* game) {
+	assert(game);
+	return game->pos;
+}
+
+struct player** game_get_players(struct game* game) {
+	assert(game && game->players);
+	return(game->players);
+}
+
 struct player* game_get_player(struct game* game, int id) {
 	assert(game);
 	assert(id > 0 && id <= game->nb_player);
-	return game->player[id-1];
+	return game->players[id-1];
 }
 
 struct level* game_get_curr_level(struct game* game) {
@@ -78,38 +103,71 @@ int game_get_frame(struct game* game)
 void game_banner_display(struct game* game) {
 	assert(game);
 
-	struct map* map = level_get_curr_map(game_get_curr_level(game));
-	struct player* player = game->player[0];
+	struct player* player = game->players[0];
+	struct level* level = game->curr_level;
+	struct map* map = level_get_curr_map(level);
 
 	int y = (map_get_height(map)) * SIZE_BLOC;
 	for (int i = 0; i < map_get_width(map); i++)
 		window_display_image(sprite_get_banner_line(), i * SIZE_BLOC, y);
 
-	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 6 * SIZE_BLOC) / 4;
+	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 9 * SIZE_BLOC) / 6;
 	int x = white_bloc;
 	y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
+
+	window_display_image(sprite_get_number(game->nb_curr_level), x, y);
+
+	x += SIZE_BLOC - 5;
+	window_display_image(sprite_get_number(10), x, y);
+
+	x += 10;
+	window_display_image(sprite_get_number(level_get_curr_nb_map(level)),x, y);
+
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_life(), x, y); // sprite life
 
-	x = white_bloc + SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_life(game_get_player(game, 1))), x, y); // life number
 
-	x = 2 * white_bloc + 2 * SIZE_BLOC;
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
 
-	x = 2 * white_bloc + 3 * SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_bomb(game_get_player(game, 1))), x, y); // bomb number
 
-	x = 3 * white_bloc + 4 * SIZE_BLOC;
+	x += white_bloc + SIZE_BLOC;
 	window_display_image(sprite_get_banner_range(), x, y); // range sprite
 
-	x = 3 * white_bloc + 5 * SIZE_BLOC;
+	x += SIZE_BLOC;
 	window_display_image(
 			sprite_get_number(player_get_nb_range(game_get_player(game, 1))), x, y); // range number
 
+	x += white_bloc + SIZE_BLOC;
 	if(player_get_key(player))
-		window_display_image(sprite_get_key(), (map_get_width(map) -1) * SIZE_BLOC, y);
+		window_display_image(sprite_get_key(), x, y);
+}
+
+void game_order_players_array(struct game* game, struct player* player[4])
+{
+	int min = 9999999;
+	int posPLayer = 0;
+	struct player* auxPlayer;
+	int id = 0;
+	for(int i=0; i<game->nb_player; i++) {
+		for(int j=i; j<game->nb_player; j++) {
+			posPLayer = player_get_y_real(player[j]);
+			if( posPLayer < min) {
+				min = posPLayer;
+				id = j;
+			}
+		}
+		auxPlayer = player[id];
+		player[id] = player[i];
+		player[i] = auxPlayer;
+		min = 9999999;
+	}
 }
 
 void game_display(struct game* game) {
@@ -117,94 +175,56 @@ void game_display(struct game* game) {
 
 	window_clear();
 
-	int frameChanged = 0;
-
-	if(game->nb_player < 2)
-		game_banner_display(game);
 	level_display(game_get_curr_level(game));
 
-	struct player* player[game->nb_player];
+	monster_display(level_get_curr_map(game->curr_level));
+
+	bomb_display(game, level_get_curr_map(game->curr_level));
 	
-	int minYLast = -1;
-	int maxY = -1;
+	if(game->nb_player == 1) { // Single player
+		struct player* player = game->players[0];
 
+		// Always display
+		game_banner_display(game);
+		player_display(player);
 
-	for(int i=0; i<game->nb_player; i++) 
-	{
-		player[i] = game->player[i];
 		if(game->game_state == PLAYING) {
-				if(player_get_moving(player[i]))
-					player_move(player[i], level_get_curr_map(game->curr_level), game);
+			player_move(game, player, level_get_curr_map(game->curr_level));
+			monster_move(level_get_curr_map(game->curr_level), player);
 
-		if(player_get_y(game->player[i]) > maxY)
-			maxY = player_get_y(game->player[i]);
-				if(map_get_bombs(level_get_curr_map(game->curr_level)) != NULL) // if there is at least one bomb
-					bomb_update(game, level_get_curr_map(game->curr_level), player[i]);
-
-				player_update(player[i]);
-				if(!frameChanged)
-				{
-					frameChanged = !frameChanged;
-					game->frame++;
-				}
-			}
-			else if(game->game_state == PAUSED) {
-		/*		window_display_image(sprite_get_menu(M_BG_GREY), 0, 0);
-				window_display_image(sprite_get_menu(M_H_PAUSE), MAP_WIDTH *  SIZE_BLOC / 2 - 185, 0);
-				window_display_image(sprite_get_menu(M_B_KEEP), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 170);
-				window_display_image(sprite_get_menu(M_B_MAINMENU), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 220);
-				window_display_image(sprite_get_menu(M_B_QUIT), MAP_WIDTH *  SIZE_BLOC / 2 - 75, 270);
-				window_display_image(sprite_get_menu(M_SELECT), MAP_WIDTH *  SIZE_BLOC / 2 - 75 - 40, 170 + 50 * game->pos);
-		*/
-				menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
-			}
-	}
-
-	/*
-	 * In order to make players pass through each others smootly,
-	 * the initial minimum y-position is first set to the maximum one
-	 * (because setting it to a greater value doesn't work).
-	 * Then, the minimum y-position is set to the actual one and players with the same y-position
-	 * are displayed.
-	 * This value is then recorded and stored into minYLast.
-	 * The algorithm is repeated with the minimum y-position that is greater than minYLast 
-	 * and all players are sorted to be displayed in the correct order.
-	 */
-
-	for(int i=0; i<game->nb_player; i++) 
-	{
-		if(player_get_y_real(game->player[i]) > maxY)
-			maxY = player_get_y_real(game->player[i]);
-	}
-
-	int minY = maxY;
-
-	for(int k=0; k<game->nb_player; k++) 
-	{
-		for(int j=0; j<game->nb_player; j++) 
-		{
-			if(player_get_y_real(game->player[j]) < minY && player_get_y_real(game->player[j]) > minYLast)
-				minY = player_get_y_real(game->player[j]);
+			player_update(player);
+			monster_update(level_get_curr_map(game->curr_level));
 		}
-
+	}
+	else { // Multi player
+		struct player* players_in_order[game->nb_player];
 		for(int i=0; i<game->nb_player; i++)
-		{
-			player[i] = game->player[i];
-			if(player_get_y_real(player[i]) == minY)
-			{
+			players_in_order[i] = game->players[i];
+		game_order_players_array(game, players_in_order);
 
-				bomb_display(
-						game,
-						level_get_curr_map(game->curr_level), // map
-						player[i]);
+		for(int i = 0; i < game->nb_player; i++) {
 
-				monster_display(level_get_curr_map(game->curr_level), player[i], game);
+			player_display(players_in_order[i]);
 
-				player_display(player[i], game);
+			if(game->game_state == PLAYING) {
+				player_move(game, players_in_order[i], level_get_curr_map(game->curr_level));
+
+				player_update(players_in_order[i]);
 			}
-		}
-		minYLast = minY;
-		minY = maxY;
+		} // end for each player
+
+
+	} // end Multi player
+
+	if(game->game_state == PLAYING) {
+
+		bomb_update(level_get_curr_map(game->curr_level));
+
+	}
+	else if(game->game_state == PAUSED) {
+
+		menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
+
 	}
 	window_refresh();
 }
@@ -214,7 +234,7 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 	struct player* player[game->nb_player];
 	for(int i=0; i<game->nb_player; i++) 
 	{
-		player[i] = game->player[i];
+		player[i] = game->players[i];
 	}
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
 
@@ -250,6 +270,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 					break;
 				}
 			}
+			if(game->game_state == CHOOSE_MAP) {
+				game->game_state = PLAYING;
+				window_resize(map_get_width(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC, map_get_height(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
+			}
 			break;
 		// case SDLK_a:
 		// 	player_inc_nb_life(player);
@@ -280,8 +304,11 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 				player_set_way(player[0], NORTH);
 				player_inc_moving(player[0]);
 			}
-			else if (game->game_state == PAUSED) {
+			else if (game->game_state == PAUSED)
 				return(menu_update(state, key, key_event));
+			else if(game->game_state == CHOOSE_MAP) {
+				if(game->pos > 0)
+					game->pos--;
 			}
 			break;
 		case SDLK_DOWN:
@@ -291,6 +318,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			}
 			else if (game->game_state == PAUSED) {
 				return(menu_update(state, key, key_event));
+			}
+			else if(game->game_state == CHOOSE_MAP) {
+				if(game->pos < sprite_get_nb_map_multi() - 1)
+					game->pos++;
 			}
 			break;
 		case SDLK_RIGHT:
