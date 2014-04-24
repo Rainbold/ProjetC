@@ -16,6 +16,7 @@ void level_change_map(struct game* game,  struct player* player, struct map* map
 
 // return current map of the level
 struct map* level_get_curr_map(struct level* level);
+void level_set_cur_map(struct level* level, int i);
 
 int level_get_curr_nb_map(struct level* level);
 

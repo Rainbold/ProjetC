@@ -94,7 +94,7 @@
 SDL_Surface* numbers[10];
 SDL_Surface* menu[NB_SURFACE_MENU];
 SDL_Surface* map_multi[20];
-int nb_map_multi;
+int nb_map_multi = 0;
 int max_width;
 
 #define NB_ANIM_STARS 4
@@ -224,12 +224,13 @@ void menu_load() {
 		printf("Error : unable to open data/multi\n");
 
 	max_width = 0;
-	for(int i = 0; (readfile = readdir(dir)) != NULL; i++) {
-
-		map_multi[i] = TTF_RenderText_Blended(police, readfile->d_name, couleurNoir);
-		nb_map_multi = i+1;
-		if(map_multi[i]->w >= max_width)
-			max_width = map_multi[i]->w;
+	while((readfile = readdir(dir)) != NULL) {
+		if(map_is_valid_format2(readfile->d_name)) {
+			map_multi[nb_map_multi] = TTF_RenderText_Blended(police, readfile->d_name, couleurNoir);
+			if(map_multi[nb_map_multi]->w >= max_width)
+				max_width = map_multi[nb_map_multi]->w;
+			nb_map_multi++;
+		}
 	}
 	if(closedir(dir) == -1)
 		printf("Problème à la fermeture");
@@ -263,22 +264,11 @@ void menu_unload() {
 		SDL_FreeSurface(numbers[i]);
 	}
 	SDL_FreeSurface(menu_stars);
+	for(int i = 0; i < nb_map_multi; i++)
+		SDL_FreeSurface(map_multi[i]);
 }
 
 void banner_load() {
-	// numbers imgs
-/*	numbers[0] = load_image(BANNER_0);
-	numbers[1] = load_image(BANNER_1);
-	numbers[2] = load_image(BANNER_2);
-	numbers[3] = load_image(BANNER_3);
-	numbers[4] = load_image(BANNER_4);
-	numbers[5] = load_image(BANNER_5);
-	numbers[6] = load_image(BANNER_6);
-	numbers[7] = load_image(BANNER_7);
-	numbers[8] = load_image(BANNER_8);
-	numbers[9] = load_image(BANNER_9);
-*/
-
 
 	// other banner sprites
 	banner_life = load_image(BANNER_LIFE);

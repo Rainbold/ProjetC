@@ -80,17 +80,19 @@ struct map* file_load_map_multi(int n_map, int nb_players) {
 
 	DIR* dir = NULL;
 	struct dirent* readfile = NULL;
-	dir = opendir("./data/multi");
+	dir = opendir("data/multi");
 
 	if(!dir)
 		printf("Error : unable to open data/multi\n");
 
 	for(int i = 0; i <= n_map; i++) {
 		readfile = readdir(dir);
+		if(!map_is_valid_format2(readfile->d_name)) {
+			i--;
+		}
 	}
 
-	//sprintf(lien, "data/multi/%s", readfile->d_name);
-	sprintf(lien, "data/multi/test.lvl");
+	sprintf(lien, "data/multi/%s", readfile->d_name);
 
 	if(closedir(dir) == -1)
 		printf("Problème à la fermeture");

@@ -9,7 +9,7 @@
 
 #ifdef USE_WIIMOTE
 
-#define MAX_WIIMOTES 1
+#define MAX_WIIMOTES 4
 wiimote** wiimotes;
 
 void wiimote_init() {
@@ -37,21 +37,21 @@ void wiimote_link(int time) { // time in s to find wiimotes
 	//printf("connnected: %d, found: %d\n", connected, found);
 
 	wiiuse_set_leds(wiimotes[0], WIIMOTE_LED_1);
-//	wiiuse_set_leds(wiimotes[1], WIIMOTE_LED_2);
-//	wiiuse_set_leds(wiimotes[2], WIIMOTE_LED_3);
-//	wiiuse_set_leds(wiimotes[3], WIIMOTE_LED_4);
+	wiiuse_set_leds(wiimotes[1], WIIMOTE_LED_2);
+	wiiuse_set_leds(wiimotes[2], WIIMOTE_LED_3);
+	wiiuse_set_leds(wiimotes[3], WIIMOTE_LED_4);
 
 	wiiuse_rumble(wiimotes[0], 1);
-//	wiiuse_rumble(wiimotes[1], 1);
-//	wiiuse_rumble(wiimotes[2], 1);
-//	wiiuse_rumble(wiimotes[3], 1);
+	wiiuse_rumble(wiimotes[1], 1);
+	wiiuse_rumble(wiimotes[2], 1);
+	wiiuse_rumble(wiimotes[3], 1);
 
 	SDL_Delay(200);
 
 	wiiuse_rumble(wiimotes[0], 0);
-//	wiiuse_rumble(wiimotes[1], 0);
-//	wiiuse_rumble(wiimotes[2], 0);
-//	wiiuse_rumble(wiimotes[3], 0);
+	wiiuse_rumble(wiimotes[1], 0);
+	wiiuse_rumble(wiimotes[2], 0);
+	wiiuse_rumble(wiimotes[3], 0);
 }
 
 
@@ -62,66 +62,181 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 	int send = 0;
 
 	if(wiiuse_poll(wiimotes, MAX_WIIMOTES)) {
-	int i = 0;
-		printf("ok\n");
-//		for (int i = 0; i < MAX_WIIMOTES; ++i) {
+		for (int i = 0; i < MAX_WIIMOTES; ++i) {
 			send = 0;
-			printf("wiimote: %d %d %d\n", wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
+			//printf("wiimote: %d %d %d\n", wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
 			if(wiimotes[i]->event == WIIUSE_EVENT) {
 
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_RIGHT)) {
-					key = SDLK_UP;
+					switch(i) {
+					case 0:
+						key = SDLK_UP;
+						break;
+					case 1:
+						key = SDLK_z;
+						break;
+					case 2:
+						key = SDLK_t;
+						break;
+					case 3:
+						key = SDLK_i;
+						break;
+					}
 					key_event = DOWN;
 					send = 1;
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_LEFT)) {
-					key = SDLK_DOWN;
+					switch(i) {
+					case 0:
+						key = SDLK_DOWN;
+						break;
+					case 1:
+						key = SDLK_s;
+						break;
+					case 2:
+						key = SDLK_g;
+						break;
+					case 3:
+						key = SDLK_k;
+						break;
+					}
 					key_event = DOWN;
 					send = 1;
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_UP)) {
-					key = SDLK_LEFT;
+					switch(i) {
+					case 0:
+						key = SDLK_LEFT;
+						break;
+					case 1:
+						key = SDLK_q;
+						break;
+					case 2:
+						key = SDLK_f;
+						break;
+					case 3:
+						key = SDLK_j;
+						break;
+					}
 					key_event = DOWN;
 					send = 1;
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_DOWN)) {
-					key = SDLK_RIGHT;
+					switch(i) {
+					case 0:
+						key = SDLK_RIGHT;
+						break;
+					case 1:
+						key = SDLK_d;
+						break;
+					case 2:
+						key = SDLK_h;
+						break;
+					case 3:
+						key = SDLK_l;
+						break;
+					}
 					key_event = DOWN;
 					send = 1;
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_ONE)) {
-					key = SDLK_SPACE;
+					switch(i) {
+					case 0:
+						key = SDLK_SPACE;
+						break;
+					case 1:
+						key = SDLK_a;
+						break;
+					case 2:
+						key = SDLK_r;
+						break;
+					case 3:
+						key = SDLK_u;
+						break;
+					}
 					key_event = DOWN;
 					send = 1;
 				}
-				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_TWO)) {
+				if(IS_JUST_PRESSED(wiimotes[0], WIIMOTE_BUTTON_TWO)) {
 					key = SDLK_RETURN;
 					key_event = DOWN;
 					send = 1;
 				}
-				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_HOME)) {
+				if(IS_JUST_PRESSED(wiimotes[0], WIIMOTE_BUTTON_HOME)) {
 					key = SDLK_ESCAPE;
 					key_event = DOWN;
 					send = 1;
 				}
 
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_RIGHT)) {
-					key = SDLK_UP;
+					switch(i) {
+					case 0:
+						key = SDLK_UP;
+						break;
+					case 1:
+						key = SDLK_z;
+						break;
+					case 2:
+						key = SDLK_t;
+						break;
+					case 3:
+						key = SDLK_i;
+						break;
+					}
 					key_event = UP;
 					send = 1;
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_LEFT)) {
-					key = SDLK_DOWN;
+					switch(i) {
+					case 0:
+						key = SDLK_DOWN;
+						break;
+					case 1:
+						key = SDLK_s;
+						break;
+					case 2:
+						key = SDLK_g;
+						break;
+					case 3:
+						key = SDLK_k;
+						break;
+					}
 					key_event = UP;
 					send = 1;
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_UP)) {
-					key = SDLK_LEFT;
+					switch(i) {
+					case 0:
+						key = SDLK_LEFT;
+						break;
+					case 1:
+						key = SDLK_q;
+						break;
+					case 2:
+						key = SDLK_f;
+						break;
+					case 3:
+						key = SDLK_j;
+						break;
+					}
 					key_event = UP;
 					send = 1;
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_DOWN)) {
-					key = SDLK_RIGHT;
+					switch(i) {
+					case 0:
+						key = SDLK_RIGHT;
+						break;
+					case 1:
+						key = SDLK_d;
+						break;
+					case 2:
+						key = SDLK_h;
+						break;
+					case 3:
+						key = SDLK_l;
+						break;
+					}
 					key_event = UP;
 					send = 1;
 				}
@@ -137,7 +252,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 				}
 				return(menu_update(state, key, key_event));
 			}
-	//	}
+		}
 	}
 	return state;
 }

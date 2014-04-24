@@ -21,10 +21,11 @@ struct level* level_get_level(int num, struct game* game) {
 	int nb_players = game_get_nb_player(game);
 
 	if(nb_players >= 2) {
-		level->nb_maps = 1;
+		level->nb_maps = sprite_get_nb_map_multi();
 		level->cur_map = 0;
-		level->maps = malloc(sizeof(*level->maps));
-		level->maps[0] = file_load_map_multi(0, nb_players);
+		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
+		for(int i = 0; i < level->nb_maps; i++)
+			level->maps[i] = file_load_map_multi(i, nb_players);
 	}
 	else {
 		for(int i = 0; i < 8; i++) {
@@ -95,6 +96,10 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 
 struct map* level_get_curr_map(struct level* level) {
 	return level->maps[level->cur_map];
+}
+
+void level_set_cur_map(struct level* level, int i) {
+	level->cur_map = i;
 }
 
 int level_get_curr_nb_map(struct level* level) {

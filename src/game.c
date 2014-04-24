@@ -240,15 +240,22 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 
 	if(key_event == DOWN) {
 		switch (key) {
+		case SDLK_p:
+			if(game->game_state == CHOOSE_MAP)
+				break;
+		/* no break */
 		case SDLK_ESCAPE:
-		case SDLK_p: // Pause
+		 // Pause
 			if(game->game_state == PLAYING) {
 				new_menu(PAUSE_SINGLE);
 				game->game_state = PAUSED;
 			}
-			else {
+			else if(game->game_state == PAUSED){
 				menu_free(NULL);
 				game->game_state = PLAYING;
+			}
+			else if(game->game_state == CHOOSE_MAP) {
+				return ENDGAME;
 			}
 			return GAME;
 			break;
@@ -273,6 +280,7 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->game_state == CHOOSE_MAP) {
 				game->game_state = PLAYING;
 				window_resize(map_get_width(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC, map_get_height(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
+				players_from_map(game, level_get_curr_map(game->curr_level));
 			}
 			break;
 		// case SDLK_a:
@@ -307,8 +315,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			else if (game->game_state == PAUSED)
 				return(menu_update(state, key, key_event));
 			else if(game->game_state == CHOOSE_MAP) {
-				if(game->pos > 0)
+				if(game->pos > 0) {
 					game->pos--;
+					level_set_cur_map(game_get_curr_level(game), game->pos);
+				}
 			}
 			break;
 		case SDLK_DOWN:
@@ -320,8 +330,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 				return(menu_update(state, key, key_event));
 			}
 			else if(game->game_state == CHOOSE_MAP) {
-				if(game->pos < sprite_get_nb_map_multi() - 1)
+				if(game->pos < sprite_get_nb_map_multi() - 1) {
 					game->pos++;
+					level_set_cur_map(game_get_curr_level(game), game->pos);
+				}
 			}
 			break;
 		case SDLK_RIGHT:
