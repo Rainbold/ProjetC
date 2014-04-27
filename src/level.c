@@ -13,7 +13,7 @@ struct level {
 	short cur_map; // the current map
 };
 
-struct level* level_get_level(int num, struct game* game) {
+struct level* level_get_level(struct game* game, int n_lvl, int n_map) {
 	
 
 	struct level* level = malloc(sizeof(*level));
@@ -22,14 +22,14 @@ struct level* level_get_level(int num, struct game* game) {
 
 	if(nb_players >= 2) {
 		level->nb_maps = sprite_get_nb_map_multi();
-		level->cur_map = 0;
+		level->cur_map = n_map;
 		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
 		for(int i = 0; i < level->nb_maps; i++)
 			level->maps[i] = file_load_map_multi(i, nb_players);
 	}
 	else {
 		for(int i = 0; i < 8; i++) {
-			if(file_map_exist(num, i))
+			if(file_map_exist(n_lvl, i))
 				map_count++;
 			else
 				i = 8;
@@ -39,12 +39,12 @@ struct level* level_get_level(int num, struct game* game) {
 			return NULL;
 
 		level->nb_maps = map_count;
-		level->cur_map = 0;
+		level->cur_map = n_map;
 
 		level->maps = malloc(sizeof(*level->maps) * level->nb_maps);
 
 		for(int i = 0; i < level->nb_maps; i++) {
-			level->maps[i] = file_load_map(num, i);
+			level->maps[i] = file_load_map(n_lvl, i);
 		}
 
 		map_load_monsters(level->maps[0], game);

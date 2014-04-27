@@ -64,6 +64,35 @@ void player_reset_way_mov(struct player* player) {
 	player->moving = 0;
 }
 
+void player_reset(struct game* game, int bomb_number, int life_number, int range_number, int velocity, int key) {
+	assert(game);
+	struct player** players = game_get_players(game);
+	struct player* player;
+
+	for(int i = 0; i < game_get_nb_player(game); i++) {
+		player = players[i];
+
+		player->current_way = SOUTH;
+		player->way[NORTH] = 0;
+		player->way[SOUTH] = 0;
+		player->way[EAST] = 0;
+		player->way[WEST] = 0;
+		player->nb_bomb = bomb_number;
+		player->nb_life = life_number;
+		player->nb_range = range_number;
+		player->invicibility = 0;
+		player->moving = 0;
+		player->velocity = velocity;
+		player->x_sprite = 0;
+		player->y_sprite = 0;
+		player->anim = 0;
+		player->rumble = 0;
+		player->id = i+1;
+		player->key = key;
+	}
+
+}
+
 int player_get_x(struct player* player) {
 	assert(player != NULL);
 	return player->x;
@@ -86,12 +115,14 @@ int player_get_y_real(struct player* player) {
 
 void player_set_current_way(struct player* player, way_t way) {
 	assert(player);
-	player->current_way = way;
+	if(player->nb_life)
+		player->current_way = way;
 }
 
 void player_set_way(struct player* player, way_t way) {
 	assert(player);
-	player->way[way] = 1;
+	if(player->nb_life)
+		player->way[way] = 1;
 }
 
 void player_unset_way(struct player* player, way_t way) {
@@ -101,7 +132,8 @@ void player_unset_way(struct player* player, way_t way) {
 
 void player_inc_moving(struct player* player) {
 	assert(player);
-	player->moving++;
+	if(player->nb_life)
+		player->moving++;
 }
 
 void player_dec_moving(struct player* player) {
@@ -117,13 +149,13 @@ int player_get_moving(struct player* player) {
 
 void player_inc_velocity(struct player* player) {
 	assert(player);
-	if(player->velocity < 40)
+	if(player->velocity < 40 && player->nb_life)
 		player->velocity++;
 }
 
 void player_dec_velocity(struct player* player) {
 	assert(player);
-	if(player->velocity > 1)
+	if(player->velocity > 1 && player->nb_life)
 		player->velocity--;
 }
 int player_get_nb_bomb(struct player* player) { // get nb_bomb
@@ -133,14 +165,37 @@ int player_get_nb_bomb(struct player* player) { // get nb_bomb
 
 void player_inc_nb_bomb(struct player* player) { // nb_bomb++
 	assert(player);
-	if(player_get_nb_bomb(player) < 9)
+	if(player_get_nb_bomb(player) < 9 && player->nb_life)
 		player->nb_bomb += 1;
 }
 
 void player_dec_nb_bomb(struct player* player) { // nb_bomb--
 	assert(player);
-	if(player_get_nb_bomb(player) > 0)
+	if(player_get_nb_bomb(player) > 1 && player->nb_life)
 		player->nb_bomb -= 1;
+}
+
+int player_get_nb_player_alive(struct game* game) {
+	assert(game);
+	struct player** players = game_get_players(game);
+	int nb_return = 0;
+	for(int i = 0; i < game_get_nb_player(game); i++) {
+		if(players[i]->nb_life)
+			nb_return++;
+	}
+	return(nb_return);
+}
+
+int player_get_id_player_alive(struct game* game) {
+	assert(game);
+	// Supposing that only 1 player is alive
+	struct player** players = game_get_players(game);
+
+	for(int i = 0; i < game_get_nb_player(game); i++) {
+		if(players[i]->nb_life)
+			return players[i]->id;
+	}
+	return 0;
 }
 
 int player_get_nb_life(struct player* player) { // get nb_life
@@ -150,7 +205,7 @@ int player_get_nb_life(struct player* player) { // get nb_life
 
 void player_inc_nb_life(struct player* player) { // nb_life++
 	assert(player);
-	if(player_get_nb_life(player) < 9)
+	if(player_get_nb_life(player) < 9 && player->nb_life)
 		player->nb_life += 1;
 }
 
@@ -158,17 +213,23 @@ void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if n
 	assert(player);
 	if(player_get_nb_life(player) > 0)
 		player->nb_life -= 1;
-#ifdef USE_WIIMOTE
-		wiimote_set_rumble(player->id, 1);
-		player->rumble = DEFAULT_GAME_FPS; // 1s of rumble
-#endif
 }
 
 void player_hit(struct player* player, int invicibility_time) { // invicibility_time in frame
 	assert(player);
 	if(!player->invicibility) {
-		player_dec_nb_life(player);
-	player_set_invicibility(player, invicibility_time);
+		if(player->nb_life > 1) {
+			player_dec_nb_life(player);
+			player_set_invicibility(player, invicibility_time);
+		}
+		else {
+			player->moving = 0;
+			player->nb_life = 0;
+		}
+#ifdef USE_WIIMOTE
+		wiimote_set_rumble(player->id, 1);
+		player->rumble = DEFAULT_GAME_FPS; // 1s of rumble
+#endif
 	}
 }
 
@@ -184,13 +245,13 @@ int player_get_nb_range(struct player* player) { // get nb_range
 
 void player_inc_nb_range(struct player* player) { // nb_range++
 	assert(player);
-	if(player_get_nb_range(player) < 9)
+	if(player_get_nb_range(player) < 9 && player->nb_life)
 		player->nb_range += 1;
 }
 
 void player_dec_nb_range(struct player* player) { // nb_range--
 	assert(player);
-	if(player_get_nb_range(player) > 1 )
+	if(player_get_nb_range(player) > 1 && player->nb_life)
 		player->nb_range -= 1;
 }
 
@@ -222,7 +283,7 @@ void players_from_map(struct game* game, struct map* map) {
 		for (j = 0; j < map_get_height(map); j++) {
 
 			cell = map_get_cell_compose_type(map, i, j);
-
+			//printf("cell: %d, i: %d, j: %d\n", cell, i ,j);
 			if((cell & 15) == CELL_PLAYER) {
 				if(cell >> 4 >= 0 && cell >> 4 <= 3) {
 					x[cell >> 4] = i;
@@ -520,28 +581,30 @@ void player_display(struct player* player) {
 	assert(player);
 	int anim;
 
-	if(player->invicibility > 0) {
-		if(((player->invicibility)/2)%2)
-			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 128);
+	if(player->nb_life) {
+		if(player->invicibility > 0) {
+			if(((player->invicibility)/2)%2)
+				SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 128);
+			else
+				SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 192);
+		}
 		else
-			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 192);
-	}
-	else
-		SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 255);
+			SDL_SetAlpha(sprite_get_players(player->id), SDL_SRCALPHA, 255);
 
-	if(player->moving) {
-		anim = (((player->anim)*(player->velocity)/12)+1)%8;
-		player->anim++;
-	}
-	else {
-		anim = 0;
-	}
+		if(player->moving) {
+			anim = (((player->anim)*(player->velocity)/12)+1)%8;
+			player->anim++;
+		}
+		else {
+			anim = 0;
+		}
 
-	window_display_sprite(	sprite_get_players(player->id),
-							sprite_get_rect_player_anim(anim, player->id, player->current_way),
-							player->x * SIZE_BLOC + player->x_sprite,
-							player->y * SIZE_BLOC + player->y_sprite - 20
-							);
+		window_display_sprite(	sprite_get_players(player->id),
+								sprite_get_rect_player_anim(anim, player->id, player->current_way),
+								player->x * SIZE_BLOC + player->x_sprite,
+								player->y * SIZE_BLOC + player->y_sprite - 20
+								);
+	}
 }
 
 void player_update(struct player* player) {

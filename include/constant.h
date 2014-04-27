@@ -4,7 +4,7 @@
 #define WINDOW_NAME "[PG110] Bomberman 2014"
 
 // Comment if you don't want to use wiimote or if you cannot compile
-//#define USE_WIIMOTE
+#define USE_WIIMOTE
 
 // Size (# of pixels) of a cell of the map 
 #define SIZE_BLOC       40
@@ -47,52 +47,21 @@ typedef enum state {
 	NEWGAME_MULTI3,
 	NEWGAME_MULTI4,
 
-/*	NEWGAME_MULTI2_1,
-	NEWGAME_MULTI2_2,
-	NEWGAME_MULTI2_3,
-	NEWGAME_MULTI2_4,
-	NEWGAME_MULTI2_5,
-	NEWGAME_MULTI2_6,
-	NEWGAME_MULTI2_7,
-	NEWGAME_MULTI2_8,
-	NEWGAME_MULTI2_9,
-	NEWGAME_MULTI2_10,
-
-	NEWGAME_MULTI3_1,
-	NEWGAME_MULTI3_2,
-	NEWGAME_MULTI3_3,
-	NEWGAME_MULTI3_4,
-	NEWGAME_MULTI3_5,
-	NEWGAME_MULTI3_6,
-	NEWGAME_MULTI3_7,
-	NEWGAME_MULTI3_8,
-	NEWGAME_MULTI3_9,
-	NEWGAME_MULTI3_10,
-
-	NEWGAME_MULTI4_1,
-	NEWGAME_MULTI4_2,
-	NEWGAME_MULTI4_3,
-	NEWGAME_MULTI4_4,
-	NEWGAME_MULTI4_5,
-	NEWGAME_MULTI4_6,
-	NEWGAME_MULTI4_7,
-	NEWGAME_MULTI4_8,
-	NEWGAME_MULTI4_9,
-	NEWGAME_MULTI4_10,
-*/
 	ENDGAME,
 	QUIT,
 	KEEP,
-	MAINMENU
+	MAINMENU,
+	CHANGEMAP,
 } state_t;
 
 typedef enum game_state {
 	PLAYING = 0,
 	PAUSED, // 1
 	CHOOSE_MAP, //2
+	SCORE, // 3
 } game_state_t;
 
-#define NB_SURFACE_MENU 19
+#define NB_SURFACE_MENU 20
 typedef enum select_menu {
 	M_B_SINGLE = 0,
 	M_B_NEWGAME,
@@ -112,12 +81,14 @@ typedef enum select_menu {
 	M_B_YES,
 	M_B_NO,
 
+	M_B_CHANGEMAP,
+
 	M_BG_GREY,
 	M_BG_MAINMENU,
 
 	M_SELECT,
 	M_SELECT_BLACK,
-	M_STARS // 19/19
+	M_STARS // 20/20
 } select_menu_t;
 
 typedef enum type_menu {

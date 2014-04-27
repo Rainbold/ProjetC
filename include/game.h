@@ -28,8 +28,13 @@ int game_get_nb_player(struct game* game);
 // Returns the current level
 struct level* game_get_curr_level(struct game* game);
 
-// SDL_GetTicks minus the pause time
-int game_get_frame(struct game* game);
+void game_reset_lvl_map(struct game* game);
+
+// Scores
+int* game_get_scores(struct game* game);
+void game_inc_score(struct game* game, int id);
+void game_reset_scores(struct game* game);
+
 
 // Display the game of the screen
 void game_display(struct game* game);

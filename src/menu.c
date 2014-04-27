@@ -7,7 +7,7 @@
 #include <constant.h>
 #include <menu.h>
 
-#define MAX_FIELD_MENU 3
+#define MAX_FIELD_MENU 4
 
 struct animation{
 	int x, y, offset;
@@ -189,6 +189,52 @@ void new_menu(enum type_menu type) {
 		g_menu = menu;
 		break;
 
+	case PAUSE_MULTI:
+		menu->type = PAUSE_MULTI;
+		menu->nb_field = 4;
+		menu->nb_sub[0] = 0;
+		menu->nb_sub[1] = 0;
+		menu->nb_sub[2] = 0;
+		menu->nb_sub[3] = 0;
+
+		menu->pos_field = 0;
+		menu->pos_sub = 0;
+
+		menu->select[0][0] = M_B_KEEP;
+
+		menu->select[1][0] = M_B_CHANGEMAP;
+
+		menu->select[2][0] = M_B_MAINMENU;
+
+		menu->select[3][0] = M_B_QUIT;
+
+		menu->header = M_H_PAUSE;
+		menu->pos_header_x = -80;
+		menu->pos_header_y = -100;
+
+		menu->pos_select_x = -75;
+		menu->pos_select_y[0] = -30;
+		menu->pos_select_y[1] = 0;
+		menu->pos_select_y[2] = 30;
+		menu->pos_select_y[3] = 60;
+
+
+		menu->selector = M_SELECT;
+		menu->selector_offset = -15;
+
+		menu->background = M_BG_GREY;
+		menu->pos_bg_x = -240;
+		menu->pos_bg_y = -240;
+
+		menu->anim = 0;
+
+		menu->nb_anim = 0;
+
+		menu->anims = NULL;
+
+		g_menu = menu;
+		break;
+
 	default:
 		break;
 	}
@@ -211,6 +257,8 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 						g_menu->pos_sub = 1;
 						g_menu->header = M_H_SAVE;
 					}
+					else if(g_menu->type == PAUSE_MULTI)
+						return MAINMENU;
 					break;
 
 				case M_B_QUIT:
@@ -218,7 +266,6 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 						g_menu->pos_sub = 1;
 						g_menu->header = M_H_SAVE;
 					}
-					else
 						return QUIT;
 					break;
 
@@ -241,6 +288,11 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 				case M_B_KEEP:
 					return KEEP;
 					break;
+
+				case M_B_CHANGEMAP:
+					return CHANGEMAP;
+					break;
+
 
 				case M_B_YES:
 					// todo save

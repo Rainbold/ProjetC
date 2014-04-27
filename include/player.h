@@ -20,6 +20,7 @@ int player_get_y_real(struct player* player);
 
 
 void player_reset_way_mov(struct player* player);
+void player_reset(struct game* game, int bomb_number, int life_number, int range_number, int velocity, int key);
 
 // Set and return the direction of the player
 void player_set_current_way(struct player* player, way_t way);
@@ -65,5 +66,8 @@ int player_get_key(struct player* player);
 int player_get_id(struct player* player);
 
 void player_update(struct player* player);
+
+int player_get_nb_player_alive(struct game* game);
+int player_get_id_player_alive(struct game* game);
 
 #endif /* PLAYER_H_ */

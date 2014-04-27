@@ -23,7 +23,7 @@ void window_create(int width, int height) {
 
 	SDL_WM_SetCaption(WINDOW_NAME, NULL );
 	window = SDL_SetVideoMode(width, height, 0, // If bits-per-pixel is 0, it is treated as the current display bits per pixel.
-			SDL_HWSURFACE);
+			SDL_HWSURFACE | SDL_DOUBLEBUF);
 
 	if (window == NULL ) {
 		error("Can't set video mode: %s\n", SDL_GetError());
@@ -71,11 +71,6 @@ void window_display_sprite(SDL_Surface* sprite, SDL_Rect rect, int x, int y) {
 void window_clear() {
 	assert(window);
 	SDL_FillRect(window, NULL, SDL_MapRGB(window->format, 255, 255, 255));
-}
-
-void window_clear_black() {
-	assert(window);
-	SDL_FillRect(window, NULL, SDL_MapRGB(window->format, 0, 0, 0));
 }
 
 void window_refresh() {

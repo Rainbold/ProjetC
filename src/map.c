@@ -155,26 +155,37 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 
 		int r = rand_ab(0, 99);
 
-		if(0 <= r && r < 30)
-			map_set_cell_type(map, x, y, CELL_EMPTY);
-		else if( 30 <= r && r < 35 )
-			map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
-		else if( 35 <= r && r < 40 ) {
-			if(game_get_nb_player(game) == 1) {
-				map_set_cell_type(map, x, y, CELL_MONSTER);
-				monster_init(map,x, y, MONSTER_NORMAL);
+		if(game_get_nb_player(game) == 1) {
+			if(0 <= r && r < 30)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			else if( 30 <= r && r < 35 )
+				map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
+			else if( 35 <= r && r < 40 ) {
+					map_set_cell_type(map, x, y, CELL_MONSTER);
+					monster_init(map,x, y, MONSTER_NORMAL);
 			}
-			else
+			else if( 40 <= r && r < 55 )
+				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
+			else if( 55 <= r && r < 70 )
+				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_DEC);
+			else if( 70 <= r && r < 85 )
 				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
+			else if( 85 <= r && r < 100 )
+				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_DEC);
 		}
-		else if( 40 <= r && r < 55 )
-			map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
-		else if( 55 <= r && r < 70 )
-			map_set_cell_type(map, x, y, CELL_BONUS_RANGE_DEC);
-		else if( 70 <= r && r < 85 )
-			map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
-		else if( 85 <= r && r < 100 )
-			map_set_cell_type(map, x, y, CELL_BONUS_BOMB_DEC);
+		else {
+			if(0 <= r && r < 65)
+				map_set_cell_type(map, x, y, CELL_EMPTY);
+			else if( 65 <= r && r < 70 )
+				map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
+			else if( 70 <= r && r < 80 )
+				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
+			else if( 80 <= r && r < 90 ) {
+					map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
+			}
+			else if( 90 <= r && r < 100 )
+				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
+		}
 	}
 	else {
 		switch(map_get_cell_compose_type(map, x, y) >> 4) {

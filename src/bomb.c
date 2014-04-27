@@ -38,7 +38,7 @@ void bomb_plant(struct game* game, struct map* map, struct player* player) {
 	int x = player_get_x(player);
 	int y = player_get_y(player);
 
-	if(player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_DOOR) { // if player has at least one bomb and he is not on a bomb
+	if(player_get_nb_life(player) && player_get_nb_bomb(player) && map_get_cell_type(map, x, y) != CELL_BOMB && map_get_cell_type(map, x, y) != CELL_DOOR) { // if player has at least one bomb and he is not on a bomb
 		bomb_init(game, map, x, y, BOMB_NORMAL, player_get_nb_range(player), player);
 		map_set_cell_type(map, x, y, CELL_BOMB);
 		player_dec_nb_bomb(player);

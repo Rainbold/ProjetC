@@ -23,6 +23,7 @@ SDL_Surface* sprite_get_monster(m_type type, way_t direction);
 SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type);
 
 SDL_Surface* sprite_get_menu(enum select_menu select_menu);
+SDL_Surface* sprite_get_score(int i);
 SDL_Rect* sprite_get_rect_stars();
 
 SDL_Surface* sprite_get_grey();
@@ -34,6 +35,8 @@ SDL_Surface* sprite_get_door();
 SDL_Surface* sprite_get_closed_door();
 
 SDL_Surface* sprite_get_number(short number);
+SDL_Surface* sprite_get_number_white(short number);
+
 SDL_Surface* sprite_get_banner_life();
 SDL_Surface* sprite_get_banner_bomb();
 SDL_Surface* sprite_get_banner_line();

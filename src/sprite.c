@@ -91,11 +91,15 @@
  * 		  							Total : 13 + 1 curseur + 1 Pause
  */
 
-SDL_Surface* numbers[10];
+SDL_Surface* numbers[11];
+SDL_Surface* numbers_w[11];
 SDL_Surface* menu[NB_SURFACE_MENU];
 SDL_Surface* map_multi[20];
 int nb_map_multi = 0;
 int max_width;
+
+#define NB_TXT_SCORE 5
+SDL_Surface* score[NB_TXT_SCORE];
 
 #define NB_ANIM_STARS 4
 #define SIZE_OF_STARS 10
@@ -113,7 +117,6 @@ SDL_Surface* text_wiimote[3];
 
 
 // banner
-//SDL_Surface* numbers[10];
 SDL_Surface* banner_life;
 SDL_Surface* banner_bomb;
 SDL_Surface* banner_range;
@@ -193,6 +196,24 @@ void menu_load() {
 	numbers[9] = TTF_RenderText_Blended(police, "9", couleurNoir);
 	numbers[10] = TTF_RenderText_Blended(police, ":", couleurNoir);
 
+	numbers_w[0] = TTF_RenderText_Blended(police, "0", couleurBlanche);
+	numbers_w[1] = TTF_RenderText_Blended(police, "1", couleurBlanche);
+	numbers_w[2] = TTF_RenderText_Blended(police, "2", couleurBlanche);
+	numbers_w[3] = TTF_RenderText_Blended(police, "3", couleurBlanche);
+	numbers_w[4] = TTF_RenderText_Blended(police, "4", couleurBlanche);
+	numbers_w[5] = TTF_RenderText_Blended(police, "5", couleurBlanche);
+	numbers_w[6] = TTF_RenderText_Blended(police, "6", couleurBlanche);
+	numbers_w[7] = TTF_RenderText_Blended(police, "7", couleurBlanche);
+	numbers_w[8] = TTF_RenderText_Blended(police, "8", couleurBlanche);
+	numbers_w[9] = TTF_RenderText_Blended(police, "9", couleurBlanche);
+	numbers_w[10] = TTF_RenderText_Blended(police, ":", couleurBlanche);
+
+	score[0] = TTF_RenderText_Blended(police, "It's a Draw !", couleurBlanche);
+	score[1] = TTF_RenderText_Blended(police, "Player 1 Wins !", couleurBlanche);
+	score[2] = TTF_RenderText_Blended(police, "Player 2 Wins !", couleurBlanche);
+	score[3] = TTF_RenderText_Blended(police, "Player 3 Wins !", couleurBlanche);
+	score[4] = TTF_RenderText_Blended(police, "Player 4 Wins !", couleurBlanche);
+
 	TTF_CloseFont(police);
 	police = TTF_OpenFont(FONT, 22);
 
@@ -211,6 +232,8 @@ void menu_load() {
 
 	menu[M_B_YES] = TTF_RenderText_Blended(police, "Yes", couleurBlanche);
 	menu[M_B_NO] = TTF_RenderText_Blended(police, "No", couleurBlanche);
+
+	menu[M_B_CHANGEMAP] = TTF_RenderText_Blended(police, "Change Map", couleurBlanche);
 
 	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
 	menu[M_SELECT_BLACK] = TTF_RenderText_Blended(police, ">", couleurNoir);
@@ -248,24 +271,32 @@ void menu_load() {
 			menu_rect_stars[i].w = SIZE_OF_STARS;
 			menu_rect_stars[i].h = SIZE_OF_STARS;
 		}
-		for(int i = NB_ANIM_STARS; i < 2*NB_ANIM_STARS - 1; i++) {
-			menu_rect_stars[i].x = menu_rect_stars[2*NB_ANIM_STARS-1-i].x;
-			menu_rect_stars[i].y = 0;
-			menu_rect_stars[i].w = SIZE_OF_STARS;
-			menu_rect_stars[i].h = SIZE_OF_STARS;
-		}
+	for(int i = NB_ANIM_STARS; i < 2*NB_ANIM_STARS - 1; i++) {
+		menu_rect_stars[i].x = menu_rect_stars[2*NB_ANIM_STARS-1-i].x;
+		menu_rect_stars[i].y = 0;
+		menu_rect_stars[i].w = SIZE_OF_STARS;
+		menu_rect_stars[i].h = SIZE_OF_STARS;
+	}
+
 }
 
 void menu_unload() {
-	for (int i = 0; i < NB_SURFACE_MENU; i++) {
+	for (int i = 0; i < NB_SURFACE_MENU; i++)
 		SDL_FreeSurface(menu[i]);
-	}
-	for (int i = 0; i < 11; i++) {
+
+	for (int i = 0; i < 11; i++)
 		SDL_FreeSurface(numbers[i]);
-	}
+
+	for (int i = 0; i < 11; i++)
+		SDL_FreeSurface(numbers_w[i]);
+
 	SDL_FreeSurface(menu_stars);
+
 	for(int i = 0; i < nb_map_multi; i++)
 		SDL_FreeSurface(map_multi[i]);
+
+	for(int i = 0; i < NB_TXT_SCORE; i++)
+		SDL_FreeSurface(score[i]);
 }
 
 void banner_load() {
@@ -541,12 +572,17 @@ SDL_Surface* sprite_get_number(short number) {
 	return numbers[number];
 }
 
+SDL_Surface* sprite_get_number_white(short number) {
+	assert(number >= 0 && number <= 10);
+	return numbers_w[number];
+}
+
 SDL_Surface* sprite_get_players(int id) {
-	return players[id];
+	return players[id-1];
 }
 
 SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction) {
-	SDL_Rect* rect = player[id][direction];
+	SDL_Rect* rect = player[id-1][direction];
 	return rect[i];
 }
 
@@ -584,6 +620,11 @@ SDL_Surface* sprite_get_bonus(bonus_type_t bonus_type) {
 SDL_Surface* sprite_get_menu(select_menu_t select_menu) {
 	//assert(menu[select_menu]);
 	return menu[select_menu];
+}
+
+SDL_Surface* sprite_get_score(int i) {
+	assert(i >= 0 && i < NB_TXT_SCORE);
+	return score[i];
 }
 
 SDL_Surface* sprite_get_map_multi(int i) {

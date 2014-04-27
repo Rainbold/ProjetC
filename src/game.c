@@ -8,15 +8,17 @@
 #include <bomb.h>
 #include <monster.h>
 #include <menu.h>
+#include <multi.h>
 
 struct game {
+	int nb_curr_level;
 	struct level* curr_level; // current level
 	struct player* players[4];
 	enum game_state game_state;
 	int nb_player;
-	int	frame;
 	int pos;
-	int nb_curr_level;
+	int scores[4];
+	int score_obj;
 };
 
 struct game* game_new(int curr_lvl, int nb_player) {
@@ -24,20 +26,22 @@ struct game* game_new(int curr_lvl, int nb_player) {
 	game->nb_curr_level = curr_lvl;
 
 	game->nb_player = nb_player;
-	game->curr_level = level_get_level(game->nb_curr_level, game); // get maps of the level 0
+	game->curr_level = level_get_level(game, game->nb_curr_level, 0); // get maps of the level 0, map 0
 
-	if(nb_player == 1)
+	if(nb_player == 1) {
 		game->players[0] = player_init(0, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
+		players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
+	}
 	else {
 		for(int i=0; i<nb_player; i++) {
 			game->players[i] = player_init(i, 1, 1, 2); // player init : #1, nb_bomb, nb_life and nb_range
+			game->scores[i] = 0;
 		}
 	}
 
-	players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
 	game->game_state = PLAYING;
-	game->frame = 0;
 	game->pos = 0;
+	game->score_obj = 3;
 
 	return game;
 }
@@ -45,8 +49,15 @@ struct game* game_new(int curr_lvl, int nb_player) {
 struct level* game_next_lvl(struct game* game) {
 	assert(game);
 	game->nb_curr_level++;
-	game->curr_level = level_get_level(game->nb_curr_level, game);
+	game->curr_level = level_get_level(game, game->nb_curr_level, 0);
 	return(game->curr_level);
+}
+
+void game_reset_lvl_map(struct game* game) {
+	assert(game);
+	int n_map = level_get_curr_nb_map(game_get_curr_level(game));
+	level_free(game->curr_level);
+	game->curr_level = level_get_level(game, game->nb_curr_level, n_map);
 }
 
 void game_free(struct game* game) {
@@ -93,60 +104,92 @@ struct level* game_get_curr_level(struct game* game) {
 	return game->curr_level;
 }
 
-int game_get_frame(struct game* game)
-{
+int* game_get_scores(struct game* game) {
 	assert(game);
-	return game->frame;
+	return game->scores;
+}
+
+void game_inc_score(struct game* game, int id) {
+	assert(game);
+	game->scores[id-1]++;
+}
+
+void game_reset_scores(struct game* game) {
+	assert(game);
+	for(int i = 0; i < 4; i++)
+		game->scores[i] = 0;
 }
 
 /* Display the game's interface */
 void game_banner_display(struct game* game) {
 	assert(game);
-
-	struct player* player = game->players[0];
 	struct level* level = game->curr_level;
 	struct map* map = level_get_curr_map(level);
 
-	int y = (map_get_height(map)) * SIZE_BLOC;
-	for (int i = 0; i < map_get_width(map); i++)
-		window_display_image(sprite_get_banner_line(), i * SIZE_BLOC, y);
+	if(game->nb_player <= 1) {
+		struct player* player = game->players[0];
 
-	int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 9 * SIZE_BLOC) / 6;
-	int x = white_bloc;
-	y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
+		int y = (map_get_height(map)) * SIZE_BLOC;
+		for (int i = 0; i < map_get_width(map); i++)
+			window_display_image(sprite_get_banner_line(), i * SIZE_BLOC, y);
 
-	window_display_image(sprite_get_number(game->nb_curr_level), x, y);
+		int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 9 * SIZE_BLOC) / 6;
+		int x = white_bloc;
+		y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
 
-	x += SIZE_BLOC - 5;
-	window_display_image(sprite_get_number(10), x, y);
+		window_display_image(sprite_get_number(game->nb_curr_level), x, y);
 
-	x += 10;
-	window_display_image(sprite_get_number(level_get_curr_nb_map(level)),x, y);
+		x += SIZE_BLOC - 5;
+		window_display_image(sprite_get_number(10), x, y);
 
-	x += white_bloc + SIZE_BLOC;
-	window_display_image(sprite_get_banner_life(), x, y); // sprite life
+		x += 10;
+		window_display_image(sprite_get_number(level_get_curr_nb_map(level)),x, y);
 
-	x += SIZE_BLOC;
-	window_display_image(
-			sprite_get_number(player_get_nb_life(game_get_player(game, 1))), x, y); // life number
+		x += white_bloc + SIZE_BLOC;
+		window_display_image(sprite_get_banner_life(), x, y); // sprite life
 
-	x += white_bloc + SIZE_BLOC;
-	window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
+		x += SIZE_BLOC;
+		window_display_image(
+				sprite_get_number(player_get_nb_life(game_get_player(game, 1))), x, y); // life number
 
-	x += SIZE_BLOC;
-	window_display_image(
-			sprite_get_number(player_get_nb_bomb(game_get_player(game, 1))), x, y); // bomb number
+		x += white_bloc + SIZE_BLOC;
+		window_display_image(sprite_get_banner_bomb(), x, y); // bomb sprite
 
-	x += white_bloc + SIZE_BLOC;
-	window_display_image(sprite_get_banner_range(), x, y); // range sprite
+		x += SIZE_BLOC;
+		window_display_image(
+				sprite_get_number(player_get_nb_bomb(game_get_player(game, 1))), x, y); // bomb number
 
-	x += SIZE_BLOC;
-	window_display_image(
-			sprite_get_number(player_get_nb_range(game_get_player(game, 1))), x, y); // range number
+		x += white_bloc + SIZE_BLOC;
+		window_display_image(sprite_get_banner_range(), x, y); // range sprite
 
-	x += white_bloc + SIZE_BLOC;
-	if(player_get_key(player))
-		window_display_image(sprite_get_key(), x, y);
+		x += SIZE_BLOC;
+		window_display_image(
+				sprite_get_number(player_get_nb_range(game_get_player(game, 1))), x, y); // range number
+
+		x += white_bloc + SIZE_BLOC;
+		if(player_get_key(player))
+			window_display_image(sprite_get_key(), x, y);
+	}
+	else {
+		int y = (map_get_height(map)) * SIZE_BLOC;
+		for (int i = 0; i < map_get_width(map); i++)
+			window_display_image(sprite_get_banner_line(), i * SIZE_BLOC, y);
+
+		y = (map_get_height(map) * SIZE_BLOC) + LINE_HEIGHT;
+		int white_bloc = ((map_get_width(map) * SIZE_BLOC) - 2*game->nb_player * SIZE_BLOC) / (game->nb_player + 1);
+		int x = 0;
+		for(int i = 0; i < game->nb_player; i++) {
+			x+= white_bloc;
+			window_display_sprite(	sprite_get_players(i+1),
+									sprite_get_rect_player_anim(0, i+1, SOUTH),
+									x, y + 2);
+
+			x+= SIZE_BLOC;
+			window_display_image(sprite_get_number(game->scores[i]), x, y);
+
+			x+=SIZE_BLOC;
+		}
+	}
 }
 
 void game_order_players_array(struct game* game, struct player* player[4])
@@ -181,11 +224,12 @@ void game_display(struct game* game) {
 
 	bomb_display(game, level_get_curr_map(game->curr_level));
 	
+	game_banner_display(game);
+
 	if(game->nb_player == 1) { // Single player
 		struct player* player = game->players[0];
 
 		// Always display
-		game_banner_display(game);
 		player_display(player);
 
 		if(game->game_state == PLAYING) {
@@ -229,6 +273,24 @@ void game_display(struct game* game) {
 	window_refresh();
 }
 
+/* Return score max if select = 0, id of player max score if select = 1 */
+int game_get_score_max(struct game* game, int select) {
+	assert(game);
+	int max = game->scores[0];
+	int id = 0;
+
+	for(int i = 1; i < game->nb_player; i++) {
+		if(game->scores[i] > max) {
+			max = game->scores[i];
+			id = i+1;
+		}
+	}
+	if(select)
+		return id;
+	else
+		return max;
+}
+
 enum state game_update(enum state state, struct game* game, int key, key_event_t key_event) {
 	//struct player* player = game_get_player(game, 1);
 	struct player* player[game->nb_player];
@@ -247,7 +309,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 		case SDLK_ESCAPE:
 		 // Pause
 			if(game->game_state == PLAYING) {
-				new_menu(PAUSE_SINGLE);
+				if(game->nb_player == 1)
+					new_menu(PAUSE_SINGLE);
+				else
+					new_menu(PAUSE_MULTI);
 				game->game_state = PAUSED;
 			}
 			else if(game->game_state == PAUSED){
@@ -261,26 +326,41 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			break;
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER:
-			if(game->game_state == PAUSED) {
+			switch(game->game_state) {
+			case PAUSED:
+
 				switch(menu_update(state, key, key_event)) {
 				case KEEP:
 					menu_free(NULL);
 					game->game_state = PLAYING;
 					break;
 				case MAINMENU:
-					return(ENDGAME);
+					return ENDGAME;
 					break;
 				case QUIT:
 					return(QUIT);
 					break;
+				case CHANGEMAP:
+					multi_change_state(game, CHOOSE_MAP);
+					break;
 				default:
 					break;
 				}
-			}
-			if(game->game_state == CHOOSE_MAP) {
-				game->game_state = PLAYING;
-				window_resize(map_get_width(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC, map_get_height(level_get_curr_map(game_get_curr_level(game))) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
-				players_from_map(game, level_get_curr_map(game->curr_level));
+
+			break;
+			case CHOOSE_MAP:
+				multi_change_state(game, PLAYING);
+
+				break;
+			case SCORE:
+				if(game_get_score_max(game, 0) < game->score_obj)
+					multi_change_state(game, PLAYING);
+				else
+					multi_change_state(game, CHOOSE_MAP);
+
+				break;
+			default:
+				break;
 			}
 			break;
 		// case SDLK_a:
@@ -604,6 +684,18 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 				player_dec_moving(player[3]);
 				player_unset_way(player[3], WEST);
 			}
+			break;
+		case SDLK_F1:
+			player_reset_way_mov(game->players[0]);
+			break;
+		case SDLK_F2:
+			player_reset_way_mov(game->players[1]);
+			break;
+		case SDLK_F3:
+			player_reset_way_mov(game->players[2]);
+			break;
+		case SDLK_F4:
+			player_reset_way_mov(game->players[3]);
 			break;
 		}
 	}

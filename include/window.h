@@ -17,6 +17,4 @@ void window_write(int x, int y);
 // set every pixel of the window to white
 void window_clear();
 
-void window_clear_black();
-
 #endif /* WINDOW_H_ */
