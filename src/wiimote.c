@@ -54,20 +54,27 @@ void wiimote_link(int time) { // time in s to find wiimotes
 	wiiuse_rumble(wiimotes[3], 0);
 }
 
-void wiimote_send_event(enum state state, struct game* game, SDLKey key, key_event_t key_event) {
-
+enum state wiimote_send_event(enum state state, struct game* game, SDLKey key, key_event_t key_event) {
+	switch (state) {
+	case GAME:
+		assert(game);
+		return(game_update(state, game, key, key_event));
+			break;
+	default:
+		break;
+	}
+	return(menu_update(state, key, key_event));
 }
 
-enum state input_wiimote(struct game* game, enum state state) { // state : 0 = MENU, 1 = GAME
+enum state input_wiimote(struct game* game, enum state state2) { // state : 0 = MENU, 1 = GAME
 
 	key_event_t key_event;
 	SDLKey key;
-	int send = 0;
+	enum state state = state2;
 
 	if(wiiuse_poll(wiimotes, MAX_WIIMOTES)) {
 		for (int i = 0; i < MAX_WIIMOTES; ++i) {
-			send = 0;
-			printf("wiimote %d: btns: %d,  held, %d releaded: %d\n", i, wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
+			//printf("wiimote %d: btns: %d,  held, %d releaded: %d\n", i, wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
 			if(wiimotes[i]->event == WIIUSE_EVENT) {
 
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_RIGHT)) {
@@ -86,7 +93,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_LEFT)) {
 					switch(i) {
@@ -104,7 +111,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_UP)) {
 					switch(i) {
@@ -122,7 +129,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_DOWN)) {
 					switch(i) {
@@ -140,7 +147,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_ONE)) {
 					switch(i) {
@@ -158,17 +165,17 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[0], WIIMOTE_BUTTON_TWO)) {
 					key = SDLK_RETURN;
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_JUST_PRESSED(wiimotes[0], WIIMOTE_BUTTON_HOME)) {
 					key = SDLK_ESCAPE;
 					key_event = DOWN;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_RIGHT)) {
@@ -187,12 +194,12 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = UP;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_LEFT)) {
 					switch(i) {
 					case 0:
-						key = SDLK_UP;
+						key = SDLK_DOWN;
 						break;
 					case 1:
 						key = SDLK_s;
@@ -205,7 +212,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = UP;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_UP)) {
 					switch(i) {
@@ -223,7 +230,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = UP;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_DOWN)) {
 					switch(i) {
@@ -241,19 +248,8 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 						break;
 					}
 					key_event = UP;
-					send = 1;
+					state = wiimote_send_event(state, game, key, key_event);
 				}
-			}
-			if(send) {
-				switch (state) {
-				case GAME:
-					assert(game);
-					return(game_update(state, game, key, key_event));
-					break;
-				default:
-					break;
-				}
-				return(menu_update(state, key, key_event));
 			}
 		}
 	}

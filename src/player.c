@@ -134,12 +134,16 @@ void player_inc_moving(struct player* player) {
 	assert(player);
 	if(player->nb_life)
 		player->moving++;
+	else
+		player->moving = 0;
 }
 
 void player_dec_moving(struct player* player) {
 	assert(player);
 	if(player->moving > 0)
 		player->moving--;
+	if(!player->nb_life)
+		player->moving = 0;
 }
 
 int player_get_moving(struct player* player) {
@@ -211,8 +215,13 @@ void player_inc_nb_life(struct player* player) { // nb_life++
 
 void player_dec_nb_life(struct player* player) { // nb_life-- TODO gameover if nb_life <= 0
 	assert(player);
-	if(player_get_nb_life(player) > 0)
+	if(player_get_nb_life(player) > 0) {
 		player->nb_life -= 1;
+#ifdef USE_WIIMOTE
+		wiimote_set_rumble(player->id, 1);
+		player->rumble = DEFAULT_GAME_FPS; // 1s of rumble
+#endif
+	}
 }
 
 void player_hit(struct player* player, int invicibility_time) { // invicibility_time in frame
@@ -226,10 +235,6 @@ void player_hit(struct player* player, int invicibility_time) { // invicibility_
 			player->moving = 0;
 			player->nb_life = 0;
 		}
-#ifdef USE_WIIMOTE
-		wiimote_set_rumble(player->id, 1);
-		player->rumble = DEFAULT_GAME_FPS; // 1s of rumble
-#endif
 	}
 }
 
@@ -568,12 +573,7 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 		}
 	}
 
-/*	if (move) {
-		if(map_get_cell_type(map, x, y) == CELL_PLAYER)
-			map_set_cell_type(map, x, y, CELL_EMPTY);
-		map_set_cell_type(map, player->x, player->y, CELL_PLAYER);
-	} */
-	//printf("mov: %d, x: %d, y: %d, x_sprite: %d, y_sprite: %d\n", player->moving, player->x, player->y, player->x_sprite, player->y_sprite);
+	printf("mov: %d, x: %d, y: %d, x_sprite: %d, y_sprite: %d\n", player->moving, player->x, player->y, player->x_sprite, player->y_sprite);
 	return move;
 }
 

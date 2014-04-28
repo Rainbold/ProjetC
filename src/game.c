@@ -266,8 +266,11 @@ void game_display(struct game* game) {
 
 	}
 	else if(game->game_state == PAUSED) {
-
-		menu_display(map_get_width(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC, map_get_height(level_get_curr_map(game->curr_level)) / 2 * SIZE_BLOC);
+		int map_w = map_get_width(level_get_curr_map(game->curr_level));
+		int map_h = map_get_height(level_get_curr_map(game->curr_level));
+		int mid_w = map_w / 2 * SIZE_BLOC + map_w%2 * SIZE_BLOC / 2;
+		int mid_h = map_h / 2 * SIZE_BLOC + map_h%2 * SIZE_BLOC / 2;
+		menu_display(mid_w, mid_h);
 
 	}
 	window_refresh();

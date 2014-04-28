@@ -92,10 +92,6 @@ void multi_change_state(struct game* game, game_state_t state_to) {
 	case PAUSED:
 		switch(state_to) {
 		case SCORE:
-#ifdef USE_WIIMOTE
-			for(int i = 0; i < game_get_nb_player(game); i++)
-				wiimote_set_rumble(i+1, 0);
-#endif
 			game_set_state(game, SCORE);
 			if(player_get_nb_player_alive(game) == 1)
 				game_inc_score(game, player_get_id_player_alive(game));
