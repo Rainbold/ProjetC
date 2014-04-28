@@ -20,7 +20,7 @@ enum state input_keyboard(struct game* game, enum state state) { // state : 0 = 
 		case SDL_KEYDOWN:
 #ifdef USE_WIIMOTE
 			if(key_event == DOWN && event.key.keysym.sym == SDLK_F12)
-				wiimote_link(2);
+				wiimote_link(5);
 #endif
 			switch (state) {
 			case GAME:

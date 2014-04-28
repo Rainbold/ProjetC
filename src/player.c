@@ -171,7 +171,7 @@ void player_inc_nb_bomb(struct player* player) { // nb_bomb++
 
 void player_dec_nb_bomb(struct player* player) { // nb_bomb--
 	assert(player);
-	if(player_get_nb_bomb(player) > 1 && player->nb_life)
+	if(player_get_nb_bomb(player) > 0 && player->nb_life)
 		player->nb_bomb -= 1;
 }
 

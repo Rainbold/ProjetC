@@ -29,12 +29,12 @@ struct game* game_new(int curr_lvl, int nb_player) {
 	game->curr_level = level_get_level(game, game->nb_curr_level, 0); // get maps of the level 0, map 0
 
 	if(nb_player == 1) {
-		game->players[0] = player_init(0, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
+		game->players[0] = player_init(1, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
 		players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
 	}
 	else {
 		for(int i=0; i<nb_player; i++) {
-			game->players[i] = player_init(i, 1, 1, 2); // player init : #1, nb_bomb, nb_life and nb_range
+			game->players[i] = player_init(i+1, 1, 1, 2); // player init : #1, nb_bomb, nb_life and nb_range
 			game->scores[i] = 0;
 		}
 	}

@@ -54,6 +54,9 @@ void wiimote_link(int time) { // time in s to find wiimotes
 	wiiuse_rumble(wiimotes[3], 0);
 }
 
+void wiimote_send_event(enum state state, struct game* game, SDLKey key, key_event_t key_event) {
+
+}
 
 enum state input_wiimote(struct game* game, enum state state) { // state : 0 = MENU, 1 = GAME
 
@@ -64,7 +67,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 	if(wiiuse_poll(wiimotes, MAX_WIIMOTES)) {
 		for (int i = 0; i < MAX_WIIMOTES; ++i) {
 			send = 0;
-			//printf("wiimote: %d %d %d\n", wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
+			printf("wiimote %d: btns: %d,  held, %d releaded: %d\n", i, wiimotes[i]->btns, wiimotes[i]->btns_held, wiimotes[i]->btns_released);
 			if(wiimotes[i]->event == WIIUSE_EVENT) {
 
 				if(IS_JUST_PRESSED(wiimotes[i], WIIMOTE_BUTTON_RIGHT)) {
@@ -189,7 +192,7 @@ enum state input_wiimote(struct game* game, enum state state) { // state : 0 = M
 				if(IS_RELEASED(wiimotes[i], WIIMOTE_BUTTON_LEFT)) {
 					switch(i) {
 					case 0:
-						key = SDLK_DOWN;
+						key = SDLK_UP;
 						break;
 					case 1:
 						key = SDLK_s;
