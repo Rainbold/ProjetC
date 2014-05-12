@@ -24,15 +24,45 @@ FILE* file_open(char* lien, mode_file mode) {
 	return(NULL);
 }
 
-struct map* file_load_map(int n_level, int n_map) {
+struct map* map_read_file1(const char* mapFile) {
+   FILE* f = NULL;
+   unsigned char byte = 0;
 
+   int i;
+   int j;
+
+   f = fopen(mapFile, "rb");
+
+   if(!f)
+	   return(NULL);
+
+   if( fread(&byte, 1, sizeof(byte), f) == 0 )
+	   return(NULL);
+   int map_width = byte;
+
+   if( fread(&byte, 1, sizeof(byte), f) == 0 )
+	   return(NULL);
+   int map_height = byte;
+
+   struct map* map = map_new(map_width, map_height);
+
+   for(i=0; i<map_width; i++) {
+	   for(j=0; j<map_height; j++) {
+		   if( fread(&byte, 1, sizeof(byte), f) == 0 )
+			   return(NULL);
+		   map_set_cell_type(map, i, j, byte);
+	   }
+   }
+
+   fclose(f);
+
+   return map;
+}
+
+struct map* map_read_file2(char* lien) {
 	int map_width = 0;
 	int map_height = 0;
 	int type = 0;
-	char lien[250];
-
-	sprintf(lien, "data/single/map_%d_%d.lvl", n_level, n_map);
-
 	FILE* map_file = file_open(lien, READ);
 
 	if(map_file == NULL)
@@ -67,6 +97,27 @@ struct map* file_load_map(int n_level, int n_map) {
 
 	fclose(map_file);
 	return map;
+}
+
+struct map* file_load_map(int n_level, int n_map) {
+
+	char lien[250];
+
+	sprintf(lien, "data/single/map_%d_%d.lvl", n_level, n_map);
+
+	int verif1 = map_is_valid_format1(lien);
+	int verif2 = map_is_valid_format2(lien);
+
+	if(verif1 && verif2) {
+		// Hexa file
+		return(map_read_file1(lien));
+	}
+	else if(!verif1 && verif2) {
+		// Normal file
+		return(map_read_file2(lien));
+	}
+	else
+		return NULL;
 }
 
 struct map* file_load_map_multi(int n_map, int nb_players) {

@@ -33,7 +33,7 @@ int rand_ab(int a, int b)
 
 	return res+a;
 }
-
+/* if the file is in hexa */
 int map_is_valid_format1(const char* mapFile)
 {
    FILE* f = NULL;
@@ -55,7 +55,7 @@ int map_is_valid_format1(const char* mapFile)
 
    return 1;
 }
-
+/* if the file finish with .lvl */
 int map_is_valid_format2(const char* mapFile)
 {
 	int len = strlen(mapFile);
