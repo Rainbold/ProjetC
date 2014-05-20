@@ -1,0 +1,42 @@
+\documentclass[11pt]{article}
+
+\usepackage[left=0.75in, right=0.75in, top=0.75in, bottom=0.75in]{geometry}
+\usepackage{layout}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+
+
+\title{\textbf{PG110 Project}\\Bomberman}
+\author{Maxime PETERLIN - Gabriel VERMEULEN \\\\{ENSEIRB-MATMECA, Bordeaux}}
+\date{June, 6th 2014}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Fonctionnalités de bases}
+
+RAS
+
+\section{Fonctionnalités ajoutées}
+	\subsection{Menus}
+		Ajout de menus permettant de choisir, par exemple, entre le singleplayer et le multiplayer ou encore entre lancer une nouvelle partie ou en charger une.
+	\subsection{Pathfinding pour les monstres}
+		Implémentation de l'algorithme de Dijkstra. Le monstre suit le joueur en fonction de son agressivité qui définie ici comme étant le nombre de cases séparant le monstre et le joueur.
+	\subsection{Animations}
+		Implémentation de la gestion de l'animation des sprites.
+	\subsection{Multijoueurs LAN (possibilité d'utiliser des Wiimotes)}
+		Création d'un mode multijoueurs (maximum 4 joueurs) se jouant en 3 manches gagnantes.\\
+		Il est également possible (et conseillé) d'utiliser des Wiimotes pour contrôler les déplacements des joueurs.
+	\subsection{Changement des sprites et ajout de nouveaux bonus}
+		Les sprites ont été modifiés par rapport à ceux proposés initialement.\\
+		Les bonus qui ont été ajoutés sont les suivants :
+		\begin{itemize}
+			\item boost de vitesse.
+		\end{itemize}
+	\subsection{Editeur de maps}
+		Création d'un éditeur de maps à l'aide de la bibliothèque GTK+.\\
+		Prend uniquement en compte le format des maps que nous avons mis en place.
+
+\end{document}
