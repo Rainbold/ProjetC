@@ -103,6 +103,16 @@ int player_get_y(struct player* player) {
 	return player->y;
 }
 
+void player_set_x(struct player* player, int x) {
+	assert(player != NULL);
+	player->x = x;
+}
+
+void player_set_y(struct player* player, int y) {
+	assert(player != NULL);
+	player->y = y;
+}
+
 int player_get_x_real(struct player* player) {
 	assert(player != NULL);
 	return player->x_sprite+player->x*40;
@@ -575,6 +585,9 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 				level_change_map(game, player, map, (type & 112) >> 4);
 			}
 			//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
+			break;
+		case CELL_FLAG:
+			level_change_level(game, player, map);
 			break;
 		case CELL_KEY:
 			player->key++;

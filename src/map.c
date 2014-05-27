@@ -156,26 +156,30 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 		int r = rand_ab(0, 99);
 
 		if(game_get_nb_player(game) == 1) {
-			if(0 <= r && r < 30)
+			if(0 <= r && r < 40)
 				map_set_cell_type(map, x, y, CELL_EMPTY);
-			else if( 30 <= r && r < 35 )
-				map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
-			else if( 35 <= r && r < 40 ) {
+			else if( 40 <= r && r < 50 )
+				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
+			else if( 50 <= r && r < 60 )
+				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_DEC);
+			else if( 60 <= r && r < 70 )
+				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
+			else if( 70 <= r && r < 80 )
+				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_DEC);
+			else if( 80 <= r && r < 90 )
+				map_set_cell_type(map, x, y, CELL_BONUS_ROLLER);
+			else if( 90 <= r && r < 95 ) {
 					map_set_cell_type(map, x, y, CELL_MONSTER);
 					monster_init(map,x, y, MONSTER_NORMAL);
 			}
-			else if( 40 <= r && r < 55 )
-				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_INC);
-			else if( 55 <= r && r < 70 )
-				map_set_cell_type(map, x, y, CELL_BONUS_RANGE_DEC);
-			else if( 70 <= r && r < 85 )
-				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_INC);
-			else if( 85 <= r && r < 100 )
-				map_set_cell_type(map, x, y, CELL_BONUS_BOMB_DEC);
+			else if( 95 <= r && r < 100 )
+				map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
 		}
 		else {
-			if(0 <= r && r < 65)
+			if(0 <= r && r < 55)
 				map_set_cell_type(map, x, y, CELL_EMPTY);
+			else if( 55 <= r && r < 65 )
+				map_set_cell_type(map, x, y, CELL_BONUS_ROLLER);
 			else if( 65 <= r && r < 70 )
 				map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
 			else if( 70 <= r && r < 80 )
@@ -200,6 +204,9 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 			break;
 		case BONUS_RANGE_DEC:
 			map_set_cell_type(map, x, y, CELL_BONUS_RANGE_DEC);
+			break;
+		case BONUS_ROLLER:
+			map_set_cell_type(map, x, y, CELL_BONUS_ROLLER);
 			break;
 		case BONUS_LIFE:
 			map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
@@ -233,6 +240,11 @@ void display_bonus(struct map* map, int x, int y, char type)
 	case BONUS_BOMB_DEC:
 		window_display_image(sprite_get_bonus(BONUS_BOMB_DEC), x, y);
 		break;
+
+	case BONUS_ROLLER:
+		window_display_image(sprite_get_bonus(BONUS_ROLLER), x, y);
+		break;
+
 	case BONUS_LIFE:
 		window_display_image(sprite_get_banner_life(), x, y);
 		break;
@@ -293,6 +305,9 @@ void map_display(struct map* map, int offset_x, int offset_y)
 				break;
 			case CELL_DOOR:
 				display_door(map, x, y, type);
+				break;
+			case CELL_FLAG:
+				window_display_image(sprite_get_flag(), x, y);
 				break;
 			}
 		}

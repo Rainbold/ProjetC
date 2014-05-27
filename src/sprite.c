@@ -12,6 +12,7 @@
 #define MAP_KEY			"sprite/key.png"
 #define MAP_DOOR		"sprite/door.png"
 #define MAP_CLOSED_DOOR	"sprite/closed_door.png"
+#define FLAG			"sprite/flag.png"
 
 // Scenery elements
 #define MAP_STONE		"sprite/stone.png"
@@ -25,16 +26,6 @@
 #define BANNER_LIFE		"sprite/banner_life.png"
 #define BANNER_BOMB		"sprite/bomb3.png"
 #define BANNER_RANGE	"sprite/banner_range.png"
-#define BANNER_0		"sprite/banner_0.jpg"
-#define BANNER_1		"sprite/banner_1.jpg"
-#define BANNER_2		"sprite/banner_2.jpg"
-#define BANNER_3		"sprite/banner_3.jpg"
-#define BANNER_4		"sprite/banner_4.jpg"
-#define BANNER_5		"sprite/banner_5.jpg"
-#define BANNER_6		"sprite/banner_6.jpg"
-#define BANNER_7		"sprite/banner_7.jpg"
-#define BANNER_8		"sprite/banner_8.jpg"
-#define BANNER_9		"sprite/banner_9.jpg"
 
 // Sprites of Bombs
 #define BOMB			"sprite/bomb40.png"
@@ -50,10 +41,11 @@
 #define MENU_STARS		"sprite/stars.png"
 
 // Sprites of Bonus
-#define IMG_BONUS_BOMB_RANGE_INC  "sprite/bonus_bomb_range_inc.png"
-#define IMG_BONUS_BOMB_RANGE_DEC  "sprite/bonus_bomb_range_dec.png"
-#define IMG_BONUS_BOMB_NB_INC     "sprite/bonus_bomb_nb_inc.png"
-#define IMG_BONUS_BOMB_NB_DEC     "sprite/bonus_bomb_nb_dec.png"
+#define IMG_BONUS_BOMB_RANGE_INC 	"sprite/bonus_bomb_range_inc.png"
+#define IMG_BONUS_BOMB_RANGE_DEC	"sprite/bonus_bomb_range_dec.png"
+#define IMG_BONUS_BOMB_NB_INC		"sprite/bonus_bomb_nb_inc.png"
+#define IMG_BONUS_BOMB_NB_DEC		"sprite/bonus_bomb_nb_dec.png"
+#define IMG_BONUS_ROLLER			"sprite/roller.png"
 
 // Sprites of Players
 #define PLAYER_1			"sprite/bomberman1_40.png"
@@ -130,11 +122,12 @@ SDL_Surface* door;
 SDL_Surface* closed_door;
 SDL_Surface* stone;
 SDL_Surface* tree;
+SDL_Surface* flag;
 
 #define SIZE_OF_SPRITE 40
 
 // bonus
-#define NB_BONUS 4
+#define NB_BONUS 5
 SDL_Surface* bonus[NB_BONUS];
 
 // monster
@@ -324,6 +317,7 @@ void map_load() {
 	stone = load_image(MAP_STONE);
 	door = load_image(MAP_DOOR);
 	closed_door = load_image(MAP_CLOSED_DOOR);
+	flag = load_image(FLAG);
 }
 
 void map_unload() {
@@ -334,6 +328,7 @@ void map_unload() {
 	SDL_FreeSurface(stone);
 	SDL_FreeSurface(door);
 	SDL_FreeSurface(closed_door);
+	SDL_FreeSurface(flag);
 }
 
 void bonus_load() {
@@ -341,6 +336,7 @@ void bonus_load() {
 	bonus[BONUS_RANGE_DEC-1] = load_image(IMG_BONUS_BOMB_RANGE_DEC);
 	bonus[BONUS_BOMB_INC-1] = load_image(IMG_BONUS_BOMB_NB_INC);
 	bonus[BONUS_BOMB_DEC-1] = load_image(IMG_BONUS_BOMB_NB_DEC);
+	bonus[BONUS_ROLLER-1] = load_image(IMG_BONUS_ROLLER);
 }
 
 void bonus_unload() {
@@ -657,6 +653,11 @@ SDL_Surface* sprite_get_box() {
 SDL_Surface* sprite_get_key() {
 	assert(key);
 	return key;
+}
+
+SDL_Surface* sprite_get_flag() {
+	assert(flag);
+	return flag;
 }
 
 SDL_Surface* sprite_get_stone() {

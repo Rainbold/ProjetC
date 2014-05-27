@@ -12,6 +12,7 @@ struct level;
 // return level number num
 struct level* level_get_level(struct game* game, int n_lvl, int n_map);
 
+void level_change_level(struct game* game, struct player* player, struct map* map);
 void level_change_map(struct game* game,  struct player* player, struct map* map, unsigned char num);
 
 // return current map of the level

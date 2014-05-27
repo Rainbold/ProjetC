@@ -14,6 +14,10 @@ void player_free(struct player* player);
 // Returns the current position of the player
 int player_get_x(struct player* player);
 int player_get_y(struct player* player);
+void player_set_x(struct player* player, int x);
+void player_set_y(struct player* player, int y);
+
+
 // Returns the current position of the player
 int player_get_x_real(struct player* player);
 int player_get_y_real(struct player* player);

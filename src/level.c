@@ -55,43 +55,62 @@ struct level* level_get_level(struct game* game, int n_lvl, int n_map) {
 	return level;
 }
 
+void level_change_level(struct game* game, struct player* player, struct map* map) {
+	assert(game);
+	assert(player);
+	assert(map);
+
+	struct level* level = game_get_curr_level(game);
+	struct list* bList = map_get_bombs(map);
+
+	while(bList != NULL) {
+		bList = list_cut_head(bList);
+		player_inc_nb_bomb(player);
+	}
+
+	level_free(level);
+	level = game_next_lvl(game);
+
+	if(level == NULL) {
+		printf("END of GAME\n");
+		exit(EXIT_SUCCESS);
+	}
+	else {
+		printf("Next level\n");
+	}
+	players_from_map(game, level->maps[level->cur_map]);
+	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
+}
+
 void level_change_map(struct game* game, struct player* player, struct map* map, unsigned char num) {
 	struct level* level = game_get_curr_level(game);
-
 	struct list* bList = map_get_bombs(map);
 
 	assert(game);
 	assert(player);
 	assert(map);
 
-	while(bList != NULL) {
-		map_set_cell_type(map, list_get_x(bList), list_get_y(bList), CELL_EMPTY);
-		bList = list_cut_head(bList);
-		player_inc_nb_bomb(player);
-	}
-
-	map_set_bombs(map, NULL);
-
-	player_reset_way_mov(player);
-
 	if(num < level->nb_maps) {
+
+		while(bList != NULL) {
+			map_set_cell_type(map, list_get_x(bList), list_get_y(bList), CELL_EMPTY);
+			bList = list_cut_head(bList);
+			player_inc_nb_bomb(player);
+		}
+		map_set_bombs(map, NULL);
+		player_reset_way_mov(player);
 		level->cur_map = num;
 		map_load_monsters(map, game);
 		printf("Next map\n");
-	}
-	else {
-		level_free(level);
-		level = game_next_lvl(game);
-		if(level == NULL) {
-			printf("END of GAME\n");
-			exit(EXIT_SUCCESS);
+		int x = player_get_x(player);
+		int y = player_get_y(player);
+		players_from_map(game, level->maps[level->cur_map]);
+		if(player_get_x(player) == 0 && player_get_y(player) == 0) {
+			player_set_x(player, x);
+			player_set_x(player, y);
 		}
-		else {
-		printf("Next level\n");
-		}
+		window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 	}
-	players_from_map(game, level->maps[level->cur_map]);
-	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 }
 
 struct map* level_get_curr_map(struct level* level) {
