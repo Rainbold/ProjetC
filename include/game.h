@@ -24,9 +24,14 @@ int game_get_pos(struct game* game);
 struct player** game_get_players(struct game* game);
 struct player* game_get_player(struct game* game, int id);
 int game_get_nb_player(struct game* game);
+void game_set_player(struct game* game, int i_tab, struct player* player);
 
 // Returns the current level
 struct level* game_get_curr_level(struct game* game);
+int game_get_nb_curr_level(struct game* game);
+
+void game_set_curr_level(struct game* game, struct level* level);
+void game_set_nb_curr_level(struct game* game, int nb_curr_level);
 
 void game_reset_lvl_map(struct game* game);
 

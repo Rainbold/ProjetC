@@ -43,6 +43,11 @@ int main(int argc, char *argv[]) {
 			game = game_new(0, 1); // lvl 0
 			state = GAME;
 			break;
+		case LOADGAME:
+			menu_free();
+			game = game_new(-1, 1); // lvl -1, to load data
+			state = GAME;
+			break;
 
 		case NEWGAME_MULTI4:
 			nb_players++;

@@ -105,7 +105,7 @@ int map_get_height(struct map* map);
 cell_type_t map_get_cell_type(struct map* map, int x, int y);
 
 // Return the type of a cell without masking the least significant bit
-char map_get_cell_compose_type(struct map* map, int x, int y);
+unsigned char map_get_cell_compose_type(struct map* map, int x, int y);
 
 // Set the type of a cell
 void  map_set_cell_type(struct map* map, int x, int y, cell_type_t type);

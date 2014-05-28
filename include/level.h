@@ -20,6 +20,7 @@ struct map* level_get_curr_map(struct level* level);
 void level_set_cur_map(struct level* level, int i);
 
 int level_get_curr_nb_map(struct level* level);
+void level_set_cur_map_struct(struct level* level, int cur_map, struct map* map);
 
 // return map number num of the level
 struct map*  level_get_map(struct level* level, int num);

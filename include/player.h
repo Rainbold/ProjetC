@@ -7,8 +7,8 @@
 
 struct player;
  
-// Creates a new player with a given number of available bombs
-struct player* player_init(int id, int bomb_number, int life_number, int range_number);
+// Creates a new player with a given number of available bombs and other parameters
+struct player* player_init(int id, int bomb_number, int life_number, int range_number, int velocity);
 void player_free(struct player* player);
 
 // Returns the current position of the player
@@ -65,6 +65,7 @@ void player_display(struct player* player);
 
 void player_inc_velocity(struct player* player);
 void player_dec_velocity(struct player* player);
+int player_get_velovity(struct player * player);
 
 int player_get_key(struct player* player);
 int player_get_id(struct player* player);

@@ -52,6 +52,8 @@ typedef enum state {
 	KEEP,
 	MAINMENU,
 	CHANGEMAP,
+	SAVEGAME_MAINMENU,
+	SAVEGAME_QUIT,
 } state_t;
 
 typedef enum game_state {

@@ -113,6 +113,12 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 	}
 }
 
+void level_set_cur_map_struct(struct level* level, int cur_map, struct map* map) {
+	assert(level);
+	assert(map);
+	level->maps[cur_map] = map;
+}
+
 struct map* level_get_curr_map(struct level* level) {
 	return level->maps[level->cur_map];
 }

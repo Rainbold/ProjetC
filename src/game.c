@@ -9,6 +9,7 @@
 #include <monster.h>
 #include <menu.h>
 #include <multi.h>
+#include <file.h>
 
 struct game {
 	int nb_curr_level;
@@ -23,22 +24,33 @@ struct game {
 
 struct game* game_new(int curr_lvl, int nb_player) {
 	struct game* game = malloc(sizeof(*game));
-	game->nb_curr_level = curr_lvl;
+	int rc = 1;
 
-	game->nb_player = nb_player;
-	game->curr_level = level_get_level(game, game->nb_curr_level, 0); // get maps of the level 0, map 0
-
-	if(nb_player == 1) {
-		game->players[0] = player_init(1, 1, 2, 1); // player init : #1, nb_bomb, nb_life and nb_range
-		players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
+	if(curr_lvl == -1) {
+		game->nb_player = 1;
+		rc = file_loadgame(game);
 	}
-	else {
-		for(int i=0; i<nb_player; i++) {
-			game->players[i] = player_init(i+1, 1, 1, 2); // player init : #1, nb_bomb, nb_life and nb_range
-			game->scores[i] = 0;
+
+	if(rc) {
+		if(curr_lvl < 0)
+			game->nb_curr_level = 0;
+		else
+			game->nb_curr_level = curr_lvl;
+
+		game->nb_player = nb_player;
+		game->curr_level = level_get_level(game, game->nb_curr_level, 0); // get maps of the level 0, map 0
+
+		if(nb_player == 1) {
+			game->players[0] = player_init(1, 1, 2, 1, 4); // player init : #1, nb_bomb, nb_life, nb_range and velocity
+			players_from_map(game, level_get_curr_map(game->curr_level)); // get x,y of the player on the first map
+		}
+		else {
+			for(int i=0; i<nb_player; i++) {
+				game->players[i] = player_init(i+1, 1, 1, 2, 4); // player init : #i, nb_bomb, nb_life, nb_range and velocity
+				game->scores[i] = 0;
+			}
 		}
 	}
-
 	game->game_state = PLAYING;
 	game->pos = 0;
 	game->score_obj = 3;
@@ -100,8 +112,32 @@ struct player* game_get_player(struct game* game, int id) {
 	return game->players[id-1];
 }
 
+void game_set_player(struct game* game, int i_tab, struct player* player) {
+	assert(game);
+	assert(i_tab >= 0 && i_tab < game->nb_player);
+	assert(player);
+	game->players[i_tab] = player;
+}
+
 struct level* game_get_curr_level(struct game* game) {
+	assert(game);
 	return game->curr_level;
+}
+
+int game_get_nb_curr_level(struct game* game) {
+	assert(game);
+	return game->nb_curr_level;
+}
+
+void game_set_nb_curr_level(struct game* game, int nb_curr_level) {
+	assert(game);
+	game->nb_curr_level = nb_curr_level;
+}
+
+void game_set_curr_level(struct game* game, struct level* level) {
+	assert(game);
+	assert(level);
+	game->curr_level = level;
 }
 
 int* game_get_scores(struct game* game) {
@@ -341,6 +377,14 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 					return ENDGAME;
 					break;
 				case QUIT:
+					return(QUIT);
+					break;
+				case SAVEGAME_MAINMENU:
+					file_savegame(game);
+					return ENDGAME;
+					break;
+				case SAVEGAME_QUIT:
+					file_savegame(game);
 					return(QUIT);
 					break;
 				case CHANGEMAP:

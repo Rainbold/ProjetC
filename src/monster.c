@@ -114,6 +114,11 @@ void monster_set_invicibility(struct monster* monster, int invicibility_time) {
 	monster->invicibility = invicibility_time;
 }
 
+m_type monster_get_type(struct monster* monster) {
+	assert(monster);
+	return monster->type;
+}
+
 struct list* monster_hit(struct list* mList, int x, int y, struct game* game) { // nb_life
 	if(mList == NULL) 
 		return NULL;

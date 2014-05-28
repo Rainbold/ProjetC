@@ -26,7 +26,7 @@ struct player {
 	int key;
 };
 
-struct player* player_init(int id, int bomb_number, int life_number, int range_number) {
+struct player* player_init(int id, int bomb_number, int life_number, int range_number, int velocity) {
 	struct player* player = malloc(sizeof(*player));
 	if (!player)
 		error("Memory error");
@@ -41,7 +41,7 @@ struct player* player_init(int id, int bomb_number, int life_number, int range_n
 	player->nb_range = range_number;
 	player->invicibility = 0;
 	player->moving = 0;
-	player->velocity = 4;
+	player->velocity = velocity;
 	player->x_sprite = 0;
 	player->y_sprite = 0;
 	player->anim = 0;
@@ -172,6 +172,12 @@ void player_dec_velocity(struct player* player) {
 	if(player->velocity > 1 && player->nb_life)
 		player->velocity--;
 }
+
+int player_get_velovity(struct player * player) {
+	assert(player);
+	return(player->velocity);
+}
+
 int player_get_nb_bomb(struct player* player) { // get nb_bomb
 	assert(player);
 	return player->nb_bomb;
@@ -571,6 +577,9 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 			case BONUS_BOMB_DEC:
 				player_dec_nb_bomb(player);
 				break;
+			case BONUS_ROLLER:
+				player_inc_velocity(player);
+				break;
 			case BONUS_LIFE:
 				player_inc_nb_life(player);
 				break;
@@ -582,7 +591,8 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 				level_change_map(game, player, map, (type & 112) >> 4);
 			else if(type >> 7 == 0 && player->key > 0) {
 				player->key--;
-				level_change_map(game, player, map, (type & 112) >> 4);
+				map_set_cell_type(map, player->x, player->y, type || 1 << 7);
+				//level_change_map(game, player, map, (type & 112) >> 4);
 			}
 			//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
 			break;

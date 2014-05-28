@@ -17,6 +17,8 @@ int monster_get_movetimer(struct monster* monster);
 void monster_set_movetimer(struct monster* monster, int timer);
 int monster_get_aggr(struct monster* monster);
 
+m_type monster_get_type(struct monster* monster);
+
 int monster_pathfinding(struct map* map, struct player* player, struct list* mList, int* getDist);
 
 void monster_move(struct map* map, struct player* player);

@@ -266,6 +266,7 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 						g_menu->pos_sub = 1;
 						g_menu->header = M_H_SAVE;
 					}
+					else
 						return QUIT;
 					break;
 
@@ -273,7 +274,7 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 					return NEWGAME_SINGLE;
 					break;
 				case M_B_LOADGAME:
-					//return LOADGAME; todo
+					return LOADGAME;
 					break;
 
 				case M_B_2PLAYER:
@@ -295,7 +296,16 @@ enum state menu_update(enum state state, int key, key_event_t key_event) {
 
 
 				case M_B_YES:
-					// todo save
+					switch(g_menu->select[g_menu->pos_field][0]) {
+					case M_B_MAINMENU:
+						return SAVEGAME_MAINMENU;
+						break;
+					case M_B_QUIT:
+						return SAVEGAME_QUIT;
+						break;
+					default:
+						break;
+					}
 					break;
 				case M_B_NO:
 					switch(g_menu->select[g_menu->pos_field][0]) {
