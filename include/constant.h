@@ -4,7 +4,7 @@
 #define WINDOW_NAME "Bomberman Returns"
 
 // Comment if you don't want to use wiimote or if you cannot compile
-#define USE_WIIMOTE
+//#define USE_WIIMOTE
 
 // Size (# of pixels) of a cell of the map 
 #define SIZE_BLOC       40

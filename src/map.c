@@ -67,6 +67,9 @@ struct list* map_load_monsters(struct map* map, struct game* game) {
 			case CELL_MONSTER_ALIEN3:
 				//monster_init(map, i, j, MONSTER_ALIEN3);
 				break;
+			case CELL_MONSTER_ALIEN4:
+				//monster_init(map, i, j, MONSTER_ALIEN4);
+				break;
 			default:
 				break;
 			}
@@ -212,8 +215,19 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 			map_set_cell_type(map, x, y, CELL_BONUS_LIFE);
 			break;
 		case BONUS_MONSTER:
-			map_set_cell_type(map, x, y, CELL_MONSTER);
 			monster_init(map, x, y, MONSTER_NORMAL);
+			break;
+		case BONUS_ALIEN1:
+			monster_init(map, x, y, MONSTER_ALIEN1);
+			break;
+		case BONUS_ALIEN2:
+			monster_init(map, x, y, MONSTER_ALIEN2);
+			break;
+		case BONUS_ALIEN3:
+			monster_init(map, x, y, MONSTER_ALIEN3);
+			break;
+		case BONUS_ALIEN4:
+			monster_init(map, x, y, MONSTER_ALIEN4);
 			break;
 		default:
 			break;

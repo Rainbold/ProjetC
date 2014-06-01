@@ -252,14 +252,24 @@ void game_order_players_array(struct game* game, struct player* player[4])
 void game_display(struct game* game) {
 	assert(game);
 
+	int map_w, map_h;
+
 	window_clear();
+
+	if(game->nb_player == 1) {
+		map_w = map_get_width(level_get_curr_map(game->curr_level));
+		map_h = map_get_height(level_get_curr_map(game->curr_level));
+		for(int i = 0; i < map_w; i++)
+			for(int j = 0; j < map_h+2; j++)
+				window_display_image(sprite_get_empty(), i * SIZE_BLOC, j * SIZE_BLOC);
+	}
 
 	level_display(game_get_curr_level(game));
 
 	monster_display(level_get_curr_map(game->curr_level));
 
 	bomb_display(game, level_get_curr_map(game->curr_level));
-	
+
 	game_banner_display(game);
 
 	if(game->nb_player == 1) { // Single player
@@ -302,8 +312,8 @@ void game_display(struct game* game) {
 
 	}
 	else if(game->game_state == PAUSED) {
-		int map_w = map_get_width(level_get_curr_map(game->curr_level));
-		int map_h = map_get_height(level_get_curr_map(game->curr_level));
+		map_w = map_get_width(level_get_curr_map(game->curr_level));
+		map_h = map_get_height(level_get_curr_map(game->curr_level));
 		int mid_w = map_w / 2 * SIZE_BLOC + map_w%2 * SIZE_BLOC / 2;
 		int mid_h = map_h / 2 * SIZE_BLOC + map_h%2 * SIZE_BLOC / 2;
 		menu_display(mid_w, mid_h);

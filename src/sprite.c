@@ -14,6 +14,7 @@
 #define MAP_CLOSED_DOOR	"sprite/closed_door.png"
 #define FLAG			"sprite/flag.png"
 #define PRINCESS		"sprite/bomberwoman.png"
+#define EMPTY			"sprite/empty.png"
 
 // Scenery elements
 #define MAP_STONE		"sprite/stone.png"
@@ -88,10 +89,10 @@ SDL_Rect menu_rect_stars[2 * NB_ANIM_STARS - 1];
 
 
 // banner
-SDL_Surface* banner_life;
+SDL_Surface* banner_line;
 SDL_Surface* banner_bomb;
 SDL_Surface* banner_range;
-SDL_Surface* banner_line;
+SDL_Surface* banner_life;
 
 // map
 SDL_Surface* box;
@@ -103,6 +104,7 @@ SDL_Surface* stone;
 SDL_Surface* tree;
 SDL_Surface* flag;
 SDL_Surface* princess;
+SDL_Surface* empty;
 
 #define SIZE_OF_SPRITE 40
 
@@ -111,7 +113,8 @@ SDL_Surface* princess;
 SDL_Surface* bonus[NB_BONUS];
 
 // monster
-SDL_Surface** monsters[4];
+#define NB_MONSTER 5
+SDL_Surface** monsters[NB_MONSTER];
 SDL_Surface* monster_img_norm[4];
 SDL_Surface* monster_img_alien1[4];
 SDL_Surface* monster_img_alien2[4];
@@ -284,17 +287,16 @@ void menu_unload() {
 }
 
 void banner_load() {
-
 	// other banner sprites
-	banner_life = load_image(BANNER_LIFE);
+	banner_line = load_image(BANNER_LINE);
 	banner_bomb = load_image(BANNER_BOMB);
 	banner_range = load_image(BANNER_RANGE);
-	banner_line = load_image(BANNER_LINE);
+	banner_life = load_image(BANNER_LIFE);
 }
 
 void banner_unload() {
 	// other banner sprites
-	SDL_FreeSurface(banner_life);
+	SDL_FreeSurface(banner_line);
 	SDL_FreeSurface(banner_bomb);
 	SDL_FreeSurface(banner_range);
 	SDL_FreeSurface(banner_life);
@@ -310,6 +312,7 @@ void map_load() {
 	closed_door = load_image(MAP_CLOSED_DOOR);
 	flag = load_image(FLAG);
 	princess = load_image(PRINCESS);
+	empty = load_image(EMPTY);
 }
 
 void map_unload() {
@@ -322,6 +325,7 @@ void map_unload() {
 	SDL_FreeSurface(closed_door);
 	SDL_FreeSurface(flag);
 	SDL_FreeSurface(princess);
+	SDL_FreeSurface(empty);
 }
 
 void bonus_load() {
@@ -420,7 +424,7 @@ void monster_load() {
 }
 
 void monster_unload() {
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < NB_MONSTER; i++) {
 		SDL_FreeSurface(monster_img_norm[i]);
 		SDL_FreeSurface(monster_img_alien1[i]);
 		SDL_FreeSurface(monster_img_alien2[i]);
@@ -677,6 +681,11 @@ SDL_Surface* sprite_get_flag() {
 SDL_Surface* sprite_get_princess() {
 	assert(princess);
 	return princess;
+}
+
+SDL_Surface* sprite_get_empty() {
+	assert(empty);
+	return empty;
 }
 
 SDL_Surface* sprite_get_stone() {

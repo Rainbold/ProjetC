@@ -8,11 +8,8 @@
 // load game's sprites
 void sprite_load();
 
-SDL_Surface* sprite_get_bomb(short bombAnim);
-
 SDL_Surface* sprite_get_players(int id);
 SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction);
-//SDL_Surface* sprite_get_player(int i, way_t direction);
 
 SDL_Surface* sprite_get_map_multi(int i);
 int sprite_get_nb_map_multi();
@@ -35,14 +32,15 @@ SDL_Surface* sprite_get_door();
 SDL_Surface* sprite_get_closed_door();
 SDL_Surface* sprite_get_flag();
 SDL_Surface* sprite_get_princess();
+SDL_Surface* sprite_get_empty();
 
 SDL_Surface* sprite_get_number(short number);
 SDL_Surface* sprite_get_number_white(short number);
 
-SDL_Surface* sprite_get_banner_life();
-SDL_Surface* sprite_get_banner_bomb();
 SDL_Surface* sprite_get_banner_line();
+SDL_Surface* sprite_get_banner_bomb();
 SDL_Surface* sprite_get_banner_range();
+SDL_Surface* sprite_get_banner_life();
 
 SDL_Surface* sprite_get_bombs();
 
