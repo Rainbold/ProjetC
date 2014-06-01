@@ -72,8 +72,8 @@ void level_change_level(struct game* game, struct player* player, struct map* ma
 	level = game_next_lvl(game);
 
 	if(level == NULL) {
-		printf("END of GAME\n");
-		exit(EXIT_SUCCESS);
+		printf("Level null\n");
+		return;
 	}
 	else {
 		printf("Next level\n");

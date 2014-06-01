@@ -592,13 +592,16 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 			else if(type >> 7 == 0 && player->key > 0) {
 				player->key--;
 				map_set_cell_type(map, player->x, player->y, type || 1 << 7);
-				//level_change_map(game, player, map, (type & 112) >> 4);
 			}
 			//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
 			break;
-		case CELL_FLAG:
-			level_change_level(game, player, map);
+		case CELL_GOAL:
+			if(type == CELL_FLAG)
+				level_change_level(game, player, map);
+			else if(type == CELL_PRINCESS)
+				player->key = -1;
 			break;
+
 		case CELL_KEY:
 			player->key++;
 			map_set_cell_type(map, player->x, player->y, CELL_EMPTY);

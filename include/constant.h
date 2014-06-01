@@ -1,7 +1,7 @@
 #ifndef CONSTANT_H_
 #define CONSTANT_H_
 
-#define WINDOW_NAME "[PG110] Bomberman 2014"
+#define WINDOW_NAME "Bomberman Returns"
 
 // Comment if you don't want to use wiimote or if you cannot compile
 #define USE_WIIMOTE
@@ -47,6 +47,9 @@ typedef enum state {
 	NEWGAME_MULTI3,
 	NEWGAME_MULTI4,
 
+	GO, // GameOver
+	W, // Win
+
 	ENDGAME,
 	QUIT,
 	KEEP,
@@ -54,6 +57,8 @@ typedef enum state {
 	CHANGEMAP,
 	SAVEGAME_MAINMENU,
 	SAVEGAME_QUIT,
+
+	DEFAULT,
 } state_t;
 
 typedef enum game_state {
@@ -63,38 +68,46 @@ typedef enum game_state {
 	SCORE, // 3
 } game_state_t;
 
-#define NB_SURFACE_MENU 20
+#define NB_SURFACE_MENU 26
 typedef enum select_menu {
 	M_B_SINGLE = 0,
-	M_B_NEWGAME,
-	M_B_LOADGAME,
+	M_B_NEWGAME,	// 1
+	M_B_LOADGAME,	// 2
 
-	M_B_MULTI,
-	M_B_2PLAYER,
-	M_B_3PLAYER,
-	M_B_4PLAYER,
+	M_B_MULTI,		// 3
+	M_B_2PLAYER,	// 4
+	M_B_3PLAYER,	// 5
+	M_B_4PLAYER,	// 6
 
-	M_H_PAUSE,
-	M_B_KEEP,
-	M_B_MAINMENU,
-	M_B_QUIT,
+	M_H_PAUSE,		// 7
+	M_B_KEEP,		// 8
+	M_B_MAINMENU,	// 9
+	M_B_QUIT,		// 10
 
-	M_H_SAVE,
-	M_B_YES,
-	M_B_NO,
+	M_H_SAVE,		// 11
+	M_B_YES,		// 12
+	M_B_NO,			// 13
 
-	M_B_CHANGEMAP,
+	M_B_CHANGEMAP,	// 14
 
-	M_BG_GREY,
-	M_BG_MAINMENU,
+	M_BG_GREY,		// 15
+	M_BG_MAINMENU,	// 16
+	M_BG_WIN,		// 17
+	M_BG_GAMEOVER,	// 18
 
-	M_SELECT,
-	M_SELECT_BLACK,
-	M_STARS // 20/20
+	M_S_SELECT,		// 19
+	M_S_SELECT_BLACK,// 20
+	M_S_STARS,		// 21
+	M_S_ALIEN2,		// 22
+	M_S_ALIEN3,		// 23
+	M_S_ALIEN4,		// 24
+	M_S_CAGE,		// 25
 } select_menu_t;
 
 typedef enum type_menu {
 	MAIN = 0,
+	GAMEOVER,
+	WIN,
 	PAUSE_SINGLE,
 	PAUSE_MULTI,
 } type_t;

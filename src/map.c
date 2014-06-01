@@ -264,8 +264,7 @@ void display_scenery(struct map* map, int x, int  y, char type)
 	}
 }
 
-void display_door(struct map* map, int x, int  y, unsigned char type)
-{
+void display_door(struct map* map, int x, int  y, unsigned char type) {
 	switch (type >> 7) { // sub-type is encoded with the most significant bit
 	case CLOSED_DOOR:
 		window_display_image(sprite_get_closed_door(), x, y);
@@ -273,6 +272,18 @@ void display_door(struct map* map, int x, int  y, unsigned char type)
 
 	case OPENED_DOOR:
 		window_display_image(sprite_get_door(), x, y);
+		break;
+	}
+}
+
+void display_goal(struct map* map, int x, int  y, unsigned char type) {
+	switch (type) {
+	case CELL_FLAG:
+		window_display_image(sprite_get_flag(), x, y);
+		break;
+
+	case CELL_PRINCESS:
+		window_display_image(sprite_get_princess(), x, y);
 		break;
 	}
 }
@@ -306,8 +317,8 @@ void map_display(struct map* map, int offset_x, int offset_y)
 			case CELL_DOOR:
 				display_door(map, x, y, type);
 				break;
-			case CELL_FLAG:
-				window_display_image(sprite_get_flag(), x, y);
+			case CELL_GOAL:
+				display_goal(map, x, y, type);
 				break;
 			}
 		}

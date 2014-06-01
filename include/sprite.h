@@ -34,6 +34,7 @@ SDL_Surface* sprite_get_stone();
 SDL_Surface* sprite_get_door();
 SDL_Surface* sprite_get_closed_door();
 SDL_Surface* sprite_get_flag();
+SDL_Surface* sprite_get_princess();
 
 SDL_Surface* sprite_get_number(short number);
 SDL_Surface* sprite_get_number_white(short number);

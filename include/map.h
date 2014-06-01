@@ -38,9 +38,10 @@ enum door_type {
 
 typedef enum monster_type {
 	MONSTER_NORMAL = 0,
-	MONSTER_ALIEN1, //1
-	MONSTER_ALIEN2, //2
-	MONSTER_ALIEN3  //3
+	MONSTER_ALIEN1, // 1
+	MONSTER_ALIEN2, // 2
+	MONSTER_ALIEN3,  // 3
+	MONSTER_ALIEN4  // 4
 } m_type;
 
 typedef enum players_numbers {
@@ -82,7 +83,8 @@ enum compose_type {
     CELL_PLAYER_3 = CELL_PLAYER | (PLAYER3 << 4),				// 0010 0011 - 2 3 = 35
     CELL_PLAYER_4 = CELL_PLAYER | (PLAYER4 << 4),				// 0011 0011 - 3 3 = 51
 
-    CELL_FLAG = 1
+    CELL_FLAG = 0x01,
+    CELL_PRINCESS = 0x11,
 };
 
 typedef enum type_struct {

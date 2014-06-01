@@ -331,13 +331,14 @@ int game_get_score_max(struct game* game, int select) {
 }
 
 enum state game_update(enum state state, struct game* game, int key, key_event_t key_event) {
-	//struct player* player = game_get_player(game, 1);
-	struct player* player[game->nb_player];
-	for(int i=0; i<game->nb_player; i++) 
-	{
-		player[i] = game->players[i];
+	struct player* players[game->nb_player];
+	for(int i=0; i<game->nb_player; i++) {
+		players[i] = game->players[i];
 	}
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
+
+	if(player_get_key(players[0]) == -1)
+		return(W);
 
 	if(key_event == DOWN) {
 		switch (key) {
@@ -365,6 +366,9 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			break;
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER:
+			if(game->nb_player == 1 && player_get_nb_life(players[0]) <= 0)
+				return GO;
+
 			switch(game->game_state) {
 			case PAUSED:
 
@@ -410,34 +414,10 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 				break;
 			}
 			break;
-		// case SDLK_a:
-		// 	player_inc_nb_life(player);
-		// 	break;
-		// case SDLK_z:
-		// 	player_dec_nb_life(player);
-		// 	break;
-		// case SDLK_q:
-		// 	player_inc_nb_bomb(player);
-		// 	break;
-		// case SDLK_s:
-		// 	player_dec_nb_bomb(player);
-		// 	break;
-		// case SDLK_w:
-		// 	player_inc_nb_range(player);
-		// 	break;
-		// case SDLK_x:
-		// 	player_dec_nb_range(player);
-		// 	break;
-		// case SDLK_d:
-		// 	player_dec_velocity(player);
-		// 	break;
-		// case SDLK_f:
-		// 	player_inc_velocity(player);
-		// 	break;
 		case SDLK_UP:
 			if(game->game_state == PLAYING){
-				player_set_way(player[0], NORTH);
-				player_inc_moving(player[0]);
+				player_set_way(players[0], NORTH);
+				player_inc_moving(players[0]);
 			}
 			else if (game->game_state == PAUSED)
 				return(menu_update(state, key, key_event));
@@ -450,8 +430,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			break;
 		case SDLK_DOWN:
 			if(game->game_state == PLAYING){
-				player_set_way(player[0], SOUTH);
-				player_inc_moving(player[0]);
+				player_set_way(players[0], SOUTH);
+				player_inc_moving(players[0]);
 			}
 			else if (game->game_state == PAUSED) {
 				return(menu_update(state, key, key_event));
@@ -465,26 +445,26 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			break;
 		case SDLK_RIGHT:
 			if(game->game_state == PLAYING){
-				player_set_way(player[0], EAST);
-				player_inc_moving(player[0]);
+				player_set_way(players[0], EAST);
+				player_inc_moving(players[0]);
 			}
 			break;
 		case SDLK_LEFT:
 			if(game->game_state == PLAYING){
-				player_set_way(player[0], WEST);
-				player_inc_moving(player[0]);
+				player_set_way(players[0], WEST);
+				player_inc_moving(players[0]);
 			}
 			break;
 		case SDLK_SPACE:
 			if(game->game_state == PLAYING)
-				bomb_plant(game, map, player[0]); // the bomb is planted if it is possible
+				bomb_plant(game, map, players[0]); // the bomb is planted if it is possible
 			break;
 		case SDLK_z:
 			if(game->nb_player >= 2)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[1], NORTH);
-					player_inc_moving(player[1]);
+					player_set_way(players[1], NORTH);
+					player_inc_moving(players[1]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -495,8 +475,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 2)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[1], SOUTH);
-					player_inc_moving(player[1]);
+					player_set_way(players[1], SOUTH);
+					player_inc_moving(players[1]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -507,8 +487,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 2)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[1], EAST);
-					player_inc_moving(player[1]);
+					player_set_way(players[1], EAST);
+					player_inc_moving(players[1]);
 				}
 			}
 			break;
@@ -516,8 +496,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 2)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[1], WEST);
-					player_inc_moving(player[1]);
+					player_set_way(players[1], WEST);
+					player_inc_moving(players[1]);
 				}
 			}
 			break;
@@ -525,15 +505,15 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 2)
 			{
 				if(game->game_state == PLAYING)
-					bomb_plant(game, map, player[1]); // the bomb is planted if it is possible
+					bomb_plant(game, map, players[1]); // the bomb is planted if it is possible
 			}
 			break;
 		case SDLK_t:
 			if(game->nb_player >= 3)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[2], NORTH);
-					player_inc_moving(player[2]);
+					player_set_way(players[2], NORTH);
+					player_inc_moving(players[2]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -544,8 +524,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 3)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[2], SOUTH);
-					player_inc_moving(player[2]);
+					player_set_way(players[2], SOUTH);
+					player_inc_moving(players[2]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -556,8 +536,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 3)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[2], EAST);
-					player_inc_moving(player[2]);
+					player_set_way(players[2], EAST);
+					player_inc_moving(players[2]);
 				}
 			}
 			break;
@@ -565,8 +545,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 3)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[2], WEST);
-					player_inc_moving(player[2]);
+					player_set_way(players[2], WEST);
+					player_inc_moving(players[2]);
 				}
 			}
 			break;
@@ -574,15 +554,15 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 3)
 			{
 				if(game->game_state == PLAYING)
-					bomb_plant(game, map, player[2]); // the bomb is planted if it is possible
+					bomb_plant(game, map, players[2]); // the bomb is planted if it is possible
 			}
 			break;
 		case SDLK_i:
 			if(game->nb_player >= 4)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[3], NORTH);
-					player_inc_moving(player[3]);
+					player_set_way(players[3], NORTH);
+					player_inc_moving(players[3]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -593,8 +573,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 4)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[3], SOUTH);
-					player_inc_moving(player[3]);
+					player_set_way(players[3], SOUTH);
+					player_inc_moving(players[3]);
 				}
 				else if (game->game_state == PAUSED) {
 					return(menu_update(state, key, key_event));
@@ -605,8 +585,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 4)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[3], EAST);
-					player_inc_moving(player[3]);
+					player_set_way(players[3], EAST);
+					player_inc_moving(players[3]);
 				}
 			}
 			break;
@@ -614,8 +594,8 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 4)
 			{
 				if(game->game_state == PLAYING){
-					player_set_way(player[3], WEST);
-					player_inc_moving(player[3]);
+					player_set_way(players[3], WEST);
+					player_inc_moving(players[3]);
 				}
 			}
 			break;
@@ -623,7 +603,7 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			if(game->nb_player >= 4)
 			{
 				if(game->game_state == PLAYING)
-					bomb_plant(game, map, player[3]); // the bomb is planted if it is possible
+					bomb_plant(game, map, players[3]); // the bomb is planted if it is possible
 			}
 			break;
 		default:
@@ -633,103 +613,103 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 	else if(key_event == UP) {
 		switch (key) {
 		case SDLK_UP:
-				player_dec_moving(player[0]);
-				player_unset_way(player[0], NORTH);
+				player_dec_moving(players[0]);
+				player_unset_way(players[0], NORTH);
 			break;
 		case SDLK_DOWN:
-				player_dec_moving(player[0]);
-				player_unset_way(player[0], SOUTH);
+				player_dec_moving(players[0]);
+				player_unset_way(players[0], SOUTH);
 			break;
 		case SDLK_RIGHT:
-				player_dec_moving(player[0]);
-				player_unset_way(player[0], EAST);
+				player_dec_moving(players[0]);
+				player_unset_way(players[0], EAST);
 			break;
 		case SDLK_LEFT:
-				player_dec_moving(player[0]);
-				player_unset_way(player[0], WEST);
+				player_dec_moving(players[0]);
+				player_unset_way(players[0], WEST);
 			break;
 		case SDLK_z:
 			if(game->nb_player >= 2)
 			{
-				player_dec_moving(player[1]);
-				player_unset_way(player[1], NORTH);
+				player_dec_moving(players[1]);
+				player_unset_way(players[1], NORTH);
 			}
 			break;
 		case SDLK_s:
 			if(game->nb_player >= 2)
 			{
-				player_dec_moving(player[1]);
-				player_unset_way(player[1], SOUTH);
+				player_dec_moving(players[1]);
+				player_unset_way(players[1], SOUTH);
 			}
 			break;
 		case SDLK_d:
 			if(game->nb_player >= 2)
 			{
-				player_dec_moving(player[1]);
-				player_unset_way(player[1], EAST);
+				player_dec_moving(players[1]);
+				player_unset_way(players[1], EAST);
 			}
 			break;
 		case SDLK_q:
 			if(game->nb_player >= 2)
 			{
-				player_dec_moving(player[1]);
-				player_unset_way(player[1], WEST);
+				player_dec_moving(players[1]);
+				player_unset_way(players[1], WEST);
 			}
 			break;
 		case SDLK_t:
 			if(game->nb_player >= 3)
 			{
-				player_dec_moving(player[2]);
-				player_unset_way(player[2], NORTH);
+				player_dec_moving(players[2]);
+				player_unset_way(players[2], NORTH);
 			}
 			break;
 		case SDLK_g:
 			if(game->nb_player >= 3)
 			{
-				player_dec_moving(player[2]);
-				player_unset_way(player[2], SOUTH);
+				player_dec_moving(players[2]);
+				player_unset_way(players[2], SOUTH);
 			}
 			break;
 		case SDLK_h:
 			if(game->nb_player >= 3)
 			{
-				player_dec_moving(player[2]);
-				player_unset_way(player[2], EAST);
+				player_dec_moving(players[2]);
+				player_unset_way(players[2], EAST);
 			}
 			break;
 		case SDLK_f:
 			if(game->nb_player >= 3)
 			{
-				player_dec_moving(player[2]);
-				player_unset_way(player[2], WEST);
+				player_dec_moving(players[2]);
+				player_unset_way(players[2], WEST);
 			}
 			break;
 		case SDLK_i:
 			if(game->nb_player >= 4)
 			{
-				player_dec_moving(player[3]);
-				player_unset_way(player[3], NORTH);
+				player_dec_moving(players[3]);
+				player_unset_way(players[3], NORTH);
 			}
 			break;
 		case SDLK_k:
 			if(game->nb_player >= 4)
 			{
-				player_dec_moving(player[3]);
-				player_unset_way(player[3], SOUTH);
+				player_dec_moving(players[3]);
+				player_unset_way(players[3], SOUTH);
 			}
 			break;
 		case SDLK_l:
 			if(game->nb_player >= 4)
 			{
-				player_dec_moving(player[3]);
-				player_unset_way(player[3], EAST);
+				player_dec_moving(players[3]);
+				player_unset_way(players[3], EAST);
 			}
 			break;
 		case SDLK_j:
 			if(game->nb_player >= 4)
 			{
-				player_dec_moving(player[3]);
-				player_unset_way(player[3], WEST);
+				player_dec_moving(players[3]);
+				player_unset_way(players[3], WEST);
 			}
 			break;
 		case SDLK_F1:

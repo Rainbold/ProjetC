@@ -13,6 +13,7 @@
 #define MAP_DOOR		"sprite/door.png"
 #define MAP_CLOSED_DOOR	"sprite/closed_door.png"
 #define FLAG			"sprite/flag.png"
+#define PRINCESS		"sprite/bomberwoman.png"
 
 // Scenery elements
 #define MAP_STONE		"sprite/stone.png"
@@ -31,14 +32,20 @@
 #define BOMB			"sprite/bomb40.png"
 
 // Sprites of menu
-#define MENU_BG_GREY 	"sprite/m_bg_grey.png"
-#define MENU_BG_MAIN	"sprite/m_bg_main.png"
-#define MENU_B_NEWGAME	"sprite/m_b_newgame.png"
-#define MENU_B_QUIT		"sprite/m_b_quit.png"
-#define MENU_B_KEEP		"sprite/m_b_continuer.png"
-#define MENU_B_MAIN		"sprite/m_b_main.png"
-#define MENU_H_PAUSE	"sprite/m_h_pause.png"
-#define MENU_STARS		"sprite/stars.png"
+#define MENU_BG_GREY 		"sprite/m_bg_grey.png"
+#define MENU_BG_MAIN		"sprite/m_bg_main.png"
+#define MENU_BG_WIN			"sprite/m_bg_win.png"
+#define MENU_BG_GAMEOVER	"sprite/m_bg_gameover.png"
+#define MENU_B_NEWGAME		"sprite/m_b_newgame.png"
+#define MENU_B_QUIT			"sprite/m_b_quit.png"
+#define MENU_B_KEEP			"sprite/m_b_continuer.png"
+#define MENU_B_MAIN			"sprite/m_b_main.png"
+#define MENU_H_PAUSE		"sprite/m_h_pause.png"
+#define MENU_S_STARS		"sprite/stars.png"
+#define MENU_S_ALIEN2		"sprite/alien2_200.png"
+#define MENU_S_ALIEN3		"sprite/alien3_200.png"
+#define MENU_S_ALIEN4		"sprite/alien4_200.png"
+#define MENU_S_CAGE			"sprite/cage.png"
 
 // Sprites of Bonus
 #define IMG_BONUS_BOMB_RANGE_INC 	"sprite/bonus_bomb_range_inc.png"
@@ -54,35 +61,16 @@
 #define PLAYER_4			"sprite/bomberman4_40.png"
 
 // Sprites of Monsters
-#define MONSTER_LEFT	"sprite/monster_left.png"
-#define MONSTER_UP		"sprite/monster_up.png"
-#define MONSTER_RIGHT	"sprite/monster_right.png"
-#define MONSTER_DOWN	"sprite/monster_down.png"
-#define MONSTER_IMG_ALIEN1	"sprite/alien1.png"
+#define MONSTER_LEFT		"sprite/monster_left.png"
+#define MONSTER_UP			"sprite/monster_up.png"
+#define MONSTER_RIGHT		"sprite/monster_right.png"
+#define MONSTER_DOWN		"sprite/monster_down.png"
+#define MONSTER_IMG_ALIEN1	"sprite/alien1_40.png"
+#define MONSTER_IMG_ALIEN2	"sprite/alien2_40.png"
+#define MONSTER_IMG_ALIEN3	"sprite/alien3_40.png"
+#define MONSTER_IMG_ALIEN4	"sprite/alien4_40.png"
 
-/*	Main menu : main BG with sprites | id text[]
- * 		1--Single player				0
- * 		  |----New Game						5
- * 		  |_-_-Load Game					6
- * 		2--Multi players				1
- * 		  |----2 players					7
- * 		  |----3 players					8
- * 		  |_-_-4 players					9
- *
- * 	Pause menu : BG grey with alpha
- * 		1--Continue						2
- * 		2--Main menu					3
- * 		  |----Save ?						10
- * 		  |----yes							11
- * 		  |_-_-No							12
- * 		3--Quit							4
- * 		  |----Save ?						10
- *		  |----yes							11
- * 		  |_-_-No							12
- *
- * 		  							Total : 13 + 1 curseur + 1 Pause
- */
-
+// Text & Menu
 SDL_Surface* numbers[11];
 SDL_Surface* numbers_w[11];
 SDL_Surface* menu[NB_SURFACE_MENU];
@@ -97,15 +85,6 @@ SDL_Surface* score[NB_TXT_SCORE];
 #define SIZE_OF_STARS 10
 SDL_Surface* menu_stars;
 SDL_Rect menu_rect_stars[2 * NB_ANIM_STARS - 1];
-
-#ifdef USE_WIIMOTE
-/*Text : 						id
- * Looking for wiimotes...		1
- * wiimote id connected			2
- * wiimote id disconnected		3
- */
-SDL_Surface* text_wiimote[3];
-#endif
 
 
 // banner
@@ -123,6 +102,7 @@ SDL_Surface* closed_door;
 SDL_Surface* stone;
 SDL_Surface* tree;
 SDL_Surface* flag;
+SDL_Surface* princess;
 
 #define SIZE_OF_SPRITE 40
 
@@ -131,32 +111,34 @@ SDL_Surface* flag;
 SDL_Surface* bonus[NB_BONUS];
 
 // monster
-SDL_Surface** monsters[2];
+SDL_Surface** monsters[4];
 SDL_Surface* monster_img_norm[4];
-SDL_Surface* monster_img_alien[4];
+SDL_Surface* monster_img_alien1[4];
+SDL_Surface* monster_img_alien2[4];
+SDL_Surface* monster_img_alien3[4];
+SDL_Surface* monster_img_alien4[4];
 
 // player
-
 // sprites 40x60
 #define NB_ANIM_PLAYER 8
-#define TAILLE_TAB_ANIM_PLAYER 4
+#define SIZE_TAB_ANIM_PLAYER 4
 #define SIZE_OF_PLAYER_SPRITE 60
 
 SDL_Surface* players[4];
 
-SDL_Rect* player[4][TAILLE_TAB_ANIM_PLAYER];
+SDL_Rect* player[4][SIZE_TAB_ANIM_PLAYER];
 SDL_Rect player_rect_up[4][NB_ANIM_PLAYER];
 SDL_Rect player_rect_down[4][NB_ANIM_PLAYER];
 SDL_Rect player_rect_left[4][NB_ANIM_PLAYER];
 SDL_Rect player_rect_right[4][NB_ANIM_PLAYER];
 
 // bombs
-#define TAILLE_TAB_ANIM_BOMB 8
+#define SIZE_TAB_ANIM_BOMB 8
 #define NB_ANIM_BOMBS 4
 
 SDL_Surface* bombs;
 
-SDL_Rect* bomb[TAILLE_TAB_ANIM_BOMB];
+SDL_Rect* bomb[SIZE_TAB_ANIM_BOMB];
 SDL_Rect bomb_rect_wait[NB_ANIM_BOMBS];
 SDL_Rect bomb_rect_center[2*NB_ANIM_BOMBS - 1];
 SDL_Rect bomb_rect_v[2*NB_ANIM_BOMBS - 1];
@@ -228,8 +210,8 @@ void menu_load() {
 
 	menu[M_B_CHANGEMAP] = TTF_RenderText_Blended(police, "Change Map", couleurBlanche);
 
-	menu[M_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
-	menu[M_SELECT_BLACK] = TTF_RenderText_Blended(police, ">", couleurNoir);
+	menu[M_S_SELECT] = TTF_RenderText_Blended(police, ">", couleurBlanche);
+	menu[M_S_SELECT_BLACK] = TTF_RenderText_Blended(police, ">", couleurNoir);
 
 	// Maps multiplayer
 	DIR* dir = NULL;
@@ -254,9 +236,18 @@ void menu_load() {
 	
 	TTF_CloseFont(police);
 
+	// Backgrounds
 	menu[M_BG_GREY] = load_image(MENU_BG_GREY);
 	menu[M_BG_MAINMENU] = load_image(MENU_BG_MAIN);
-	menu[M_STARS] = load_image(MENU_STARS); // 18/18 -> ok
+	menu[M_BG_WIN] = load_image(MENU_BG_WIN);
+	menu[M_BG_GAMEOVER] = load_image(MENU_BG_GAMEOVER);
+
+	// Sprites
+	menu[M_S_STARS] = load_image(MENU_S_STARS);
+	menu[M_S_ALIEN2] = load_image(MENU_S_ALIEN2);
+	menu[M_S_ALIEN3] = load_image(MENU_S_ALIEN3);
+	menu[M_S_ALIEN4] = load_image(MENU_S_ALIEN4);
+	menu[M_S_CAGE] = load_image(MENU_S_CAGE);
 
 	for(int i = 0; i < NB_ANIM_STARS; i++) {
 			menu_rect_stars[i].x = SIZE_OF_STARS * i;
@@ -318,6 +309,7 @@ void map_load() {
 	door = load_image(MAP_DOOR);
 	closed_door = load_image(MAP_CLOSED_DOOR);
 	flag = load_image(FLAG);
+	princess = load_image(PRINCESS);
 }
 
 void map_unload() {
@@ -329,6 +321,7 @@ void map_unload() {
 	SDL_FreeSurface(door);
 	SDL_FreeSurface(closed_door);
 	SDL_FreeSurface(flag);
+	SDL_FreeSurface(princess);
 }
 
 void bonus_load() {
@@ -395,23 +388,44 @@ void player_unload() {
 void monster_load() {
 
 	monsters[MONSTER_NORMAL] = monster_img_norm;
-	monsters[MONSTER_ALIEN1] = monster_img_alien;
+	monsters[MONSTER_ALIEN1] = monster_img_alien1;
+	monsters[MONSTER_ALIEN2] = monster_img_alien2;
+	monsters[MONSTER_ALIEN3] = monster_img_alien3;
+	monsters[MONSTER_ALIEN4] = monster_img_alien4;
 
 	monster_img_norm[WEST] = load_image(MONSTER_LEFT);
 	monster_img_norm[EAST] = load_image(MONSTER_RIGHT);
 	monster_img_norm[NORTH] = load_image(MONSTER_UP);
 	monster_img_norm[SOUTH] = load_image(MONSTER_DOWN);
 
-	monster_img_alien[NORTH] = load_image(MONSTER_IMG_ALIEN1);
-	monster_img_alien[WEST] = load_image(MONSTER_IMG_ALIEN1);
-	monster_img_alien[SOUTH] = load_image(MONSTER_IMG_ALIEN1);
-	monster_img_alien[EAST] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien1[NORTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien1[WEST] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien1[SOUTH] = load_image(MONSTER_IMG_ALIEN1);
+	monster_img_alien1[EAST] = load_image(MONSTER_IMG_ALIEN1);
+
+	monster_img_alien2[NORTH] = load_image(MONSTER_IMG_ALIEN2);
+	monster_img_alien2[WEST] = load_image(MONSTER_IMG_ALIEN2);
+	monster_img_alien2[SOUTH] = load_image(MONSTER_IMG_ALIEN2);
+	monster_img_alien2[EAST] = load_image(MONSTER_IMG_ALIEN2);
+
+	monster_img_alien3[NORTH] = load_image(MONSTER_IMG_ALIEN3);
+	monster_img_alien3[WEST] = load_image(MONSTER_IMG_ALIEN3);
+	monster_img_alien3[SOUTH] = load_image(MONSTER_IMG_ALIEN3);
+	monster_img_alien3[EAST] = load_image(MONSTER_IMG_ALIEN3);
+
+	monster_img_alien4[NORTH] = load_image(MONSTER_IMG_ALIEN4);
+	monster_img_alien4[WEST] = load_image(MONSTER_IMG_ALIEN4);
+	monster_img_alien4[SOUTH] = load_image(MONSTER_IMG_ALIEN4);
+	monster_img_alien4[EAST] = load_image(MONSTER_IMG_ALIEN4);
 }
 
 void monster_unload() {
 	for (int i = 0; i < 4; i++) {
 		SDL_FreeSurface(monster_img_norm[i]);
-		SDL_FreeSurface(monster_img_alien[i]);
+		SDL_FreeSurface(monster_img_alien1[i]);
+		SDL_FreeSurface(monster_img_alien2[i]);
+		SDL_FreeSurface(monster_img_alien3[i]);
+		SDL_FreeSurface(monster_img_alien4[i]);
 	}
 
 }
@@ -558,7 +572,7 @@ SDL_Surface* sprite_get_bombs() {
 // Sprite function
 
 SDL_Rect sprite_get_rect_bomb_anim(int i, int j) {
-	assert(0 <= i && 0 <= j && i < TAILLE_TAB_ANIM_BOMB && j < 2*NB_ANIM_BOMBS);
+	assert(0 <= i && 0 <= j && i < SIZE_TAB_ANIM_BOMB && j < 2*NB_ANIM_BOMBS);
 	SDL_Rect* rect = bomb[i];
 	return rect[j];
 }
@@ -658,6 +672,11 @@ SDL_Surface* sprite_get_key() {
 SDL_Surface* sprite_get_flag() {
 	assert(flag);
 	return flag;
+}
+
+SDL_Surface* sprite_get_princess() {
+	assert(princess);
+	return princess;
 }
 
 SDL_Surface* sprite_get_stone() {

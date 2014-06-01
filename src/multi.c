@@ -39,7 +39,7 @@ void multi_display(struct game* game) {
 									15 + 30 * i);
 		}
 
-		window_display_image(sprite_get_menu(M_SELECT_BLACK), 10, 15 + 30 * game_get_pos(game));
+		window_display_image(sprite_get_menu(M_S_SELECT_BLACK), 10, 15 + 30 * game_get_pos(game));
 
 		map_display(	map,
 						10 + 15 + sprite_get_max_width() + 50,
