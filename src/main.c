@@ -134,6 +134,7 @@ int main(int argc, char *argv[]) {
 			SDL_Delay(ideal_speed - execution_speed); // we are ahead of ideal time. let's wait.
 	}
 
+	sprite_free();
 	window_free();
 	TTF_Quit();
 	SDL_Quit();

@@ -92,6 +92,25 @@ void map_free(struct map* map)
 {
 	if (map == NULL )
 		return;
+	if(map->bombsList != NULL) {
+		struct list* bList = map->bombsList;
+		while(bList != NULL) {
+			if(list_get_data(bList) != NULL)
+				free(list_get_data(bList));
+
+			bList = list_cut_head(bList);
+		}
+	}
+	if(map->monstersList != NULL) {
+		struct list* mList = map->monstersList;
+		while(mList != NULL) {
+			if(list_get_data(mList) != NULL)
+				free(list_get_data(mList));
+
+			mList = list_cut_head(mList);
+		}
+	}
+
 	free(map->grid);
 	free(map);
 }
@@ -235,7 +254,7 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y)
 	}
 }
 
-void display_bonus(struct map* map, int x, int y, char type)
+void display_bonus(struct map* map, int x, int y, unsigned char type)
 {
 	// bonus is encoded with the 4 most significant bits
 	switch (type >> 4) {
@@ -265,7 +284,7 @@ void display_bonus(struct map* map, int x, int y, char type)
 	}
 }
 
-void display_scenery(struct map* map, int x, int  y, char type)
+void display_scenery(struct map* map, int x, int  y, unsigned char type)
 {
 	switch (type >> 4) { // sub-types are encoded with the 4 most significant bits
 	case SCENERY_STONE:
@@ -274,6 +293,42 @@ void display_scenery(struct map* map, int x, int  y, char type)
 
 	case SCENERY_TREE:
 		window_display_image(sprite_get_tree(), x, y);
+		break;
+
+	case SCENERY_WALL_B:
+		window_display_image(sprite_get_wall_b(), x, y);
+		break;
+
+	case SCENERY_WALL_G:
+		window_display_image(sprite_get_wall_g(), x, y);
+		break;
+
+	case SCENERY_WALL_H:
+		window_display_image(sprite_get_wall_h(), x, y);
+		break;
+
+	case SCENERY_WALL_D:
+		window_display_image(sprite_get_wall_d(), x, y);
+		break;
+
+	case SCENERY_ANGLE_BG:
+		window_display_image(sprite_get_angle_bg(), x, y);
+		break;
+
+	case SCENERY_ANGLE_BD:
+		window_display_image(sprite_get_angle_bd(), x, y);
+		break;
+
+	case SCENERY_ANGLE_HG:
+		window_display_image(sprite_get_angle_hg(), x, y);
+		break;
+
+	case SCENERY_ANGLE_HD:
+		window_display_image(sprite_get_angle_hd(), x, y);
+		break;
+
+	case SCENERY_BLOC:
+		window_display_image(sprite_get_bloc(), x, y);
 		break;
 	}
 }

@@ -33,6 +33,15 @@ SDL_Surface* sprite_get_closed_door();
 SDL_Surface* sprite_get_flag();
 SDL_Surface* sprite_get_princess();
 SDL_Surface* sprite_get_empty();
+SDL_Surface* sprite_get_wall_b();
+SDL_Surface* sprite_get_wall_g();
+SDL_Surface* sprite_get_wall_h();
+SDL_Surface* sprite_get_wall_d();
+SDL_Surface* sprite_get_angle_bg();
+SDL_Surface* sprite_get_angle_bd();
+SDL_Surface* sprite_get_angle_hg();
+SDL_Surface* sprite_get_angle_hd();
+SDL_Surface* sprite_get_bloc();
 
 SDL_Surface* sprite_get_number(short number);
 SDL_Surface* sprite_get_number_white(short number);
@@ -45,5 +54,7 @@ SDL_Surface* sprite_get_banner_life();
 SDL_Surface* sprite_get_bombs();
 
 SDL_Rect sprite_get_rect_bomb_anim(int i, int j);
+
+void sprite_free();
 
 #endif /* SPRITE_H_ */

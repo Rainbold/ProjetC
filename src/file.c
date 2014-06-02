@@ -40,6 +40,13 @@ struct map* file_read_map1(const char* mapFile) {
    if(!f)
 	   return(NULL);
 
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x6c )
+      return 0;
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x76 )
+      return 0;
+   if( fread(&byte, 1, sizeof(byte), f) == 0 || byte != 0x6c )
+      return 0;
+
    if( fread(&byte, 1, sizeof(byte), f) == 0 )
 	   return(NULL);
    int map_width = byte;
@@ -194,10 +201,13 @@ int file_map_exist(int n_level, int n_map) {
 
 	FILE* file = file_open(lien, READ);
 
-	if(file == NULL)
+	if(file == NULL) {
 		return 0;
-	else
+	}
+	else {
+		fclose(file);
 		return 1;
+	}
 }
 
 void file_savegame(struct game* game) {

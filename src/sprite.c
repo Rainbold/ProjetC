@@ -19,6 +19,15 @@
 // Scenery elements
 #define MAP_STONE		"sprite/stone.png"
 #define MAP_TREE        "sprite/tree.png"
+#define MAP_WALL_B		"sprite/wall_b.png"
+#define MAP_WALL_G		"sprite/wall_g.png"
+#define MAP_WALL_H		"sprite/wall_h.png"
+#define MAP_WALL_D		"sprite/wall_d.png"
+#define MAP_ANGLE_BG	"sprite/angle_bg.png"
+#define MAP_ANGLE_BD	"sprite/angle_bd.png"
+#define MAP_ANGLE_HG	"sprite/angle_hg.png"
+#define MAP_ANGLE_HD	"sprite/angle_hd.png"
+#define MAP_BLOC		"sprite/bloc.png"
 
 // Font
 #define FONT 			"sprite/font.ttf"
@@ -105,6 +114,15 @@ SDL_Surface* tree;
 SDL_Surface* flag;
 SDL_Surface* princess;
 SDL_Surface* empty;
+SDL_Surface* wall_b;
+SDL_Surface* wall_g;
+SDL_Surface* wall_h;
+SDL_Surface* wall_d;
+SDL_Surface* angle_bg;
+SDL_Surface* angle_bd;
+SDL_Surface* angle_hg;
+SDL_Surface* angle_hd;
+SDL_Surface* bloc;
 
 #define SIZE_OF_SPRITE 40
 
@@ -313,6 +331,15 @@ void map_load() {
 	flag = load_image(FLAG);
 	princess = load_image(PRINCESS);
 	empty = load_image(EMPTY);
+	wall_b = load_image(MAP_WALL_B);
+	wall_g = load_image(MAP_WALL_G);
+	wall_h = load_image(MAP_WALL_H);
+	wall_d = load_image(MAP_WALL_D);
+	angle_bg = load_image(MAP_ANGLE_BG);
+	angle_bd = load_image(MAP_ANGLE_BD);
+	angle_hg = load_image(MAP_ANGLE_HG);
+	angle_hd = load_image(MAP_ANGLE_HD);
+	bloc = load_image(MAP_BLOC);
 }
 
 void map_unload() {
@@ -326,6 +353,18 @@ void map_unload() {
 	SDL_FreeSurface(flag);
 	SDL_FreeSurface(princess);
 	SDL_FreeSurface(empty);
+
+	SDL_FreeSurface(wall_b);
+	SDL_FreeSurface(wall_g);
+	SDL_FreeSurface(wall_h);
+	SDL_FreeSurface(wall_d);
+
+	SDL_FreeSurface(angle_bg);
+	SDL_FreeSurface(angle_bd);
+	SDL_FreeSurface(angle_hg);
+	SDL_FreeSurface(angle_hd);
+
+	SDL_FreeSurface(bloc);
 }
 
 void bonus_load() {
@@ -424,7 +463,7 @@ void monster_load() {
 }
 
 void monster_unload() {
-	for (int i = 0; i < NB_MONSTER; i++) {
+	for (int i = 0; i < 4; i++) {
 		SDL_FreeSurface(monster_img_norm[i]);
 		SDL_FreeSurface(monster_img_alien1[i]);
 		SDL_FreeSurface(monster_img_alien2[i]);
@@ -686,6 +725,51 @@ SDL_Surface* sprite_get_princess() {
 SDL_Surface* sprite_get_empty() {
 	assert(empty);
 	return empty;
+}
+
+SDL_Surface* sprite_get_wall_b() {
+	assert(wall_b);
+	return wall_b;
+}
+
+SDL_Surface* sprite_get_wall_g() {
+	assert(wall_g);
+	return wall_g;
+}
+
+SDL_Surface* sprite_get_wall_h() {
+	assert(wall_h);
+	return wall_h;
+}
+
+SDL_Surface* sprite_get_wall_d() {
+	assert(wall_d);
+	return wall_d;
+}
+
+SDL_Surface* sprite_get_angle_bg() {
+	assert(angle_bg);
+	return angle_bg;
+}
+
+SDL_Surface* sprite_get_angle_bd() {
+	assert(angle_bd);
+	return angle_bd;
+}
+
+SDL_Surface* sprite_get_angle_hg() {
+	assert(angle_hg);
+	return angle_hg;
+}
+
+SDL_Surface* sprite_get_angle_hd() {
+	assert(angle_hd);
+	return angle_hd;
+}
+
+SDL_Surface* sprite_get_bloc() {
+	assert(bloc);
+	return bloc;
 }
 
 SDL_Surface* sprite_get_stone() {

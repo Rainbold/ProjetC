@@ -203,7 +203,7 @@ void game_banner_display(struct game* game) {
 				sprite_get_number(player_get_nb_range(game_get_player(game, 1))), x, y); // range number
 
 		x += white_bloc + SIZE_BLOC;
-		if(player_get_key(player))
+		if(player_get_key(player) > 0)
 			window_display_image(sprite_get_key(), x, y);
 	}
 	else {

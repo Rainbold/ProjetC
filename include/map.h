@@ -33,6 +33,15 @@ typedef enum bonus_type {
 enum scenery_type {
 	SCENERY_STONE, // 0
 	SCENERY_TREE, // 1
+	SCENERY_WALL_B, // 2
+	SCENERY_WALL_G, // 3
+	SCENERY_WALL_H, // 4
+	SCENERY_WALL_D, // 5
+	SCENERY_ANGLE_BG, // 6
+	SCENERY_ANGLE_BD, // 7
+	SCENERY_ANGLE_HG, // 8
+	SCENERY_ANGLE_HD, // 9
+	SCENERY_BLOC, // 10 (A)
 };
 
 enum door_type {
