@@ -72,11 +72,11 @@ void level_change_level(struct game* game, struct player* player, struct map* ma
 	level = game_next_lvl(game);
 
 	if(level == NULL) {
-		printf("Level null\n");
+		printf("Level null, maybe there is no more level ?\n");
 		return;
 	}
 	else {
-		printf("Next level\n");
+		//printf("Next level\n");
 	}
 	players_from_map(game, level->maps[level->cur_map]);
 	window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
@@ -100,7 +100,7 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 		map_set_bombs(map, NULL);
 		player_reset_way_mov(player);
 		level->cur_map = num;
-		printf("Next map\n");
+		//printf("Next map\n");
 		int x = player_get_x(player);
 		int y = player_get_y(player);
 		players_from_map(game, level->maps[level->cur_map]);
