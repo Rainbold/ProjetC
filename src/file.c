@@ -57,13 +57,13 @@ struct map* file_read_map1(const char* mapFile) {
 
    struct map* map = map_new(map_width, map_height);
 
-   for(i=0; i<map_width; i++) {
-	   for(j=0; j<map_height; j++) {
-		   if( fread(&byte, 1, sizeof(byte), f) == 0 )
-			   return(NULL);
-		   map_set_cell_type(map, i, j, byte);
-	   }
-   }
+	for(j=0; j<map_height; j++) {
+   		for(i=0; i<map_width; i++) {
+		   	if( fread(&byte, 1, sizeof(byte), f) == 0 )
+				return(NULL);
+		  	map_set_cell_type(map, i, j, byte);
+	   	}
+   	}
 
    fclose(f);
 
