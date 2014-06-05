@@ -250,6 +250,7 @@ void player_hit(struct player* player, int invicibility_time) { // invicibility_
 		else {
 			player->moving = 0;
 			player->nb_life = 0;
+			player->key = -2;
 		}
 	}
 }

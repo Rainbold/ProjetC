@@ -347,8 +347,11 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 	}
 	struct map* map = level_get_curr_map(game_get_curr_level(game));
 
-	if(player_get_key(players[0]) == -1)
+	if(game->nb_player == 1 && player_get_key(players[0]) == -1)
 		return(W);
+
+	if(game->nb_player == 1 && player_get_key(players[0]) == -2)
+		return(GO);
 
 	if(key_event == DOWN) {
 		switch (key) {
@@ -376,9 +379,6 @@ enum state game_update(enum state state, struct game* game, int key, key_event_t
 			break;
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER:
-			if(game->nb_player == 1 && player_get_nb_life(players[0]) <= 0)
-				return GO;
-
 			switch(game->game_state) {
 			case PAUSED:
 

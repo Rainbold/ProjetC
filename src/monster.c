@@ -11,6 +11,7 @@ struct monster {
 	// Timers
 	int moveTimer;		// timer used to change direction when not following a player
 	int invicibility;	// timer used to invicibility
+	int replicator_timer;
 
 	// Display data
 	int moving;
@@ -24,6 +25,7 @@ struct monster {
 	int aggr;			// path max to find the player
 	int velocity_aggr;
 	int velocity_norm;
+	int replicator;
 };
 
 void monster_init(struct map* map, int x, int y, m_type type)
@@ -48,6 +50,8 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		monster->aggr = 5;
 		monster->velocity_norm = 1;
 		monster->velocity_aggr = 2;
+		monster->replicator_timer = 0;
+		monster->replicator = 0;
 
 		break;
 	case MONSTER_ALIEN1:
@@ -56,8 +60,40 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		monster->aggr = 5;
 		monster->velocity_norm = 0;
 		monster->velocity_aggr = 3;
+		monster->replicator_timer = 0;
+		monster->replicator = 0;
 
 		break;
+	case MONSTER_ALIEN2:
+		monster->size = 1;
+		monster->nb_life = 2;
+		monster->aggr = 3;
+		monster->velocity_norm = 4;
+		monster->velocity_aggr = 4;
+		monster->replicator_timer = 0;
+		monster->replicator = 0;
+
+		break;
+	case MONSTER_ALIEN3:
+		monster->size = 1;
+		monster->nb_life = 2;
+		monster->aggr = 50;
+		monster->velocity_norm = 2;
+		monster->velocity_aggr = 2;
+		monster->replicator_timer = 0;
+		monster->replicator = 0;
+
+		break;
+	case MONSTER_ALIEN4:
+		monster->size = 1;
+		monster->nb_life = 1;
+		monster->aggr = 0;
+		monster->velocity_norm = 1;
+		monster->velocity_aggr = 1;
+		monster->replicator_timer = 4 * DEFAULT_GAME_FPS;
+		monster->replicator = monster->replicator_timer;
+
+			break;
 	default:
 		break;
 	}
@@ -200,6 +236,32 @@ void monster_move(struct map* map, struct player* player) {
 				else {
 					monster->moveTimer = DEFAULT_GAME_FPS;
 					monster->currentWay = SOUTH;
+				}
+			}
+
+			if(monster->type == MONSTER_ALIEN4 && monster->replicator_timer <= 0) {
+				int x = list_get_x(mList);
+				int y = list_get_y(mList);
+				switch(monster->currentWay) {
+				case NORTH:
+					y--;
+					break;
+				case SOUTH:
+					y++;
+					break;
+				case EAST:
+					x++;
+					break;
+				case WEST:
+					x--;
+					break;
+				}
+				if(x >= 0 && x < map_get_width(map) && y >= 0 && y < map_get_height(map)) {
+					if(map_get_cell_type(map, x, y) == CELL_EMPTY) {
+						int type = rand_ab(0, 4);
+						monster_init(map, x, y, type);
+						monster->replicator_timer = monster->replicator;
+					}
 				}
 			}
 
@@ -356,6 +418,9 @@ void monster_update(struct map* map) {
 
 		if(monster->moveTimer >  0)
 			monster->moveTimer--;
+
+		if(monster->replicator_timer >  0)
+			monster->replicator_timer--;
 
 		mList = list_get_next(mList);
 	}

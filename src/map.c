@@ -62,13 +62,13 @@ struct list* map_load_monsters(struct map* map, struct game* game) {
 				monster_init(map, i, j, MONSTER_ALIEN1);
 				break;
 			case CELL_MONSTER_ALIEN2:
-				//monster_init(map, i, j, MONSTER_ALIEN2);
+				monster_init(map, i, j, MONSTER_ALIEN2);
 				break;
 			case CELL_MONSTER_ALIEN3:
-				//monster_init(map, i, j, MONSTER_ALIEN3);
+				monster_init(map, i, j, MONSTER_ALIEN3);
 				break;
 			case CELL_MONSTER_ALIEN4:
-				//monster_init(map, i, j, MONSTER_ALIEN4);
+				monster_init(map, i, j, MONSTER_ALIEN4);
 				break;
 			default:
 				break;
