@@ -29,14 +29,8 @@ typedef enum way {
 	EAST //3
 } way_t;
 
-typedef enum bomb_currentAnimation {
-	ANIM_1 = 0,
-	ANIM_2, // 1
-	ANIM_3, // 2
-	ANIM_4, //3
-	ANIM_5 //4
-} b_curAnim;
 
+// Main state
 typedef enum state {
 	MENU = 0,
 	GAME,
@@ -61,6 +55,7 @@ typedef enum state {
 	DEFAULT,
 } state_t;
 
+// State of the current game
 typedef enum game_state {
 	PLAYING = 0,
 	PAUSED, // 1
@@ -69,6 +64,7 @@ typedef enum game_state {
 } game_state_t;
 
 #define NB_SURFACE_MENU 26
+// All the surfaces of menus
 typedef enum select_menu {
 	M_B_SINGLE = 0,
 	M_B_NEWGAME,	// 1
@@ -104,6 +100,7 @@ typedef enum select_menu {
 	M_S_CAGE,		// 25
 } select_menu_t;
 
+// Different types of menu
 typedef enum type_menu {
 	MAIN = 0,
 	GAMEOVER,
@@ -112,8 +109,10 @@ typedef enum type_menu {
 	PAUSE_MULTI,
 } type_t;
 
+// Specify if the event is a key up or down
 typedef enum key_event {
 	UP = 0,
 	DOWN
 } key_event_t;
+
 #endif /* CONSTANT */

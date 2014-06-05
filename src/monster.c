@@ -66,8 +66,8 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		break;
 	case MONSTER_ALIEN2:
 		monster->size = 1;
-		monster->nb_life = 2;
-		monster->aggr = 3;
+		monster->nb_life = 1;
+		monster->aggr = 2;
 		monster->velocity_norm = 4;
 		monster->velocity_aggr = 4;
 		monster->replicator_timer = 0;
@@ -78,8 +78,8 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		monster->size = 1;
 		monster->nb_life = 2;
 		monster->aggr = 50;
-		monster->velocity_norm = 2;
-		monster->velocity_aggr = 2;
+		monster->velocity_norm = 1;
+		monster->velocity_aggr = 1;
 		monster->replicator_timer = 0;
 		monster->replicator = 0;
 
@@ -90,7 +90,7 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		monster->aggr = 0;
 		monster->velocity_norm = 1;
 		monster->velocity_aggr = 1;
-		monster->replicator_timer = 4 * DEFAULT_GAME_FPS;
+		monster->replicator_timer = 6 * DEFAULT_GAME_FPS;
 		monster->replicator = monster->replicator_timer;
 
 			break;
@@ -101,53 +101,6 @@ void monster_init(struct map* map, int x, int y, m_type type)
 	monster->velocity = monster->velocity_norm;
 
 	map_insert_monster(map, x, y, LIST_MONSTER, monster);
-}
-
-int monster_get_currentway(struct monster* monster)
-{
-	assert(monster);
-	return monster->currentWay;
-}
-
-void monster_set_currentway(struct monster* monster, way_t dir)
-{
-	assert(monster);
-	monster->currentWay = dir;
-}
-
-int monster_get_movetimer(struct monster* monster)
-{
-	if(monster == NULL)
-		return 0;
-	return monster->moveTimer;
-}
-
-void monster_set_movetimer(struct monster* monster, int timer)
-{
-	assert(monster);
-	monster->moveTimer = timer;
-}
-
-int monster_get_aggr(struct monster* monster)
-{
-	assert(monster);
-	return monster->aggr;
-}
-
-int monster_get_nb_life(struct monster* monster) { // get nb_life
-	if(monster == NULL)
-		return 0;
-	return monster->nb_life;
-}
-
-void monster_set_nb_life(struct monster* monster, int life) { // set nb_life
-	assert(monster);
-	monster->nb_life = life;
-}
-
-void monster_set_invicibility(struct monster* monster, int invicibility_time) {
-	assert(monster);
-	monster->invicibility = invicibility_time;
 }
 
 m_type monster_get_type(struct monster* monster) {

@@ -19,8 +19,12 @@ enum state input_keyboard(struct game* game, enum state state) { // state : 0 = 
 			/* no break */
 		case SDL_KEYDOWN:
 #ifdef USE_WIIMOTE
-			if(key_event == DOWN && event.key.keysym.sym == SDLK_F12)
+			if(key_event == DOWN && event.key.keysym.sym == SDLK_F10)
+				wiimote_link(2);
+			if(key_event == DOWN && event.key.keysym.sym == SDLK_F11)
 				wiimote_link(5);
+			if(key_event == DOWN && event.key.keysym.sym == SDLK_F12)
+				wiimote_disconnect();
 #endif
 			switch (state) {
 			case GAME:

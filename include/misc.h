@@ -16,6 +16,7 @@ int rand_ab(int a, int b);
 int map_is_valid_format1(const char* mapFile);
 int map_is_valid_format2(const char* mapFile);
 
+// Return the maximum between a and b
 int max(int a, int b);
 
 #endif /* MISC_H_ */

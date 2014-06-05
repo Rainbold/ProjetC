@@ -136,9 +136,6 @@ void map_case_destroyed(struct game* game, struct map* map, int x, int y);
 // Test if (x,y) is within the map
 int map_is_inside(struct map* map, int x, int y);
 
-// Return a default static map
-struct map* map_get_default(int n);
-
 // Display the map on the screen
 void map_display(struct map* map, int offset_x, int offset_y);
 

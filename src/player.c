@@ -295,6 +295,9 @@ void players_from_map(struct game* game, struct map* map) {
 	struct player** players;
 	players = game_get_players(game);
 
+	int x_solo = players[0]->x;
+	int y_solo = players[0]->y;
+
 	int x[4] = {-1, -1, -1, -1};
 	int y[4] = {-1, -1, -1, -1};
 
@@ -324,6 +327,11 @@ void players_from_map(struct game* game, struct map* map) {
 		else {
 			players[i]->x = 0;
 			players[i]->y = 0;
+			if(nb_players == 1) {
+				players[0]->x = x_solo;
+				players[0]->y = y_solo;
+			}
+
 		}
 		players[i]->x_sprite = 0;
 		players[i]->y_sprite = 0;
@@ -341,9 +349,7 @@ int player_is_here(struct game* game, int x, int y) {
 }
 
 static int player_move_aux(struct game* game, struct player* player, struct map* map, int x, int y) {
-	int cellType = 0;
-//	struct bomb* bomb;
-//	struct list* bList;
+	int cellType = 0;;
 
 	if (!map_is_inside(map, x, y))
 		return 0;
@@ -357,7 +363,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 		switch(player->current_way)
 		{
 			case NORTH:
-			if(y < 1 || player->y != y + 1 || player->y_sprite > 0)
+			if(y < 1 || player->y != y + 1 || player->y_sprite > 0 || player->x != x)
 				return 0;
 			else {
 				cellType = map_get_cell_type(map, x, y - 1);
@@ -369,7 +375,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 			break;
 
 			case SOUTH:
-				if(y >= map_get_height(map) - 1 || player->y != y - 1 || player->y_sprite < 0)
+				if(y >= map_get_height(map) - 1 || player->y != y - 1 || player->y_sprite < 0 || player->x != x)
 					return 0;
 			else {
 				cellType = map_get_cell_type(map, x, y + 1);
@@ -381,7 +387,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 			break;
 
 			case EAST:
-			if(x >= map_get_width(map) - 1 || player->x != x - 1 || player->x_sprite < 0)
+			if(x >= map_get_width(map) - 1 || player->x != x - 1 || player->x_sprite < 0 || player->y != y)
 				return 0;
 			else {
 				cellType = map_get_cell_type(map, x + 1, y);
@@ -393,7 +399,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 			break;
 
 			case WEST:
-			if(x < 1 || player->x != x + 1 || player->x_sprite > 0)
+			if(x < 1 || player->x != x + 1 || player->x_sprite > 0 || player->y != y)
 					return 0;
 			else {
 				cellType = map_get_cell_type(map, x - 1, y);
@@ -592,7 +598,7 @@ int player_move(struct game* game, struct player* player, struct map* map) {
 				level_change_map(game, player, map, (type & 112) >> 4);
 			else if(type >> 7 == 0 && player->key > 0) {
 				player->key--;
-				map_set_cell_type(map, player->x, player->y, type || 1 << 7);
+				map_set_cell_type(map, player->x, player->y, type | (1 << 7));
 			}
 			//printf("door, type: %d, type>>4: %d, map: %d\n", type, type >>4, (type & 112)>>4);
 			break;

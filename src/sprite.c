@@ -640,7 +640,6 @@ SDL_Rect sprite_get_rect_player_anim(int i, int id, enum way direction) {
 }
 
 SDL_Surface* sprite_get_monster(m_type type, enum way direction) {
-	//assert(monster_img[direction]);
 	SDL_Surface** monster = monsters[type];
 	return monster[direction];
 }

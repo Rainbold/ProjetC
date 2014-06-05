@@ -100,7 +100,6 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 		map_set_bombs(map, NULL);
 		player_reset_way_mov(player);
 		level->cur_map = num;
-		map_load_monsters(map, game);
 		printf("Next map\n");
 		int x = player_get_x(player);
 		int y = player_get_y(player);
@@ -109,6 +108,7 @@ void level_change_map(struct game* game, struct player* player, struct map* map,
 			player_set_x(player, x);
 			player_set_x(player, y);
 		}
+		map_load_monsters(level->maps[level->cur_map], game);
 		window_resize(map_get_width(level_get_curr_map(level)) * SIZE_BLOC, map_get_height(level_get_curr_map(level)) * SIZE_BLOC + BANNER_HEIGHT + LINE_HEIGHT);
 	}
 }

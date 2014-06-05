@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <wiiuse.h>
 #include <constant.h>
 #include <SDL/SDL.h>
 #include <assert.h>
@@ -8,6 +7,8 @@
 #include <menu.h>
 
 #ifdef USE_WIIMOTE
+
+#include <wiiuse.h>
 
 #define MAX_WIIMOTES 4
 wiimote** wiimotes;
@@ -52,6 +53,11 @@ void wiimote_link(int time) { // time in s to find wiimotes
 	wiiuse_rumble(wiimotes[1], 0);
 	wiiuse_rumble(wiimotes[2], 0);
 	wiiuse_rumble(wiimotes[3], 0);
+}
+
+void wiimote_disconnect() {
+	for(int i = 0; i < MAX_WIIMOTES; i++)
+		wiiuse_disconnect(wiimote[i]);
 }
 
 enum state wiimote_send_event(enum state state, struct game* game, SDLKey key, key_event_t key_event) {

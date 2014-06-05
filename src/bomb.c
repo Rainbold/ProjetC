@@ -9,7 +9,6 @@
 
 struct bomb {
 	b_type type;
-	b_curAnim curAnim;
 	struct player* player;
 	int range; // bomb's range
 	int range_dir[4]; // Real range
