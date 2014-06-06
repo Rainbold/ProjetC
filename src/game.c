@@ -280,7 +280,7 @@ void game_display(struct game* game) {
 
 		if(game->game_state == PLAYING) {
 			player_move(game, player, level_get_curr_map(game->curr_level));
-			monster_move(level_get_curr_map(game->curr_level), player);
+			monster_move(game, level_get_curr_map(game->curr_level), player);
 
 			player_update(player);
 			monster_update(level_get_curr_map(game->curr_level));

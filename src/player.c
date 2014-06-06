@@ -343,9 +343,9 @@ int player_is_here(struct game* game, int x, int y) {
 	struct player** players = game_get_players(game);
 	for(int i = 0; i < game_get_nb_player(game); i++) {
 		if(players[i]->x == x && players[i]->y == y)
-			return 0;
+			return 1;
 	}
-	return 1;
+	return 0;
 }
 
 static int player_move_aux(struct game* game, struct player* player, struct map* map, int x, int y) {
@@ -367,7 +367,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 				return 0;
 			else {
 				cellType = map_get_cell_type(map, x, y - 1);
-				if( cellType != CELL_EMPTY || y < 1 || !player_is_here(game, x, y - 1))
+				if( cellType != CELL_EMPTY || y < 1 || player_is_here(game, x, y - 1))
 					return 0;
 				map_set_cell_type(map, x, y - 1, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
@@ -379,7 +379,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 					return 0;
 			else {
 				cellType = map_get_cell_type(map, x, y + 1);
-				if( cellType != CELL_EMPTY || !player_is_here(game, x, y + 1))
+				if( cellType != CELL_EMPTY || player_is_here(game, x, y + 1))
 					return 0;
 				map_set_cell_type(map, x, y + 1, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
@@ -391,7 +391,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 				return 0;
 			else {
 				cellType = map_get_cell_type(map, x + 1, y);
-				if( cellType != CELL_EMPTY || !player_is_here(game, x + 1, y))
+				if( cellType != CELL_EMPTY || player_is_here(game, x + 1, y))
 					return 0;
 				map_set_cell_type(map, x + 1, y, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);
@@ -403,7 +403,7 @@ static int player_move_aux(struct game* game, struct player* player, struct map*
 					return 0;
 			else {
 				cellType = map_get_cell_type(map, x - 1, y);
-				if( cellType != CELL_EMPTY || !player_is_here(game, x - 1, y))
+				if( cellType != CELL_EMPTY || player_is_here(game, x - 1, y))
 					return 0;
 				map_set_cell_type(map, x - 1, y, map_get_cell_compose_type(map, x, y));
 				map_set_cell_type(map, x, y, CELL_EMPTY);

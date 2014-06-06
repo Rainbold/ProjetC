@@ -22,7 +22,7 @@ m_type monster_get_type(struct monster* monster);
 int monster_pathfinding(struct map* map, struct player* player, struct list* mList, int* getDist);
 
 // Move monsters
-void monster_move(struct map* map, struct player* player);
+void monster_move(struct game* game, struct map* map, struct player* player);
 
 // Display monsters
 void monster_display(struct map* map);
@@ -38,5 +38,8 @@ struct list* monster_hit(struct list* mList, int x, int y, struct game* game);
 
 // Kill a monster
 struct list* monster_kill(struct list* mList, int x, int y, struct map* map);
+
+// Return if there is a monster
+int monster_is_here(struct game* game, int x, int y);
 
 #endif

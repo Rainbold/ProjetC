@@ -90,7 +90,7 @@ void monster_init(struct map* map, int x, int y, m_type type)
 		monster->aggr = 0;
 		monster->velocity_norm = 1;
 		monster->velocity_aggr = 1;
-		monster->replicator_timer = 6 * DEFAULT_GAME_FPS;
+		monster->replicator_timer = 10 * DEFAULT_GAME_FPS;
 		monster->replicator = monster->replicator_timer;
 
 			break;
@@ -162,7 +162,7 @@ static int monster_move_aux(struct map* map, int x, int y) {
 	return 1;
 }
 
-void monster_move(struct map* map, struct player* player) {
+void monster_move(struct game* game, struct map* map, struct player* player) {
 	struct list* mList = map_get_monsters(map);
 
 	while(mList != NULL) {
@@ -210,7 +210,7 @@ void monster_move(struct map* map, struct player* player) {
 					break;
 				}
 				if(x >= 0 && x < map_get_width(map) && y >= 0 && y < map_get_height(map)) {
-					if(map_get_cell_type(map, x, y) == CELL_EMPTY) {
+					if(map_get_cell_type(map, x, y) == CELL_EMPTY && !player_is_here(game, x, y) && !monster_is_here(game, x, y)) {
 						int type = rand_ab(0, 4);
 						monster_init(map, x, y, type);
 						monster->replicator_timer = monster->replicator;
@@ -377,6 +377,18 @@ void monster_update(struct map* map) {
 
 		mList = list_get_next(mList);
 	}
+}
+
+int monster_is_here(struct game* game, int x, int y) {
+	assert(game);
+	struct map* map = level_get_curr_map(game_get_curr_level(game));
+	struct list* mList = map_get_monsters(map);
+	while(mList != NULL) {
+		if(list_get_x(mList) == x && list_get_y(mList) == y)
+			return 1;
+		mList = list_get_next(mList);
+	}
+	return 0;
 }
 
 int monster_pathfinding(struct map* map, struct player* player, struct list* mList, int* getDist)

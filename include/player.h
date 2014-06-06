@@ -92,4 +92,7 @@ int player_get_nb_player_alive(struct game* game);
 // Return the id of the player still alive
 int player_get_id_player_alive(struct game* game);
 
+// Return if there is a player
+int player_is_here(struct game* game, int x, int y);
+
 #endif /* PLAYER_H_ */
